@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+        <title>Embed Builder</title>
+        <link rel="stylesheet" href="./assets/css/index.css" />
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.4.1/highlight.min.js"></script>
+        <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/mode/javascript/javascript.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/theme/material-darker.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/scroll/simplescrollbars.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/scroll/simplescrollbars.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/edit/matchbrackets.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/brace-fold.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/foldgutter.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/foldgutter.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/foldcode.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/json-lint.min.js"></script>
+        <script src="https://unpkg.com/jsonlint@1.6.3/web/jsonlint.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.js"></script>
+        <script src="./assets/js/index.js"></script>
+    </head>
+    <body>
+        <div class="main">
+            <section class="side1">
+                <div class="top item">
+                    <textarea style="display: none;">
+{
+   "content": "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
+   "embed": {
+         "title": "Hello ~~people~~ world",
+         "description": "A description. You can use [links](https://discord.com).\nAnd also emojis 🙂\n```\nAlso code blocks```",
+         "color": 4321431,
+         "timestamp": "2020-12-08T13:37:35.401Z",
+         "url": "https://discord.com",
+         "author": {
+            "name": "Name",
+            "url": "https://discord.com",
+            "icon_url": "https://unsplash.it/100"
+         },
+         "thumbnail": {
+            "url": "https://unsplash.it/200"
+         },
+         "image": {
+            "url": "https://unsplash.it/380/200"
+         },
+         "footer": {
+            "text": "Footer text",
+            "icon_url": "https://unsplash.it/100"
+         },
+         "fields": [
+            {
+               "name": "Field 1, *lorem* **ipsum**, ~~dolor~~",
+               "value": "Field value"
+            },
+            {
+               "name": "Field 2",
+               "value": "You can use custom emojis  &lt;:Kekwlaugh:722088222766923847&gt;. &lt;:GangstaBlob:742256196295065661&gt;",
+               "inline": false
+            },
+            {
+               "name": "Inline field",
+               "value": "Fields can be inline",
+               "inline": true
+            },
+            {
+               "name": "Inline field",
+               "value": "*Lorem ipsum*",
+               "inline": true
+            },
+            {
+               "name": "Inline field",
+               "value": "value",
+               "inline": true
+            },
+            {
+               "name": "Inline field",
+               "value": "value",
+               "inline": true
+            }
+         ]
+   }
+}                     
+
+
+                    </textarea>
+                </div>
+                <div class="bottom item"></div>
+            </section>
+            <section class="side2">
+                <div class="msgEmbed">
+                    <div class="contents">
+                        <img src="https://cdn.discordapp.com/embed/avatars/1.png" class="avatar" alt=" " />
+                        <h2>
+                            <span class="username" role="button">Discord Bot</span><span class="botTag"><span class="botText" style="top: 1.12px;">BOT</span></span>
+                            <span class="timeText"></span>
+                        </h2>
+                    </div>
+                    <div class="markup messageContent"></div>
+                    <div class="container">
+                        <div class="embed markup">
+                            <div class="embedGrid empty">
+                                <div class="embedAuthor embedMargin"></div>
+                                <div class="embedTitle embedMargin"></div>
+                                <div class="embedDescription embedMargin"></div>
+                                <div class="embedFields"></div>
+                                <img class="imageWrapper clickable embedMedia embedImage" />
+                                <img class="imageWrapper clickable embedThumbnail" />
+                                <div class="embedFooter embedMargin"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottomSide">
+                    <div class="notification">There is an error</div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>
