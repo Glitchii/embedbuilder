@@ -1,4 +1,4 @@
-# And embed visualizer
+# A embed visualizer
 
 ![Layout image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/layout.png)
 
