@@ -15,7 +15,10 @@ window.onload = () => {
         foldGutter: true,
         gutters: ["CodeMirror-foldgutter", "CodeMirror-lint-markers"],
         matchBrackets: true,
-        lint: true
+        lint: true,
+        extraKeys: {
+            "Tab": cm => cm.replaceSelection("    ", "end")
+        }
     });
 
     editor.focus();
@@ -63,14 +66,12 @@ window.onload = () => {
                 dateArray = date.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' }),
                 today = new Date(),
                 yesterday = new Date(new Date().setDate(today.getDate() - 1));
-
             return today.toDateString() === date.toDateString() ? `Today at ${dateArray}` :
                 yesterday.toDateString() === date.toDateString() ? `Yesterday at ${dateArray}` :
                     `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
         }, display = (el, data, displayType) => {
             if (data) el.innerHTML = data;
             el.style.display = displayType || "unset";
-
         }, hide = el => el.style.removeProperty('display'),
         regEscape = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
         toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x)),
