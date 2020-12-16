@@ -340,10 +340,14 @@ img[alt] {
 
 .emoji {
     object-fit: contain;
-    width: 22px;
-    height: 22px;
-    margin: 0 .05em 0 .1em !important;
-    vertical-align: -.4em;
+    width: 1.375em;
+    height: 1.375em;
+    vertical-align: bottom;
+}
+
+.embed .emoji {
+    width: 18px;
+    height: 18px;
 }
 
 .embedGrid {
@@ -471,6 +475,7 @@ img[alt] {
     margin-top: 8px;
     gap: 8px;
     min-width: 0px;
+    grid-gap: 8px;
 }
 
 .embedField {
@@ -583,6 +588,26 @@ u {
     text-size-adjust: none;
 }
 
+.embed blockquote {
+    max-width: 100%;
+}
+.blockquote {
+    display: flex;
+}
+.blockquote blockquote {
+    padding: 0 8px 0 12px;
+    box-sizing: border-box;
+    text-indent: 0;
+}
+
+.blockquote .blockquoteDivider {
+    width: 4px;
+    border-radius: 4px;
+}
+.blockquoteDivider {
+    background-color: var(--interactive-muted);
+}
+
 .container {
     display: grid;
     grid-auto-flow: row;
@@ -620,6 +645,10 @@ u {
     white-space: pre-wrap;
 }
 
+.markup .markup :is(pre, blockquote) {
+    max-width: 90%;
+}
+
 .markup pre {
     max-width: 90%;
     border-radius: 4px;
@@ -632,11 +661,7 @@ u {
     background-clip: border-box;
 }
 
-.markup pre.embeded {
-    max-width: 100%;
-}
-
-.markup pre.embeded>code {
+.embed code {
     border: none;
     background: var(--background-tertiary);
 }
@@ -780,5 +805,18 @@ u {
     .notification .inline {
         display: block;
         margin-top: 5px;
+    }
+}
+
+@media screen and (max-width: 530px) {
+    .msgEmbed {
+        margin: 20px 0px;
+        padding: 0.125rem 0 20px 65px;
+    }
+    .avatar {
+        left: 10px;
+    }
+    .main .side1 {
+        padding: 10px;
     }
 }

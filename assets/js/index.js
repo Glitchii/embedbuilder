@@ -12,7 +12,6 @@ window.onload = () => {
         theme: 'material-darker',
         scrollbarStyle: "overlay",
         mode: "application/json",
-        // lineNumbers: true,
         foldGutter: true,
         gutters: ["CodeMirror-foldgutter", "CodeMirror-lint-markers"],
         matchBrackets: true,
@@ -30,27 +29,26 @@ window.onload = () => {
             if (html) notif.innerHTML = msg;
             else notif.innerText = msg;
             notif.style.display = 'block';
-            // err && console.log(err);
-        }, markup = (txt, isEmbed) => {
+        }, markup = (txt, opts) => {
             txt = txt
-                // Custom Emojis
-                .replace(/<a?:[^:]+?:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>') // .replace(/<a?:[^:]+?:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif" onerror="this.src=\'https://cdn.discordapp.com/emojis/$1.png\'"/>') // This will keep logging failed GET request errors in console
-                // MD
+                .replace(/<:[^:]+:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+                .replace(/<a:[^:]+:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
                 .replace(/~~(.+?)~~/g, '<s>$1</s>')
-                .replace(/\`(?!\`)([^\`]+?)\`(?!\`)/g, '<code class="inline">$1</code>')
-                .replace(/\`\`(?!\`)([^\`]+?)\`\`(?!\`)/g, '<code class="inline">$1</code>')
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/__(.+?)__/g, '<u>$1</u>')
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
                 .replace(/_(.+?)_/g, '<em>$1</em>')
-                // Block
-                .replace(/\n/g, '<br>')
-                .replace(/\`\`\`(\w{1,15})<br>((\n|.)+?)\`\`\`/g, isEmbed ? '<pre class="embeded"><code class="$1">$2</code></pre>' : '<pre><code class="$1">$2</code></pre>')
-                .replace(/\`\`\`(\w{1,15})<br>((\n|.)+?)\`\`\`/g, isEmbed ? '<pre class="embeded"><code class="$1">$2</code></pre>' : '<pre><code class="$1">$2</code></pre>')
-                .replace(/\`\`\`(<br>)?((\n|.)+?)\`\`\`/g, isEmbed ? '<pre class="embeded"><code class="hljs nohighlight">$2</code></pre>' : '<pre><code class="hljs nohighlight">$2</code></pre>')
-            if (isEmbed) txt = txt
-                .replace(/\[(.+)\]\((.+)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
+            if (opts.inlineBlock) txt = txt.replace(/\`([^\`]+?)\`|\`\`([^\`]+?)\`\`|\`\`\`((?:\n|.)+?)\`\`\`/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
+            else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
+            if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
+            if (opts.replaceEmojis) {
+                txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
+                !opts.noEmoticons && Object.keys(emoticons).forEach(e => txt = txt.replace(new RegExp(`(?<=^|\\s)${regEscape(e)}(?=$|\\s)`, 'g'), emoticons[e]));
+            }
+            txt = txt
+                .replace(/(?<=\n|^)\s*>\s+([^\n]+)/g, '<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>$1</blockquote></div>')
+                .replace(/\n/g, '<br>');
             return txt;
         },
         content = document.querySelector('.messageContent'),
@@ -77,15 +75,16 @@ window.onload = () => {
             el.style.display = displayType || "unset";
 
         }, hide = el => el.style.removeProperty('display'),
+        regEscape = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
         toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x)),
         update = data => {
             try {
-                content.innerHTML = data.content ? markup(data.content) : '';
+                content.innerHTML = data.content ? markup(data.content, { replaceEmojis: true }) : '';
                 if (data.embed) {
                     let e = data.embed;
-                    if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + url(e.url) + '">' + e.title + '</a>' : e.title}`));
+                    if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + url(e.url) + '">' + e.title + '</a>' : e.title}`, { replaceEmojis: true, noEmoticons: true, inlineBlock: true }));
                     else hide(embedTitle);
-                    if (e.description) display(embedDescription, markup(e.description, true));
+                    if (e.description) display(embedDescription, markup(e.description, { inEmbed: true, replaceEmojis: true }));
                     else hide(embedDescription);
                     if (e.color) embed.closest('.embed').style.borderColor = (typeof e.color === 'number' ? '#' + e.color.toString(16) : e.color);
                     else embed.closest('.embed').style.removeProperty('border-color');
@@ -110,15 +109,15 @@ window.onload = () => {
                                 let el = fields.insertBefore(document.createElement('div'), null);
                                 el.outerHTML = `
                                 <div class="embedField" style="grid-column: 1 / 13;">
-                                    <div class="embedFieldName">${markup(f.name)}</div>
-                                    <div class="embedFieldValue">${markup(f.value)}</div>
+                                    <div class="embedFieldName">${markup(f.name, { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
+                                    <div class="embedFieldValue">${markup(f.value, { inEmbed: true, replaceEmojis: true })}</div>
                                 </div>`;
                             } else {
                                 el = fields.insertBefore(document.createElement('div'), null);
                                 el.outerHTML = `
                                 <div class="embedField ${num}" style="grid-column: ${colNum} / ${colNum + 4};">
-                                    <div class="embedFieldName">${markup(f.name)}</div>
-                                    <div class="embedFieldValue">${markup(f.value)}</div>
+                                    <div class="embedFieldName">${markup(f.name, { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
+                                    <div class="embedFieldValue">${markup(f.value, { inEmbed: true, replaceEmojis: true })}</div>
                                 </div>`;
                                 colNum = (colNum === 9 ? 1 : colNum + 4);
                                 num++;
@@ -127,16 +126,16 @@ window.onload = () => {
                         colNum = 1;
                         let len = e.fields.filter(f => f.inline).length;
                         if (len === 2 || (len > 3 && len % 2 !== 0)) {
-                            let children = Array.from(fields.children),
-                                arr = children.filter(x => x === children[len] || x === children[len - 1]);
+                            let children = Array.from(fields.children), arr = children.filter(x => x === children[len] || x === children[len - 1]);
                             arr[0].style.gridColumn = '1 / 7', arr[1].style.gridColumn = '7 / 13';
                         }
                         display(fields, undefined, 'grid');
                     } else hide(fields);
                     embed.classList.remove('empty');
-                    let re = /"((icon_)?url")(: *)("(?!\w+?:\/\/).+?")/g.exec(editor.getValue())
-                    if (re) error(`URLs should have a valid protocol (eg. https://) on this line <span class="inline">${makeShort(re[0], 30, 600)}</span>`, true);
+                    let re = /"((icon_)?url")(: *)("(?!https?:\/\/).+?")/g.exec(editor.getValue())
+                    if (re) error(`URLs should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`, true);
                     else notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
+                    twemoji.parse(msgEmbed);
                 }
             } catch (e) {
                 error(e);
@@ -146,16 +145,14 @@ window.onload = () => {
     editor.on('change', editor => {
         try { update(toObj(editor.getValue())); }
         catch (e) {
-            if (editor.getValue()) return; // error("Couldn't parse JSON; Invalid JSON syntax", e)
+            if (editor.getValue()) return;
             embed.classList.add('empty');
             content.innerHTML = '';
         }
         document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
-        twemoji.parse(msgEmbed);
     });
 
     update(toObj(editor.getValue()));
-    twemoji.parse(msgEmbed);
     document.querySelector('.timeText').innerText = tstamp()
     document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block))
     !window.navigator.userAgent.match(/Firefox\/[\d\.]+$/g) && // Firefox pushes the text up a little
