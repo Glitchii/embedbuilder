@@ -42,10 +42,7 @@ window.onload = () => {
             if (opts.inlineBlock) txt = txt.replace(/\`([^\`]+?)\`|\`\`([^\`]+?)\`\`|\`\`\`((?:\n|.)+?)\`\`\`/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
             else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
             if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
-            if (opts.replaceEmojis) {
-                txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
-                !opts.noEmoticons && Object.keys(emoticons).forEach(e => txt = txt.replace(new RegExp(`(?<=^|\\s)${regEscape(e)}(?=$|\\s)`, 'g'), emoticons[e]));
-            }
+            if (opts.replaceEmojis) txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
             txt = txt
                 .replace(/(?<=\n|^)\s*>\s+([^\n]+)/g, '<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>$1</blockquote></div>')
                 .replace(/\n/g, '<br>');
@@ -82,7 +79,7 @@ window.onload = () => {
                 content.innerHTML = data.content ? markup(data.content, { replaceEmojis: true }) : '';
                 if (data.embed) {
                     let e = data.embed;
-                    if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + url(e.url) + '">' + e.title + '</a>' : e.title}`, { replaceEmojis: true, noEmoticons: true, inlineBlock: true }));
+                    if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + url(e.url) + '">' + e.title + '</a>' : e.title}`, { replaceEmojis: true, inlineBlock: true }));
                     else hide(embedTitle);
                     if (e.description) display(embedDescription, markup(e.description, { inEmbed: true, replaceEmojis: true }));
                     else hide(embedDescription);
@@ -133,7 +130,7 @@ window.onload = () => {
                     } else hide(fields);
                     embed.classList.remove('empty');
                     let re = /"((icon_)?url")(: *)("(?!https?:\/\/).+?")/g.exec(editor.getValue())
-                    if (re) error(`URLs should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`, true);
+                    if (re) error(`URL should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`, true);
                     else notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
                     twemoji.parse(msgEmbed);
                 }
