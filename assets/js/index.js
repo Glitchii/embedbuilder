@@ -28,10 +28,16 @@ window.onload = () => {
             if (mediaWidth && window.matchMedia(`(max-width:${mediaWidth}px)`).matches)
                 return txt.length > (length - 3) ? txt.substring(0, length - 3) + '...' : txt;
             return txt;
-        }, error = (msg, html) => {
-            if (html) notif.innerHTML = msg;
-            else notif.innerText = msg;
-            notif.style.display = 'block';
+        }, error = (msg, time) => {
+            notif.innerHTML = msg, notif.style.display = 'block';
+            time && setTimeout(() => notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 })
+                .onfinish = () => notif.style.removeProperty('display'), time);
+            return false;
+        }, allGood = e => {
+            let re = /"((icon_)?url")(: *)("(?!https?:\/\/).+?")/g.exec(editor.getValue());
+            if (re) return error(`URL should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`);
+            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date") return error('Timestamp is invalid');
+            return true;
         }, markup = (txt, opts) => {
             txt = txt
                 .replace(/<:[^:]+:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
@@ -73,13 +79,13 @@ window.onload = () => {
             if (data) el.innerHTML = data;
             el.style.display = displayType || "unset";
         }, hide = el => el.style.removeProperty('display'),
-        regEscape = str => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
         toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x)),
         update = data => {
             try {
                 content.innerHTML = data.content ? markup(data.content, { replaceEmojis: true }) : '';
                 if (data.embed) {
                     let e = data.embed;
+                    if (!allGood(e)) return;
                     if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + url(e.url) + '">' + e.title + '</a>' : e.title}`, { replaceEmojis: true, inlineBlock: true }));
                     else hide(embedTitle);
                     if (e.description) display(embedDescription, markup(e.description, { inEmbed: true, replaceEmojis: true }));
@@ -130,11 +136,9 @@ window.onload = () => {
                         display(fields, undefined, 'grid');
                     } else hide(fields);
                     embed.classList.remove('empty');
-                    let re = /"((icon_)?url")(: *)("(?!https?:\/\/).+?")/g.exec(editor.getValue())
-                    if (re) error(`URL should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`, true);
-                    else notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
+                    notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
                     twemoji.parse(msgEmbed);
-                }
+                } else embed.classList.add('empty');
             } catch (e) {
                 error(e);
             }
@@ -151,8 +155,8 @@ window.onload = () => {
     });
 
     update(toObj(editor.getValue()));
-    document.querySelector('.timeText').innerText = tstamp()
-    document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block))
+    document.querySelector('.timeText').innerText = tstamp();
+    document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
     !window.navigator.userAgent.match(/Firefox\/[\d\.]+$/g) && // Firefox pushes the text up a little
         document.querySelector('.botText').style.removeProperty('top');
 };

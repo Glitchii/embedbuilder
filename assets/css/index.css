@@ -591,9 +591,11 @@ u {
 .embed blockquote {
     max-width: 100%;
 }
+
 .blockquote {
     display: flex;
 }
+
 .blockquote blockquote {
     padding: 0 8px 0 12px;
     box-sizing: border-box;
@@ -604,6 +606,7 @@ u {
     width: 4px;
     border-radius: 4px;
 }
+
 .blockquoteDivider {
     background-color: var(--interactive-muted);
 }
@@ -645,12 +648,11 @@ u {
     white-space: pre-wrap;
 }
 
-.markup .markup :is(pre, blockquote) {
+.markup pre, .markup blockquote {
     max-width: 90%;
 }
 
 .markup pre {
-    max-width: 90%;
     border-radius: 4px;
     padding: 0;
     font-family: Consolas, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Monaco, Courier New, Courier, monospace;
@@ -786,8 +788,9 @@ u {
     margin-top: 5px;
     animation: notifAn .5s ease;
     background-color: #202225;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
     padding: 10px;
-    border-radius: 4px;
     color: #8c4949;
     display: none;
     width: 100%;
