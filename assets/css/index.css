@@ -842,7 +842,6 @@ body.gui .top>.CodeMirror {
 }
 
 .top>.gui {
-    height: 100px;
     height: 100%;
     width: 100%;
     background: #292b2f;
@@ -851,6 +850,7 @@ body.gui .top>.CodeMirror {
     overflow-x: hidden;
     scrollbar-color: #202225 #292b2f;
     scrollbar-width: thin;
+    margin-top: 15px;
 }
 
 body:not(.gui) .top>.gui, body:not(.gui) .bottom, body:not(.gui) .pickerToggle {
