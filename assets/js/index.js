@@ -15,7 +15,7 @@ var activeFields, colNum = 1, num = 0,
             title: "Hello ~~people~~ world :wave:",
             description: "You can use [links](https://discord.com) or emojis :smile: 😎\n```\nAnd also code blocks\n```",
             color: 4321431,
-            timestamp: "2020-12-08T13:37:35.401Z",
+            timestamp: new Date().toISOString(),
             url: "https://discord.com",
             author: {
                 name: "Author name",
