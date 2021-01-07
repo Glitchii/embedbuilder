@@ -597,7 +597,6 @@ window.onload = () => {
     document.querySelector('.colBack').addEventListener('click', e => {
         picker.self.remove(); removePicker();
     })
-    picker.enter();
     picker.on('enter', () => colRight.classList.add('picking'))
     picker.on('exit', removePicker);
 
