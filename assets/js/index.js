@@ -470,12 +470,6 @@ window.onload = () => {
             let last = fields.children[fields.childElementCount - 2], el = last.querySelector('.designerFieldName > input');
             el.setSelectionRange(el.value.length, el.value.length); el.focus();
             last.scrollIntoView({ behavior: "smooth", block: "center" });
-            // setTimeout(() => last.animate([
-            //     { opacity: '.2', offset: .25 },
-            //     { opacity: '1', offset: .5 },
-            //     { opacity: '.2', offset: .75 },
-            //     { opacity: '1', offset: 1 }
-            // ], { easing: 'ease', duration: 1500 }), 250);
         }
 
         let files = document.querySelectorAll('input[type="file"]');
@@ -603,21 +597,21 @@ window.onload = () => {
     document.querySelector('.colBack').addEventListener('click', e => {
         picker.self.remove(); removePicker();
     })
-
+    picker.enter();
     picker.on('enter', () => colRight.classList.add('picking'))
     picker.on('exit', removePicker);
 
     document.querySelectorAll('.colr').forEach(e => e.addEventListener('click', el => {
         el = el.target.closest('.colr') || el.target;
         embed.closest('.embed').style.borderColor = el.style.backgroundColor;
-        json.embed.color = toRGB(el.style.backgroundColor, false, true);
+        json.embed && (json.embed.color = toRGB(el.style.backgroundColor, false, true));
         picker.source.style.removeProperty('background');
     }))
 
     setTimeout(() => {
         picker.on('change', function (r, g, b, a) {
             embed.closest('.embed').style.borderColor = this.color(r, g, b);
-            json.embed.color = parseInt(this.color(r, g, b).slice(1), 16);
+            json.embed && (json.embed.color = parseInt(this.color(r, g, b).slice(1), 16));
             picker.source.style.background = this.color(r, g, b);
         })
     }, 1000)
