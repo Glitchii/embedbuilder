@@ -6,6 +6,6 @@ This can be used for bot embed commands commands, although I understand that not
 You can look into the [project boards](https://github.com/Glitchii/embedbuilder/projects/3) if you want to see what is being worked on or want to contribute.
 <br>
 <br>
-![Layout image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/layout.png)  
+![GUI image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/gui.png) ![JSON image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/json.png)  
 
 [To Do](https://github.com/Glitchii/embedbuilder/projects/3) | [Discussions](https://github.com/Glitchii/embedbuilder/discussions/1)

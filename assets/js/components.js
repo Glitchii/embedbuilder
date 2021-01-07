@@ -2910,6 +2910,7 @@ var emojis = {
     "sob": "😭",
     "smiling_imp": "😈",
     "slight_smile": "🙂",
+    "pensive": "😔",
     "angry": "😠",
     "blush": "😊",
     "confused": "😕",
