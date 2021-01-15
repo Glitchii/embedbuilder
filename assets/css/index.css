@@ -513,10 +513,6 @@ img[alt] {
     display: none;
 }
 
-.embedGrid.empty {
-    display: none;
-}
-
 .messageContent {
     user-select: text;
     margin-left: -72px;
@@ -1580,8 +1576,14 @@ body {
     transform-origin: top right;
 }
 
-.side2:not(.empty) .emptyTxt {
+.messageContent.empty, .messageContent+.container.empty, .emptyTxt {
     display: none;
+}
+
+.messageContent.empty+.container.empty+.emptyTxt {
+    display: block;
+    position: absolute;
+    top: 800%;
 }
 
 .clear>svg {

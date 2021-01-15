@@ -71,6 +71,8 @@ window.onload = () => {
         .forEach(e => e.addEventListener('click', el => window.open(el.target.src)));
     let editorHolder = document.querySelector('.editorHolder'),
         guiParent = document.querySelector('.top'),
+        embedContent = document.querySelector('.messageContent'),
+        embedCont = document.querySelector('.messageContent + .container'),
         gui = guiParent.querySelector('.gui:first-of-type');
     window.editor = CodeMirror(elt => editorHolder.parentNode.replaceChild(elt, editorHolder), {
         value: JSON.stringify(json, null, 4),
@@ -103,8 +105,8 @@ window.onload = () => {
             return true;
         }, markup = (txt, opts) => {
             txt = txt
-                .replace(/<:[^:]+:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
-                .replace(/<a:[^:]+:(\d+)>/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
+                .replace(/\&#60;:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+                .replace(/\&#60;a:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
                 .replace(/~~(.+?)~~/g, '<s>$1</s>')
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -116,11 +118,10 @@ window.onload = () => {
             if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
             if (opts.replaceEmojis) txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
             txt = txt
-                .replace(/(?<=\n|^)\s*>\s+([^\n]+)/g, '<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>$1</blockquote></div>')
+                .replace(/(?<=\n|^)\s*&#62;\s+([^\n]+)/g, '<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>$1</blockquote></div>')
                 .replace(/\n/g, '<br>');
             return txt;
         },
-        embedContent = document.querySelector('.messageContent'),
         embed = document.querySelector('.embedGrid'),
         msgEmbed = document.querySelector('.msgEmbed'),
         embedTitle = document.querySelector('.embedTitle'),
@@ -516,7 +517,11 @@ window.onload = () => {
     fields = gui.querySelector('.fields ~ .edit');
     update = data => {
         try {
-            embedContent.innerHTML = data.content ? markup(encodeHTML(data.content), { replaceEmojis: true }) : '';
+            if (!data.content) embedContent.classList.add('empty');
+            else {
+                embedContent.innerHTML = markup(encodeHTML(data.content), { replaceEmojis: true });
+                embedContent.classList.remove('empty');
+            }
             if (data.embed && Object.keys(data.embed).length) {
                 let e = data.embed;
                 if (!allGood(e)) return;
@@ -572,11 +577,11 @@ window.onload = () => {
                     }
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
-                embed.classList.remove('empty');
+                embedCont.classList.remove('empty');
                 document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
                 notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
                 twemoji.parse(msgEmbed);
-            } else embed.classList.add('empty');
+            } else embedCont.classList.add('empty');
         } catch (e) {
             error(e);
         }
@@ -586,7 +591,7 @@ window.onload = () => {
         try { update(toObj(editor.getValue())); }
         catch (e) {
             if (editor.getValue()) return;
-            embed.classList.add('empty');
+            embedCont.classList.add('empty');
             embedContent.innerHTML = '';
         }
     });
@@ -637,7 +642,7 @@ window.onload = () => {
     })
 
     document.querySelector('.clear').addEventListener('click', () => {
-        json = {}
+        json = { embed: {}, content: "" };
         embed.style.removeProperty('border-color');
         picker.source.style.removeProperty('background');
         update(json); buildGui(json); editor.setValue('{}');
