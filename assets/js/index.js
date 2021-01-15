@@ -645,7 +645,7 @@ window.onload = () => {
         json = { embed: {}, content: "" };
         embed.style.removeProperty('border-color');
         picker.source.style.removeProperty('background');
-        update(json); buildGui(json); editor.setValue(JSON.stringify(json));
+        update(json); buildGui(json); editor.setValue(JSON.stringify(json, null, 4));
         document.querySelectorAll('.gui>.item').forEach(e => e.classList.add('active'));
         content.focus();
     })
