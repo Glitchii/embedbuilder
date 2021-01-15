@@ -908,8 +908,7 @@ body:not(.gui) .chooser>.back {
 }
 
 .bottom {
-    height: 40%;
-    margin: 40px auto auto auto!important;
+    /* margin: 40px auto auto auto!important; */
     max-width: 90%;
 }
 
@@ -1693,5 +1692,8 @@ body {
     .bottom .colrs {
         top: 70px;
         left: 10px;
+    }
+    .top>.gui {
+        margin-top: 5px;
     }
 }
