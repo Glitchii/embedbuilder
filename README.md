@@ -1,6 +1,6 @@
 # An embed visualizer
 
-Displays embed or message content from JSON input. This can be used for visualizing bot embed commands.  
+Visualize embed or message content from JSON input or provided GUI editor.
 
 This can be used for bot embed commands commands, although I understand that not every one understands JSON thus will add a GUI later.  
 You can look into the [project boards](https://github.com/Glitchii/embedbuilder/projects/3) if you want to see what is being worked on or want to contribute.
