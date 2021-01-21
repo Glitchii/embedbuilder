@@ -150,168 +150,174 @@ window.onload = () => {
         gui.innerHTML = `
                 <div class="item content"><p class="ttle">Message content</p></div>
                 <div class="edit">
-                    <textarea class="editContent" placeholder="Message content" autocomplete="off">${encodeHTML(object.content || '')}</textarea>
+                    <textarea class="editContent" placeholder="Message content" maxlength="2000" autocomplete="off">${encodeHTML(object.content || '')}</textarea>
                 </div>
-                    <div class="item author rows2"><p class="ttle">Author</p></div>
-                    <div class="edit">
-                        <div class="linkName">
-                            <div class="editIcon">
-                                <span class="imgParent" ${object.embed?.author?.icon_url ? 'style="content: url(' + encodeHTML(object.embed.author.icon_url) + ')"' : ''}></span>
-                                <input class="editAuthorLink" type="text" value="${encodeHTML(object.embed?.author?.icon_url || '')}" placeholder="Icon URL" autocomplete="off"/>
-                            </div>
-                            <div class="editName">
-                                <input class="editAuthorName" type="text" value="${encodeHTML(object.embed?.author?.name || '')}" placeholder="Author name" autocomplete="off" />
-                            </div>
+                <div class="item author rows2"><p class="ttle">Author</p></div>
+                <div class="edit">
+                    <div class="linkName">
+                        <div class="editIcon">
+                            <span class="imgParent" ${object.embed?.author?.icon_url ? 'style="content: url(' + encodeHTML(object.embed.author.icon_url) + ')"' : ''}></span>
+                            <input class="editAuthorLink" type="text" value="${encodeHTML(object.embed?.author?.icon_url || '')}" placeholder="Icon URL" autocomplete="off"/>
                         </div>
-                        <form method="post" enctype="multipart/form-data">
-                            <input class="browserAuthorLink" type="file" name="file" id="file2" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
-                            <button type="submit"></button>
-                            <label for="file2">
-                                <div class="browse">
-                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
-                                        <g>
-                                            <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
-                                            <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
-                                        </g>
-                                    </svg>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                                        <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
-                                        </circle>
-                                        <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
-                                        </circle>
-                                        <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
-                                        </circle>
+                        <div class="editName">
+                            <input class="editAuthorName" type="text" value="${encodeHTML(object.embed?.author?.name || '')}" placeholder="Author name" autocomplete="off" />
+                        </div>
+                    </div>
+                    <form method="post" enctype="multipart/form-data">
+                        <input class="browserAuthorLink" type="file" name="file" id="file2" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
+                        <button type="submit"></button>
+                        <label for="file2">
+                            <div class="browse">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
+                                    <g>
+                                        <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
+                                        <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
+                                    </g>
+                                </svg>
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                                    <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
+                                    </circle>
+                                    <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
+                                    </circle>
+                                    <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
+                                    </circle>
+                                </svg>                                    
                                     </svg>                                    
-                                    <p></p>
-                                </div>
-                            </label>
-                        </form>
+                                </svg>                                    
+                                <p></p>
+                            </div>
+                        </label>
+                    </form>
+                </div>                        
                     </div>                        
-                    <div class="item title inlineField">
-                        <p class="ttle">Title</p>
-                        <input class="editTitle" type="text" placeholder="Title" autocomplete="off" value="${encodeHTML(object.embed?.title || '')}">
-                    </div>
-                    <div class="item description"><p class="ttle">Description</p></div>
-                    <div class="edit">
-                        <textarea class="editDescription" placeholder="Embed description" autocomplete="off">${encodeHTML(object.embed?.description || '')}</textarea>
-                    </div>
-                    <div class="item fields"><p class="ttle">Fields</p></div>
-                    <div class="edit"></div>
-                    <div class="item thumbnail largeImg"><p class="ttle">Thumbnail</p></div>
-                    <div class="edit">
-                        <div class="linkName">
-                            <div class="editIcon">
-                                <span class="imgParent" ${object.embed?.thumbnail?.url ? 'style="content: url(' + encodeHTML(object.embed.thumbnail.url) + ')"' : ''}></span>
-                                <div class="txtCol">
-                                    <input class="editThumbnailLink" type="text" value="${encodeHTML(object.embed?.thumbnail?.url || '')}" placeholder="Thumbnail URL" autocomplete="off" />
-                                    <form method="post" enctype="multipart/form-data">
-                                        <input class="browseThumbLink" type="file" name="file" id="file3" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
-                                        <button type="submit"></button>
-                                        <label for="file3">
-                                            <div class="browse">
-                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
-                                                    <g>
-                                                        <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
-                                                        <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
-                                                    </g>
-                                                </svg>
-                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                                                    <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
-                                                    </circle>
-                                                    <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
-                                                    </circle>
-                                                    <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
-                                                    </circle>
-                                                </svg>
-                                                <p></p>
-                                            </div>
-                                        </label>
-                                    </form>
-                                </div>
+                </div>                        
+                <div class="item title inlineField">
+                    <p class="ttle">Title</p>
+                    <input class="editTitle" type="text" placeholder="Title" autocomplete="off" maxlength="256" value="${encodeHTML(object.embed?.title || '')}">
+                </div>
+                <div class="item description"><p class="ttle">Description</p></div>
+                <div class="edit">
+                    <textarea class="editDescription" placeholder="Embed description" maxlength="2048" autocomplete="off">${encodeHTML(object.embed?.description || '')}</textarea>
+                </div>
+                <div class="item fields"><p class="ttle">Fields</p></div>
+                <div class="edit"></div>
+                <div class="item thumbnail largeImg"><p class="ttle">Thumbnail</p></div>
+                <div class="edit">
+                    <div class="linkName">
+                        <div class="editIcon">
+                            <span class="imgParent" ${object.embed?.thumbnail?.url ? 'style="content: url(' + encodeHTML(object.embed.thumbnail.url) + ')"' : ''}></span>
+                            <div class="txtCol">
+                                <input class="editThumbnailLink" type="text" value="${encodeHTML(object.embed?.thumbnail?.url || '')}" placeholder="Thumbnail URL" autocomplete="off" />
+                                <form method="post" enctype="multipart/form-data">
+                                    <input class="browseThumbLink" type="file" name="file" id="file3" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
+                                    <button type="submit"></button>
+                                    <label for="file3">
+                                        <div class="browse">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
+                                                <g>
+                                                    <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
+                                                    <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
+                                                </g>
+                                            </svg>
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                                                <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
+                                                </circle>
+                                                <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
+                                                </circle>
+                                                <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
+                                                </circle>
+                                            </svg>
+                                            <p></p>
+                                        </div>
+                                    </label>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    <div class="item image largeImg"><p class="ttle">Image</p></div>
-                    <div class="edit">
-                        <div class="linkName">
-                            <div class="editIcon">
-                                <span class="imgParent" ${object.embed?.image?.url ? 'style="content: url(' + encodeHTML(object.embed.image.url) + ')"' : ''}></span>
-                                <div class="txtCol">
-                                    <input class="editImageLink" type="text" value="${encodeHTML(object.embed?.image?.url || '')}" placeholder="Image URL" autocomplete="off" />
-                                    <form method="post" enctype="multipart/form-data">
-                                        <input class="browseImageLink" type="file" name="file" id="file4" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
-                                        <button type="submit"></button>
-                                        <label for="file4">
-                                            <div class="browse">
-                                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
-                                                    <g>
-                                                        <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
-                                                        <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
-                                                    </g>
-                                                </svg>
-                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                                                    <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
-                                                    </circle>
-                                                    <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
-                                                    </circle>
-                                                    <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
-                                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
-                                                    </circle>
-                                                </svg>
-                                                <p></p>
-                                            </div>
-                                        </label>
-                                    </form>
-                                </div>
+                </div>
+                <div class="item image largeImg"><p class="ttle">Image</p></div>
+                <div class="edit">
+                    <div class="linkName">
+                        <div class="editIcon">
+                            <span class="imgParent" ${object.embed?.image?.url ? 'style="content: url(' + encodeHTML(object.embed.image.url) + ')"' : ''}></span>
+                            <div class="txtCol">
+                                <input class="editImageLink" type="text" value="${encodeHTML(object.embed?.image?.url || '')}" placeholder="Image URL" autocomplete="off" />
+                                <form method="post" enctype="multipart/form-data">
+                                    <input class="browseImageLink" type="file" name="file" id="file4" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
+                                    <button type="submit"></button>
+                                    <label for="file4">
+                                        <div class="browse">
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
+                                                <g>
+                                                    <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
+                                                    <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
+                                                </g>
+                                            </svg>
+                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                                                <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
+                                                </circle>
+                                                <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
+                                                </circle>
+                                                <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
+                                                    <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
+                                                </circle>
+                                            </svg>
+                                            <p></p>
+                                        </div>
+                                    </label>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    <div class="item footer rows2"><p class="ttle">Footer</p></div>
-                    <div class="edit">
-                        <div class="linkName">
-                            <div class="editIcon">
-                                <span class="imgParent" ${object.embed?.footer?.icon_url ? 'style="content: url(' + encodeHTML(object.embed.footer.icon_url) + ')"' : ''}></span>
-                                <input class="editFooterLink" type="text" value="${encodeHTML(object.embed?.footer?.icon_url || '')}" placeholder="Icon URL" autocomplete="off"/>
-                            </div>
-                            <div class="editName">
-                                <input class="editFooterText" type="text" value="${encodeHTML(object.embed?.footer?.text || '')}" placeholder="Footer text" autocomplete="off" />
-                            </div>
+                </div>
+                <div class="item footer rows2"><p class="ttle">Footer</p></div>
+                <div class="edit">
+                    <div class="linkName">
+                        <div class="editIcon">
+                            <span class="imgParent" ${object.embed?.footer?.icon_url ? 'style="content: url(' + encodeHTML(object.embed.footer.icon_url) + ')"' : ''}></span>
+                            <input class="editFooterLink" type="text" value="${encodeHTML(object.embed?.footer?.icon_url || '')}" placeholder="Icon URL" autocomplete="off"/>
                         </div>
-                        <form method="post" enctype="multipart/form-data">
-                            <input class="browserFooterLink" type="file" name="file" id="file" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
-                            <button type="submit"></button>
-                            <label for="file">
-                                <div class="browse">
-                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
-                                        <g>
-                                            <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
-                                            <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
-                                        </g>
-                                    </svg>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                                        <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
-                                        </circle>
-                                        <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
-                                        </circle>
-                                        <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
-                                            <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
-                                        </circle>
+                        <div class="editName">
+                            <input class="editFooterText" type="text" maxlength="2048" value="${encodeHTML(object.embed?.footer?.text || '')}" placeholder="Footer text" autocomplete="off" />
+                        </div>
+                    </div>
+                    <form method="post" enctype="multipart/form-data">
+                        <input class="browserFooterLink" type="file" name="file" id="file" accept="image/png,image/gif,image/jpeg,image/webp" autocomplete="off" />
+                        <button type="submit"></button>
+                        <label for="file">
+                            <div class="browse">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 64 64" xml:space="preserve">
+                                    <g>
+                                        <path xmlns="http://www.w3.org/2000/svg" d="m23.414 21.414 6.586-6.586v29.172c0 1.104.896 2 2 2s2-.896 2-2v-29.172l6.586 6.586c.39.391.902.586 1.414.586s1.024-.195 1.414-.586c.781-.781.781-2.047 0-2.828l-10-10c-.78-.781-2.048-.781-2.828 0l-10 10c-.781.781-.781 2.047 0 2.828.78.781 2.048.781 2.828 0z" fill="#ffffff" data-original="#000000"></path>
+                                        <path xmlns="http://www.w3.org/2000/svg" d="m50 40c-1.104 0-2 .896-2 2v8c0 1.103-.897 2-2 2h-28c-1.103 0-2-.897-2-2v-8c0-1.104-.896-2-2-2s-2 .896-2 2v8c0 3.309 2.691 6 6 6h28c3.309 0 6-2.691 6-6v-8c0-1.104-.896-2-2-2z" fill="#ffffff" data-original="#000000"></path>
+                                    </g>
+                                </svg>
+                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                                    <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 15 ; 0 -15; 0 15" repeatCount="indefinite" begin="0.1"></animateTransform>
+                                    </circle>
+                                    <circle fill="#fff" stroke="none" cx="30" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 10 ; 0 -10; 0 10" repeatCount="indefinite" begin="0.2"></animateTransform>
+                                    </circle>
+                                    <circle fill="#fff" stroke="none" cx="54" cy="50" r="6">
+                                        <animateTransform attributeName="transform" dur="1s" type="translate" values="0 5 ; 0 -5; 0 5" repeatCount="indefinite" begin="0.3"></animateTransform>
+                                    </circle>
+                                </svg>                                    
                                     </svg>                                    
-                                    <p></p>
-                                </div>
-                            </label>
-                        </form>
-                    </div>`;
+                                </svg>                                    
+                                <p></p>
+                            </div>
+                        </label>
+                    </form>
+                </div>`;
 
         let fieldsEditor = gui.querySelector('.fields ~ .edit'), addField = `
                     <div class="addField">
@@ -352,10 +358,10 @@ window.onload = () => {
                         <div class="fieldNumber"></div>
                         <div class="fieldInner">
                             <div class="designerFieldName">
-                                <input type="text" placeholder="Field name" autocomplete="off" value="${encodeHTML(f.name)}">
+                                <input type="text" placeholder="Field name" autocomplete="off" maxlength="256" value="${encodeHTML(f.name)}">
                             </div>
                             <div class="designerFieldValue">
-                                <textarea placeholder="Field value" autocomplete="off">${encodeHTML(f.value)}</textarea>
+                                <textarea placeholder="Field value" autocomplete="off" maxlength="1024">${encodeHTML(f.value)}</textarea>
                             </div>
                         </div>
                         <div class="inlineCheck">
@@ -423,6 +429,7 @@ window.onload = () => {
         document.querySelector('.addField').addEventListener('click', () => {
             !json.embed && (json.embed = {});
             let arr = json.embed.fields || [];
+            if (arr.length >= 25) return error('Cannot have more than 25 fields', 5000);
             arr.push({ name: "Field name", value: "Field value", inline: false });
             json.embed.fields = arr;
             update(json);
