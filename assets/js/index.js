@@ -649,7 +649,7 @@ window.onload = () => {
     })
 
     document.querySelector('.clear').addEventListener('click', () => {
-        json = { embed: {}, content: "" };
+        json = { };
         embed.style.removeProperty('border-color');
         picker.source.style.removeProperty('background');
         update(json); buildGui(json); editor.setValue(JSON.stringify(json, null, 4));
