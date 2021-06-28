@@ -8,4 +8,6 @@ You can look into the [project boards](https://github.com/Glitchii/embedbuilder/
 <br>
 ![GUI image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/gui.png) ![JSON image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/json.png)  
 
+Used at https://troybot.xyz/embed
+
 [To Do](https://github.com/Glitchii/embedbuilder/projects/3) | [Discussions](https://github.com/Glitchii/embedbuilder/discussions/1)
