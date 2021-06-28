@@ -99,11 +99,24 @@ window.onload = () => {
                 .onfinish = () => notif.style.removeProperty('display'), time);
             return false;
         }, allGood = e => {
-            let re = /"((icon_)?url")(: *)("(?!https?:\/\/).+?")/g.exec(editor.getValue());
-            if (re) return error(`URL should start with <code>https://</code> or <code>http://</code> on this line <span class="inline full">${makeShort(re[0], 30, 600)}</span>`);
+            let str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
             if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date") return error('Timestamp is invalid');
+            if (re) { // If a URL is found without a protocol
+                if (!/\w+:|\/\/|^\//g.exec(re[2]) && re[2].includes('.')) {
+                    let activeInput = document.querySelector('input[class$="link" i]:focus')
+                    if (activeInput) {
+                        lastPos = activeInput.selectionStart + 7;
+                        authorLink.value = `http://${re[2]}`;
+                        update(JSON.parse(str.replace(re[0], `${re[1]}http://${re[2]}"`)));
+                        activeInput.setSelectionRange(lastPos, lastPos)
+                        return true;
+                    }
+                }
+                return error(`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
+            }
             return true;
-        }, markup = (txt, opts) => {
+        },
+        markup = (txt, opts) => {
             txt = txt
                 .replace(/\&#60;:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
                 .replace(/\&#60;a:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
@@ -145,9 +158,9 @@ window.onload = () => {
             el.style.display = displayType || "unset";
         }, hide = el => el.style.removeProperty('display'),
         imgSrc = (elm, src, remove) => remove ? elm.style.removeProperty('content') : elm.style.content = `url(${src})`,
-        toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x));
-    buildGui = (object, opts) => {
-        gui.innerHTML = `
+        toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x)),
+        buildGui = (object, opts) => {
+            gui.innerHTML = `
                 <div class="item content"><p class="ttle">Message content</p></div>
                 <div class="edit">
                     <textarea class="editContent" placeholder="Message content" maxlength="2000" autocomplete="off">${encodeHTML(object.content || '')}</textarea>
@@ -319,206 +332,206 @@ window.onload = () => {
                     </form>
                 </div>`;
 
-        let fieldsEditor = gui.querySelector('.fields ~ .edit'), addField = `
-                    <div class="addField">
-                        <p>New Field</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" x="0" y="0" viewBox="0 0 477.867 477.867" xml:space="preserve">
+            let fieldsEditor = gui.querySelector('.fields ~ .edit'), addField = `
+                <div class="addField">
+                    <p>New Field</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" x="0" y="0" viewBox="0 0 477.867 477.867" xml:space="preserve">
+                        <g>
+                            <g xmlns="http://www.w3.org/2000/svg">
+                                <g>
+                                    <path d="M392.533,0h-307.2C38.228,0.056,0.056,38.228,0,85.333v307.2c0.056,47.105,38.228,85.277,85.333,85.333h307.2    c47.105-0.056,85.277-38.228,85.333-85.333v-307.2C477.81,38.228,439.638,0.056,392.533,0z M443.733,392.533    c0,28.277-22.923,51.2-51.2,51.2h-307.2c-28.277,0-51.2-22.923-51.2-51.2v-307.2c0-28.277,22.923-51.2,51.2-51.2h307.2    c28.277,0,51.2,22.923,51.2,51.2V392.533z" fill="#ffffff" data-original="#000000"
+                                    ></path>
+                                </g>
+                            </g>
+                            <g xmlns="http://www.w3.org/2000/svg">
+                                <g>
+                                    <path d="M324.267,221.867H256V153.6c0-9.426-7.641-17.067-17.067-17.067s-17.067,7.641-17.067,17.067v68.267H153.6    c-9.426,0-17.067,7.641-17.067,17.067S144.174,256,153.6,256h68.267v68.267c0,9.426,7.641,17.067,17.067,17.067    S256,333.692,256,324.267V256h68.267c9.426,0,17.067-7.641,17.067-17.067S333.692,221.867,324.267,221.867z" fill="#ffffff" data-original="#000000"></path>
+                                </g>
+                            </g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                            <g xmlns="http://www.w3.org/2000/svg"></g>
+                        </g>
+                    </svg>
+                </div>`;
+            if (object.embed?.fields) fieldsEditor.innerHTML = object.embed.fields.filter(f => f && typeof f === 'object').map(f => `
+                <div class="field">
+                    <div class="fieldNumber"></div>
+                    <div class="fieldInner">
+                        <div class="designerFieldName">
+                            <input type="text" placeholder="Field name" autocomplete="off" maxlength="256" value="${encodeHTML(f.name)}">
+                        </div>
+                        <div class="designerFieldValue">
+                            <textarea placeholder="Field value" autocomplete="off" maxlength="1024">${encodeHTML(f.value)}</textarea>
+                        </div>
+                    </div>
+                    <div class="inlineCheck">
+                        <label>
+                            <input type="checkbox" autocomplete="off" ${f.inline ? 'checked' : ''}>
+                            <span>Inline</span>
+                        </label>
+                    </div>
+                    <div class="removeBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 329.26933 329" xml:space="preserve">
                             <g>
-                                <g xmlns="http://www.w3.org/2000/svg">
-                                    <g>
-                                        <path d="M392.533,0h-307.2C38.228,0.056,0.056,38.228,0,85.333v307.2c0.056,47.105,38.228,85.277,85.333,85.333h307.2    c47.105-0.056,85.277-38.228,85.333-85.333v-307.2C477.81,38.228,439.638,0.056,392.533,0z M443.733,392.533    c0,28.277-22.923,51.2-51.2,51.2h-307.2c-28.277,0-51.2-22.923-51.2-51.2v-307.2c0-28.277,22.923-51.2,51.2-51.2h307.2    c28.277,0,51.2,22.923,51.2,51.2V392.533z" fill="#ffffff" data-original="#000000"
-                                        ></path>
-                                    </g>
-                                </g>
-                                <g xmlns="http://www.w3.org/2000/svg">
-                                    <g>
-                                        <path d="M324.267,221.867H256V153.6c0-9.426-7.641-17.067-17.067-17.067s-17.067,7.641-17.067,17.067v68.267H153.6    c-9.426,0-17.067,7.641-17.067,17.067S144.174,256,153.6,256h68.267v68.267c0,9.426,7.641,17.067,17.067,17.067    S256,333.692,256,324.267V256h68.267c9.426,0,17.067-7.641,17.067-17.067S333.692,221.867,324.267,221.867z" fill="#ffffff" data-original="#000000"></path>
-                                    </g>
-                                </g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
-                                <g xmlns="http://www.w3.org/2000/svg"></g>
+                                <path xmlns="http://www.w3.org/2000/svg" d="m194.800781 164.769531 128.210938-128.214843c8.34375-8.339844 8.34375-21.824219 0-30.164063-8.339844-8.339844-21.824219-8.339844-30.164063 0l-128.214844 128.214844-128.210937-128.214844c-8.34375-8.339844-21.824219-8.339844-30.164063 0-8.34375 8.339844-8.34375 21.824219 0 30.164063l128.210938 128.214843-128.210938 128.214844c-8.34375 8.339844-8.34375 21.824219 0 30.164063 4.15625 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921875-2.089844 15.082031-6.25l128.210937-128.214844 128.214844 128.214844c4.160156 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921874-2.089844 15.082031-6.25 8.34375-8.339844 8.34375-21.824219 0-30.164063zm0 0" fill="#ffffff" data-original="#000000"/>
                             </g>
                         </svg>
-                    </div>`;
-        if (object.embed?.fields) fieldsEditor.innerHTML = object.embed.fields.filter(f => f && typeof f === 'object').map(f => `
-                    <div class="field">
-                        <div class="fieldNumber"></div>
-                        <div class="fieldInner">
-                            <div class="designerFieldName">
-                                <input type="text" placeholder="Field name" autocomplete="off" maxlength="256" value="${encodeHTML(f.name)}">
-                            </div>
-                            <div class="designerFieldValue">
-                                <textarea placeholder="Field value" autocomplete="off" maxlength="1024">${encodeHTML(f.value)}</textarea>
-                            </div>
-                        </div>
-                        <div class="inlineCheck">
-                            <label>
-                                <input type="checkbox" autocomplete="off" ${f.inline ? 'checked' : ''}>
-                                <span>Inline</span>
-                            </label>
-                        </div>
-                        <div class="removeBtn">
-                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 329.26933 329" xml:space="preserve">
-                                <g>
-                                    <path xmlns="http://www.w3.org/2000/svg" d="m194.800781 164.769531 128.210938-128.214843c8.34375-8.339844 8.34375-21.824219 0-30.164063-8.339844-8.339844-21.824219-8.339844-30.164063 0l-128.214844 128.214844-128.210937-128.214844c-8.34375-8.339844-21.824219-8.339844-30.164063 0-8.34375 8.339844-8.34375 21.824219 0 30.164063l128.210938 128.214843-128.210938 128.214844c-8.34375 8.339844-8.34375 21.824219 0 30.164063 4.15625 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921875-2.089844 15.082031-6.25l128.210937-128.214844 128.214844 128.214844c4.160156 4.160156 9.621094 6.25 15.082032 6.25 5.460937 0 10.921874-2.089844 15.082031-6.25 8.34375-8.339844 8.34375-21.824219 0-30.164063zm0 0" fill="#ffffff" data-original="#000000"/>
-                                </g>
-                            </svg>
-                            <span>Remove</span>
-                        </div>
-                    </div>`).join('\n') + addField;
-        else fieldsEditor.innerHTML = addField;
+                        <span>Remove</span>
+                    </div>
+                </div>`).join('\n') + addField;
+            else fieldsEditor.innerHTML = addField;
 
-        gui.querySelectorAll('.removeBtn').forEach(e => {
-            e.addEventListener('click', el => {
-                fields = gui.querySelector('.fields ~ .edit');
-                let field = el.target.closest('.field');
+            gui.querySelectorAll('.removeBtn').forEach(e => {
+                e.addEventListener('click', el => {
+                    fields = gui.querySelector('.fields ~ .edit');
+                    let field = el.target.closest('.field');
+                    if (field) {
+                        let i = Array.from(fields.children).indexOf(field), jsonField = object.embed.fields[i];
+                        if (jsonField) {
+                            object.embed.fields.splice(i, 1);
+                            field.remove();
+                            update(object);
+                        }
+                    }
+                })
+            })
+
+            document.querySelectorAll('.gui > .item').forEach(e => {
+                e.addEventListener('click', el => {
+                    let elm = (el.target.closest('.top>.gui>.item') || el.target);
+                    if (elm.classList.contains('active')) window.getSelection().anchorNode !== elm && elm.classList.remove('active');
+                    else {
+                        let inlineField = elm.closest('.inlineField'),
+                            input = elm.nextElementSibling.querySelector('input[type="text"]'),
+                            txt = elm.nextElementSibling.querySelector('textarea');
+                        elm.classList.add('active');
+                        if (inlineField) inlineField.querySelector('.ttle~input').focus();
+                        else if (input) {
+                            input.focus();
+                            input.selectionStart = input.selectionEnd = input.value.length;
+                        } else if (txt) txt.focus();
+                        elm.classList.contains('fields') && elm.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                })
+            })
+
+            content = gui.querySelector('.editContent');
+            title = gui.querySelector('.editTitle');
+            authorName = gui.querySelector('.editAuthorName');
+            authorLink = gui.querySelector('.editAuthorLink');
+            desc = gui.querySelector('.editDescription');
+            thumbLink = gui.querySelector('.editThumbnailLink');
+            imgLink = gui.querySelector('.editImageLink');
+            footerText = gui.querySelector('.editFooterText');
+            footerLink = gui.querySelector('.editFooterLink');
+            fields = gui.querySelector('.fields ~ .edit');
+
+            document.querySelector('.addField').addEventListener('click', () => {
+                !json.embed && (json.embed = {});
+                let arr = json.embed.fields || [];
+                if (arr.length >= 25) return error('Cannot have more than 25 fields', 5000);
+                arr.push({ name: "Field name", value: "Field value", inline: false });
+                json.embed.fields = arr;
+                update(json);
+                buildGui(json, { newField: true, activate: document.querySelectorAll('.gui > .item.active') });
+            })
+
+            gui.querySelectorAll('textarea, input').forEach(e => e.addEventListener('input', el => {
+                let value = el.target.value, field = el.target.closest('.field');
                 if (field) {
-                    let i = Array.from(fields.children).indexOf(field), jsonField = object.embed.fields[i];
+                    let jsonField = json.embed.fields[Array.from(fields.children).indexOf(field)];
                     if (jsonField) {
-                        object.embed.fields.splice(i, 1);
-                        field.remove();
-                        update(object);
+                        if (el.target.type === 'text') jsonField.name = value;
+                        else if (el.target.type === 'textarea') jsonField.value = value;
+                        else jsonField.inline = el.target.checked;
+                    } else {
+                        let obj = {}
+                        if (el.target.type === 'text') obj.name = value;
+                        else if (el.target.type === 'textarea') obj.value = value;
+                        else obj.inline = el.target.checked;
+                        json.embed.fields.push(obj);
                     }
-                }
-            })
-        })
-
-        document.querySelectorAll('.gui > .item').forEach(e => {
-            e.addEventListener('click', el => {
-                let elm = (el.target.closest('.top>.gui>.item') || el.target);
-                if (elm.classList.contains('active')) window.getSelection().anchorNode !== elm && elm.classList.remove('active');
-                else {
-                    let inlineField = elm.closest('.inlineField'),
-                        input = elm.nextElementSibling.querySelector('input[type="text"]'),
-                        txt = elm.nextElementSibling.querySelector('textarea');
-                    elm.classList.add('active');
-                    if (inlineField) inlineField.querySelector('.ttle~input').focus();
-                    else if (input) {
-                        input.focus();
-                        input.selectionStart = input.selectionEnd = input.value.length;
-                    } else if (txt) txt.focus();
-                    elm.classList.contains('fields') && elm.scrollIntoView({ behavior: "smooth", block: "center" });
-                }
-            })
-        })
-
-        content = gui.querySelector('.editContent');
-        title = gui.querySelector('.editTitle');
-        authorName = gui.querySelector('.editAuthorName');
-        authorLink = gui.querySelector('.editAuthorLink');
-        desc = gui.querySelector('.editDescription');
-        thumbLink = gui.querySelector('.editThumbnailLink');
-        imgLink = gui.querySelector('.editImageLink');
-        footerText = gui.querySelector('.editFooterText');
-        footerLink = gui.querySelector('.editFooterLink');
-        fields = gui.querySelector('.fields ~ .edit');
-
-        document.querySelector('.addField').addEventListener('click', () => {
-            !json.embed && (json.embed = {});
-            let arr = json.embed.fields || [];
-            if (arr.length >= 25) return error('Cannot have more than 25 fields', 5000);
-            arr.push({ name: "Field name", value: "Field value", inline: false });
-            json.embed.fields = arr;
-            update(json);
-            buildGui(json, { newField: true, activate: document.querySelectorAll('.gui > .item.active') });
-        })
-
-        gui.querySelectorAll('textarea, input').forEach(e => e.addEventListener('input', el => {
-            let v = el.target.value, field = el.target.closest('.field');
-            if (field) {
-                let jsonField = json.embed.fields[Array.from(fields.children).indexOf(field)];
-                if (jsonField) {
-                    if (el.target.type === 'text') jsonField.name = v;
-                    else if (el.target.type === 'textarea') jsonField.value = v;
-                    else jsonField.inline = el.target.checked;
                 } else {
-                    let obj = {}
-                    if (el.target.type === 'text') obj.name = v;
-                    else if (el.target.type === 'textarea') obj.value = v;
-                    else obj.inline = el.target.checked;
-                    json.embed.fields.push(obj);
-                }
-            } else {
-                json.embed ??= {};
-                switch (el.target) {
-                    case content: json.content = v; break;
-                    case title: json.embed.title = v; break;
-                    case authorName: json.embed.author ??= {}, json.embed.author.name = v; break;
-                    case authorLink: json.embed.author ??= {}, json.embed.author.icon_url = v, imgSrc(el.target.previousElementSibling, v); break;
-                    case desc: json.embed.description = v; break;
-                    case thumbLink: json.embed.thumbnail ??= {}, json.embed.thumbnail.url = v, imgSrc(el.target.closest('.editIcon').querySelector('.imgParent'), v); break;
-                    case imgLink: json.embed.image ??= {}, json.embed.image.url = v, imgSrc(el.target.closest('.editIcon').querySelector('.imgParent'), v); break;
-                    case footerText: json.embed.footer ??= {}, json.embed.footer.text = v; break;
-                    case footerLink: json.embed.footer ??= {}, json.embed.footer.icon_url = v, imgSrc(el.target.previousElementSibling, v); break;
-                }
-            }
-            update(json);
-        }))
-
-        if (opts?.activate) {
-            let elements = opts.activate;
-            Array.from(elements).map(el => el.className).map(clss => '.' + clss.split(' ').slice(0, 2).join('.'))
-                .forEach(clss => document.querySelectorAll(clss)
-                    .forEach(e => e.classList.add('active')))
-        } else['.item.author', '.item.description'].forEach(clss => document.querySelector(clss).classList.add('active'));
-
-        if (opts?.newField) {
-            let last = fields.children[fields.childElementCount - 2], el = last.querySelector('.designerFieldName > input');
-            el.setSelectionRange(el.value.length, el.value.length); el.focus();
-            last.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-
-        let files = document.querySelectorAll('input[type="file"]');
-        files.forEach(f => f.addEventListener('change', e => {
-            if (f.files) {
-                e.target.nextElementSibling.click();
-                e.target.closest('.edit').querySelector('.browse').classList.add('loading');
-            }
-        }))
-
-        document.querySelectorAll('form').forEach(form => form.addEventListener('submit', e => {
-            e.preventDefault();
-            let formData = new FormData(e.target);
-            formData.append('file', files.files);
-            formData.append('datetime', '10m');
-            fetch('https://tempfile.site/api/files', {
-                method: 'POST',
-                body: formData,
-            })
-                .then(res => res.json())
-                .then(res => {
-                    let browse = e.target.closest('.edit').querySelector('.browse');
-                    browse.classList.remove('loading');
-                    if (!res.ok) {
-                        console.log(res.error);
-                        browse.classList.add('error');
-                        return setTimeout(() => browse.classList.remove('error'), 5000)
+                    json.embed ??= {};
+                    switch (el.target) {
+                        case content: json.content = value; break;
+                        case title: json.embed.title = value; break;
+                        case authorName: json.embed.author ??= {}, json.embed.author.name = value; break;
+                        case authorLink: json.embed.author ??= {}, json.embed.author.icon_url = value, imgSrc(el.target.previousElementSibling, value); break;
+                        case desc: json.embed.description = value; break;
+                        case thumbLink: json.embed.thumbnail ??= {}, json.embed.thumbnail.url = value, imgSrc(el.target.closest('.editIcon').querySelector('.imgParent'), value); break;
+                        case imgLink: json.embed.image ??= {}, json.embed.image.url = value, imgSrc(el.target.closest('.editIcon').querySelector('.imgParent'), value); break;
+                        case footerText: json.embed.footer ??= {}, json.embed.footer.text = value; break;
+                        case footerLink: json.embed.footer ??= {}, json.embed.footer.icon_url = value, imgSrc(el.target.previousElementSibling, value); break;
                     }
-                    imgSrc(e.target.previousElementSibling.querySelector('.editIcon > .imgParent') || e.target.closest('.editIcon').querySelector('.imgParent'), res.link);
-                    let input = e.target.previousElementSibling.querySelector('.editIcon > input') || e.target.previousElementSibling;
-                    input.value = res.link;
-                    if (input === authorLink) json.embed.author.icon_url = res.link;
-                    else if (input === thumbLink) json.embed.thumbnail.url = res.link;
-                    else if (input === imgLink) json.embed.image.url = res.link;
-                    else json.embed.footer.icon_url = res.link;
-                    update(json);
-                    console.info(`Image (${res.link}) will be deleted in 5 minutes. To delete it now got to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`);
-                }).catch(err => `Request to tempfile.site failed with error: ${err}`)
-        }))
-    }
+                }
+                update(json);
+            }))
+
+            if (opts?.activate) {
+                let elements = opts.activate;
+                Array.from(elements).map(el => el.className).map(clss => '.' + clss.split(' ').slice(0, 2).join('.'))
+                    .forEach(clss => document.querySelectorAll(clss)
+                        .forEach(e => e.classList.add('active')))
+            } else['.item.author', '.item.description'].forEach(clss => document.querySelector(clss).classList.add('active'));
+
+            if (opts?.newField) {
+                let last = fields.children[fields.childElementCount - 2], el = last.querySelector('.designerFieldName > input');
+                el.setSelectionRange(el.value.length, el.value.length); el.focus();
+                last.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+
+            let files = document.querySelectorAll('input[type="file"]');
+            files.forEach(f => f.addEventListener('change', e => {
+                if (f.files) {
+                    e.target.nextElementSibling.click();
+                    e.target.closest('.edit').querySelector('.browse').classList.add('loading');
+                }
+            }))
+
+            document.querySelectorAll('form').forEach(form => form.addEventListener('submit', e => {
+                e.preventDefault();
+                let formData = new FormData(e.target);
+                formData.append('file', files.files);
+                formData.append('datetime', '10m');
+                fetch('https://tempfile.site/api/files', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(res => res.json())
+                    .then(res => {
+                        let browse = e.target.closest('.edit').querySelector('.browse');
+                        browse.classList.remove('loading');
+                        if (!res.ok) {
+                            console.log(res.error);
+                            browse.classList.add('error');
+                            return setTimeout(() => browse.classList.remove('error'), 5000)
+                        }
+                        imgSrc(e.target.previousElementSibling.querySelector('.editIcon > .imgParent') || e.target.closest('.editIcon').querySelector('.imgParent'), res.link);
+                        let input = e.target.previousElementSibling.querySelector('.editIcon > input') || e.target.previousElementSibling;
+                        input.value = res.link;
+                        if (input === authorLink) ((json.embed ??= {}).author ??= {}).icon_url = res.link;
+                        else if (input === thumbLink) ((json.embed ??= {}).thumbnail ??= {}).url = res.link;
+                        else if (input === imgLink) ((json.embed ??= {}).image ??= {}).url = res.link;
+                        else ((json.embed ??= {}).footer ??= {}).url = res.link;
+                        update(json);
+                        console.info(`Image (${res.link}) will be deleted in 10 minutes. To delete it now, go to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`);
+                    }).catch(err => error(`Request to tempfile.site failed with error: ${err}`, 5000))
+            }))
+        }
 
     buildGui(json);
     fields = gui.querySelector('.fields ~ .edit');
@@ -649,7 +662,7 @@ window.onload = () => {
     })
 
     document.querySelector('.clear').addEventListener('click', () => {
-        json = { };
+        json = {};
         embed.style.removeProperty('border-color');
         picker.source.style.removeProperty('background');
         update(json); buildGui(json); editor.setValue(JSON.stringify(json, null, 4));

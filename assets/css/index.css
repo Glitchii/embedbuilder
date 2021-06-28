@@ -773,8 +773,6 @@ u {
 .notification .inline {
     width: auto;
     height: auto;
-    padding: .2em;
-    margin: -.2em 0;
     border-radius: 3px;
     font-size: 85%;
     font-family: Consolas, Andale Mono WT, Andale Mono, Lucida Console, Lucida Sans Typewriter, DejaVu Sans Mono, Bitstream Vera Sans Mono, Liberation Mono, Nimbus Mono L, Monaco, Courier New, Courier, monospace;
@@ -782,11 +780,12 @@ u {
     border: none;
     overflow: hidden;
     white-space: pre-wrap;
-    background-color: #4a3535;
     color: white;
     color: inherit;
-    background-color: inherit;
-    border: 1px dashed;
+    /* border: 1px dashed; */
+    padding: .3em 0em;
+    border-radius: 2px;
+    margin: -.2em 5px;
 }
 
 @keyframes notifAn {
@@ -1253,7 +1252,7 @@ textarea {
 
 .browse.error>p::after {
     color: #ee9191;
-    content: "Request failed. (Check dev-tools)";
+    content: "Request failed. (Check console)";
 }
 
 .linkName {
@@ -1651,8 +1650,9 @@ body {
         height: 100%;
     }
     .notification .inline {
-        display: block;
         margin-top: 5px;
+        background-color: #20222500;
+        border: none;
     }
     .bottom .colrs {
         bottom: 40px;
