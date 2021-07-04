@@ -1252,7 +1252,7 @@ textarea {
 
 .browse.error>p::after {
     color: #ee9191;
-    content: "Request failed. (Check console)";
+    content: "Request failed. (Check dev-console)";
 }
 
 .linkName {

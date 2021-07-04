@@ -106,7 +106,7 @@ window.onload = () => {
                     let activeInput = document.querySelector('input[class$="link" i]:focus')
                     if (activeInput) {
                         lastPos = activeInput.selectionStart + 7;
-                        authorLink.value = `http://${re[2]}`;
+                        activeInput.value = `http://${re[2]}`;
                         update(JSON.parse(str.replace(re[0], `${re[1]}http://${re[2]}"`)));
                         activeInput.setSelectionRange(lastPos, lastPos)
                         return true;
