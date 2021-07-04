@@ -59,7 +59,7 @@ var activeFields, colNum = 1, num = 0,
                 },
                 {
                     name: "Another field",
-                    value: "> Nope, didn't forget about code blocks",
+                    value: "> Nope, didn't forget about this",
                     inline: false
                 }
             ]
