@@ -76,7 +76,6 @@ window.onload = () => {
         gui = guiParent.querySelector('.gui:first-of-type');
     window.editor = CodeMirror(elt => editorHolder.parentNode.replaceChild(elt, editorHolder), {
         value: JSON.stringify(json, null, 4),
-        extraKeys: { Tab: cm => cm.replaceSelection("    ", "end") },
         gutters: ["CodeMirror-foldgutter", "CodeMirror-lint-markers"],
         scrollbarStyle: "overlay",
         mode: "application/json",
@@ -84,6 +83,22 @@ window.onload = () => {
         matchBrackets: true,
         foldGutter: true,
         lint: true,
+        extraKeys: {
+            // Make tabs four spaces long instead of the default two.
+            Tab: cm => cm.replaceSelection("    ", "end"),
+            // Fill in indent spaces on a new line when enter (return) key is pressed.
+            Enter: _ => {
+                let cur = editor.getCursor(), end = editor.getLine(cur.line),
+                    leadingSpaces = end.replace(/\S($|.)+/g, '') || '    \n', nextLine = editor.getLine(cur.line + 1);
+                if ((nextLine === undefined || !nextLine.trim()) && !end.substr(cur.ch).trim())
+                    editor.replaceRange('\n', { line: cur.line, ch: cur.ch });
+                else
+                    editor.replaceRange(`\n${end.endsWith('{') ? leadingSpaces + '    ' : leadingSpaces}`, {
+                        line: cur.line,
+                        ch: cur.ch
+                    });
+            },
+        }
     });
 
     editor.focus();
@@ -156,8 +171,7 @@ window.onload = () => {
             if (data) el.innerHTML = data;
             el.style.display = displayType || "unset";
         }, hide = el => el.style.removeProperty('display'),
-        imgSrc = (elm, src, remove) => remove ? elm.style.removeProperty('content') : elm.style.content = `url(${src})`,
-        toObj = jsonString => JSON.parse(jsonString.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (x, y) => y ? "" : x));
+        imgSrc = (elm, src, remove) => remove ? elm.style.removeProperty('content') : elm.style.content = `url(${src})`;
     buildGui = (object, opts) => {
         gui.innerHTML = `
             <div class="item content"><p class="ttle">Message content</p></div>
@@ -590,10 +604,12 @@ window.onload = () => {
                     colNum = 1;
                     let len = e.fields.filter(f => f.inline).length;
                     if (len === 2 || (len > 3 && len % 2 !== 0)) {
-                        let children = Array.from(embedFields.children), arr = children.filter(x => x === children[len] || x === children[len - 1]);
-                        arr[0] && (arr[0].style.gridColumn = '1 / 7');
-                        arr[1] && (arr[1].style.gridColumn = '7 / 13');
-                    }
+                        let children = embedFields.children;
+                        children[0] && (children[0].style.gridColumn = '1 / 7');
+                        children[1] && (children[1].style.gridColumn = '7 / 13');
+                        embed.style.maxWidth = "408px";
+                    } else
+                        embed.style.removeProperty('max-width');
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
                 embedCont.classList.remove('empty');
@@ -607,7 +623,13 @@ window.onload = () => {
     }
 
     editor.on('change', editor => {
-        try { update(toObj(editor.getValue())); }
+        //// Autofill when " key is typed on new line
+        // let line = editor.getCursor().line, text = editor.getLine(line)
+        // if (text.trim() === '"'){
+        // editor.replaceRange(text.trim() + ': ', { line, ch: line.length });
+        // editor.setCursor(line, text.length)
+        // }
+        try { update(JSON.parse(editor.getValue())); }
         catch (e) {
             if (editor.getValue()) return;
             embedCont.classList.add('empty');
@@ -646,7 +668,7 @@ window.onload = () => {
         document.querySelector('.botText').style.removeProperty('top');
 
     document.querySelector('.opt.gui').addEventListener('click', () => {
-        json = toObj(editor.getValue() || '{}');
+        json = JSON.parse(editor.getValue() || '{}');
         buildGui(json, { activate: activeFields });
         document.body.classList.add('gui');
         activeFields = null;

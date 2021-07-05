@@ -593,6 +593,7 @@ u {
 
 .blockquote {
     display: flex;
+    display: -webkit-box;
 }
 
 .blockquote blockquote {
@@ -647,7 +648,7 @@ u {
     white-space: pre-wrap;
 }
 
-.markup pre, .markup blockquote {
+.markup pre, .markup > blockquote {
     max-width: 90%;
 }
 
