@@ -648,7 +648,7 @@ u {
     white-space: pre-wrap;
 }
 
-.markup pre, .markup > blockquote {
+.markup pre, .markup>blockquote {
     max-width: 90%;
 }
 
@@ -846,7 +846,20 @@ body.gui .top>.CodeMirror {
     overflow-x: hidden;
     scrollbar-color: #202225 #292b2f;
     scrollbar-width: thin;
+    scrollbar-width: 7px;
     margin-top: 15px;
+}
+
+.top>.gui>* {
+    scrollbar-color: #292b2f #202225;
+}
+
+.top>.gui>* ::-webkit-scrollbar {
+    background: #202225 !important;
+}
+
+.top>.gui>* ::-webkit-scrollbar-thumb {
+    background: #292b2f !important;
 }
 
 body:not(.gui) .top>.gui, body:not(.gui) .bottom, body:not(.gui) .pickerToggle {

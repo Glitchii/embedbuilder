@@ -465,7 +465,7 @@ window.onload = () => {
         gui.querySelectorAll('textarea, input').forEach(e => e.addEventListener('input', el => {
             let value = el.target.value, field = el.target.closest('.field');
             if (field) {
-                let jsonField = json.embed.fields[Array.from(fields.children).indexOf(field)];
+                let jsonField = json.embed.fields[Array.from(fields.children).filter(e => e.className === 'field').indexOf(field)];
                 if (jsonField) {
                     if (el.target.type === 'text') jsonField.name = value;
                     else if (el.target.type === 'textarea') jsonField.value = value;
@@ -694,4 +694,8 @@ window.onload = () => {
     let colrs = document.querySelector('.colrs');
     document.querySelector('.pickerToggle').addEventListener('click', () => colrs.classList.toggle('display'));
     update(json);
+    document.querySelector('.clear').click()
+    document.querySelector('.addField').click()
+    document.querySelector('.addField').parentNode.querySelector('textarea').select()
+    document.querySelector('.addField').parentNode.querySelector('textarea').focus()
 };
