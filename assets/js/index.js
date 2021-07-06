@@ -39,7 +39,7 @@ var activeFields, colNum = 1, num = 0,
                 },
                 {
                     name: "Field 2",
-                    value: "You can use custom emojis  <:Kekwlaugh:722088222766923847>. <:GangstaBlob:742256196295065661>",
+                    value: "You can use custom emojis <:Kekwlaugh:722088222766923847>. <:GangstaBlob:742256196295065661>",
                     inline: false
                 },
                 {
