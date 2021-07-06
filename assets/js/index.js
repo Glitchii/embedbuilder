@@ -692,8 +692,4 @@ window.onload = () => {
     let colrs = document.querySelector('.colrs');
     document.querySelector('.pickerToggle').addEventListener('click', () => colrs.classList.toggle('display'));
     update(json);
-    document.querySelector('.clear').click()
-    document.querySelector('.addField').click()
-    document.querySelector('.addField').parentNode.querySelector('textarea').select()
-    document.querySelector('.addField').parentNode.querySelector('textarea').focus()
 };
