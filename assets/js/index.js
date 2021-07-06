@@ -664,8 +664,6 @@ window.onload = () => {
 
     document.querySelector('.timeText').innerText = tstamp();
     document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
-    !window.navigator.userAgent.match(/Firefox\/[\d\.]+$/g) && // Firefox pushes the text up a little
-        document.querySelector('.botText').style.removeProperty('top');
 
     document.querySelector('.opt.gui').addEventListener('click', () => {
         json = JSON.parse(editor.getValue() || '{}');
