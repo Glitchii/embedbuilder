@@ -884,13 +884,14 @@ body:not(.gui) .top>.gui, body:not(.gui) .bottom, body:not(.gui) .pickerToggle {
     border-radius: 4px;
 }
 
+/* 
 body.gui .chooser>.gui {
     background: #41444a;
 }
 
 body:not(.gui) .chooser>.json {
     background: #41444a;
-}
+} */
 
 .chooser>.back {
     position: absolute;
