@@ -929,6 +929,7 @@ body:not(.gui) .chooser>.back {
 }
 
 .bottom .colrs {
+    z-index: 5;
     animation: colrsAn .5s ease-out;
     background: #212226;
     border-radius: 10px;
@@ -1038,7 +1039,7 @@ body:not(.gui) .chooser>.back {
     height: 100%!important;
 }
 
-.colRight.picking .cTop>*:not(.color-picker), .colRight.picking .pallets, .colRight:not(.picking) .colBack {
+.colrs.picking .colRight .cTop>*:not(.color-picker), .colrs.picking .colRight .pallets, .colrs:not(.picking) .colRight .colBack, .colrs:not(.picking) .hex>div {
     display: none;
 }
 
@@ -1505,6 +1506,52 @@ body {
     }
 }
 
+@keyframes hexAn {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    50% {
+        transform: translateY(40px);
+    }
+}
+
+.colrs .hex>div {
+    position: absolute;
+    top: -35px;
+    background: #212226;
+    border-radius: 5px;
+    animation: hexAn .4s ease-in-out;
+    box-shadow: 0px -2px 10px 0px #0000001f;
+    right: 0;
+    width: 50%;
+}
+
+.colrs .hex>div>span {
+    padding: 6px 6px 6px 10px;
+    display: flex;
+}
+
+.colrs .hex>div>span>span {
+    user-select: none;
+    padding: 0;
+    margin: 0;
+    font-size: 100%;
+    position: relative;
+    bottom: -1px;
+    opacity: .6;
+    margin-right: 2px;
+}
+
+.colrs .hex>div>span input {
+    width: 100%;
+    opacity: .8;
+}
+
+.colrs .hex.incorrect>div {
+    background: #262121;
+}
+
 .addField {
     animation: addFieldFade .5s ease;
     font-size: 13px;
@@ -1589,11 +1636,11 @@ body {
     transform-origin: top right;
 }
 
-.messageContent.empty, .messageContent+.container.empty, .emptyTxt {
+body.emptyContent .messageContent, body.emptyEmbed .messageContent+.container, body.emptyEmbed .messageContent+.container, body.emptyContent .messageContent, .emptyTxt {
     display: none;
 }
 
-.messageContent.empty+.container.empty+.emptyTxt {
+body.emptyEmbed.emptyContent .emptyTxt {
     display: block;
     position: absolute;
     top: 800%;
@@ -1622,19 +1669,6 @@ body {
     }
 }
 
-@media screen and (max-width: 530px) {
-    .msgEmbed {
-        margin: 20px 0px;
-        padding: 0.125rem 0 20px 65px;
-    }
-    .avatar {
-        left: 10px;
-    }
-    .main .side1 {
-        padding: 10px;
-    }
-}
-
 @media screen and (max-height: 760px) {
     .bottom .colrs {
         bottom: 10px;
@@ -1650,6 +1684,21 @@ body {
 }
 
 @media screen and (max-width: 1015px) {
+    section.low .top>.gui {
+        opacity: .6;
+        filter: blur(2px) brightness(.99);
+        pointer-events: none!important;
+    }
+    section.low {
+        height: 50%!important;
+        transition: .4s ease;
+    }
+    section {
+        transition: .5s ease;
+    }
+    body.emptyEmbed.emptyContent section.side1:not(.low) {
+        height: 300%;
+    }
     .clear {
         position: absolute;
         cursor: pointer;
@@ -1670,9 +1719,9 @@ body {
     }
     .bottom .colrs {
         bottom: 40px;
-        left: 200px;
+        top: 100px;
+        left: 10px;
         display: none;
-        top: 0;
         animation: colrsAn .1s ease-out;
         box-shadow: 0px 5px 15px 0px #0000004f;
     }
@@ -1704,12 +1753,21 @@ body {
     }
 }
 
-@media screen and (max-width: 460px) {
-    .bottom .colrs {
-        top: 70px;
+@media screen and (max-width: 530px) {
+    .msgEmbed {
+        margin: 20px 0px;
+        padding: 0.125rem 0 20px 65px;
+    }
+    .avatar {
         left: 10px;
+    }
+    .main .side1 {
+        padding: 10px;
     }
     .top>.gui {
         margin-top: 5px;
+    }
+    .emptyTxt {
+        display: none!important;
     }
 }

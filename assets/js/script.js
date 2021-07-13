@@ -433,9 +433,11 @@ window.onload = () => {
                     elm.classList.add('active');
                     if (inlineField) inlineField.querySelector('.ttle~input').focus();
                     else if (input) {
-                        input.focus();
+                        if (!matchMedia('(max-width: 1015px)').matches)
+                            input.focus();
                         input.selectionStart = input.selectionEnd = input.value.length;
-                    } else if (txt) txt.focus();
+                    } else if (txt && !matchMedia('(max-width: 1015px)').matches)
+                        txt.focus();
                     elm.classList.contains('fields') && elm.scrollIntoView({ behavior: "smooth", block: "center" });
                 }
             })
@@ -550,10 +552,10 @@ window.onload = () => {
     fields = gui.querySelector('.fields ~ .edit');
     update = data => {
         try {
-            if (!data.content) embedContent.classList.add('empty');
+            if (!data.content) document.body.classList.add('emptyContent');
             else {
                 embedContent.innerHTML = markup(encodeHTML(data.content), { replaceEmojis: true });
-                embedContent.classList.remove('empty');
+                document.body.classList.remove('emptyContent');
             }
             if (data.embed && Object.keys(data.embed).length) {
                 let e = data.embed;
@@ -612,11 +614,13 @@ window.onload = () => {
                         embed.style.removeProperty('max-width');
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
-                embedCont.classList.remove('empty');
+                document.body.classList.remove('emptyEmbed');
                 document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
                 notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
                 twemoji.parse(msgEmbed);
-            } else embedCont.classList.add('empty');
+            } else document.body.classList.add('emptyEmbed');
+            if (!embedCont.innerText)
+                document.body.classList.add('emptyEmbed');
         } catch (e) {
             error(e);
         }
@@ -632,7 +636,7 @@ window.onload = () => {
         try { update(JSON.parse(editor.getValue())); }
         catch (e) {
             if (editor.getValue()) return;
-            embedCont.classList.add('empty');
+            document.body.classList.add('emptyEmbed');
             embedContent.innerHTML = '';
         }
     });
@@ -640,12 +644,32 @@ window.onload = () => {
     let picker = new CP(document.querySelector('.picker'), state = { parent: document.querySelector('.cTop') });
     picker.fire('change', toRGB('#41f097'));
 
-    let colRight = document.querySelector('.colRight'), removePicker = () => colRight.classList.remove('picking');
-    document.querySelector('.colBack').addEventListener('click', e => {
-        picker.self.remove(); removePicker();
+    let colrs = document.querySelector('.colrs'),
+        hexInput = colrs.querySelector('.hex>div input'),
+        typingHex = true, exit = false,
+        removePicker = () => {
+            if (exit) return exit = false;
+            if (typingHex) picker.enter();
+            else {
+                typingHex = false, exit = true;
+                colrs.classList.remove('picking');
+                picker.exit();
+            }
+        }
+    document.querySelector('.colBack').addEventListener('click', () => {
+        picker.self.remove();
+        typingHex = false;
+        removePicker();
     })
-    picker.on('enter', () => colRight.classList.add('picking'))
+    window.picker = picker
     picker.on('exit', removePicker);
+    picker.on('enter', () => {
+        if (json?.embed?.color){
+            hexInput.value = json.embed.color.toString(16).padStart(6, '0');
+            document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
+        }
+        colrs.classList.add('picking')
+    })
 
     document.querySelectorAll('.colr').forEach(e => e.addEventListener('click', el => {
         el = el.target.closest('.colr') || el.target;
@@ -654,11 +678,13 @@ window.onload = () => {
         picker.source.style.removeProperty('background');
     }))
 
+    hexInput.addEventListener('focus', () => typingHex = true);
     setTimeout(() => {
         picker.on('change', function (r, g, b, a) {
             embed.closest('.embed').style.borderColor = this.color(r, g, b);
             json.embed && (json.embed.color = parseInt(this.color(r, g, b).slice(1), 16));
             picker.source.style.background = this.color(r, g, b);
+            hexInput.value = json.embed.color.toString(16).padStart(6, '0');
         })
     }, 1000)
 
@@ -670,14 +696,21 @@ window.onload = () => {
         buildGui(json, { activate: activeFields });
         document.body.classList.add('gui');
         activeFields = null;
+        if (pickInGuiMode) {
+            pickInGuiMode = false;
+            togglePicker();
+        }
     })
 
     document.querySelector('.opt.json').addEventListener('click', () => {
         editor.setValue(JSON.stringify(json, null, 4));
         editor.refresh();
         document.body.classList.remove('gui');
+        // if (!matchMedia('(max-width: 1015px)').matches)
         editor.focus();
         activeFields = document.querySelectorAll('.gui > .item.active');
+        if (document.querySelector('section.low'))
+            togglePicker(true);
     })
 
     document.querySelector('.clear').addEventListener('click', () => {
@@ -686,10 +719,32 @@ window.onload = () => {
         picker.source.style.removeProperty('background');
         update(json); buildGui(json); editor.setValue(JSON.stringify(json, null, 4));
         document.querySelectorAll('.gui>.item').forEach(e => e.classList.add('active'));
-        content.focus();
+        if (!matchMedia('(max-width: 1015px)').matches)
+            content.focus();
+    })
+    let pickInGuiMode = false;
+    togglePicker = pickLater => {
+        colrs.classList.toggle('display');
+        document.querySelector('.side1').classList.toggle('low');
+        pickLater && (pickInGuiMode = true);
+    };
+
+    document.querySelector('.pickerToggle').addEventListener('click', togglePicker);
+    update(json);
+
+    document.body.addEventListener('click', e => {
+        if (e.target.classList.contains('low') || e.target.classList.contains('top'))
+            togglePicker();
     })
 
-    let colrs = document.querySelector('.colrs');
-    document.querySelector('.pickerToggle').addEventListener('click', () => colrs.classList.toggle('display'));
-    update(json);
+    document.querySelector('.colrs .hex>div').addEventListener('input', e => {
+        let inputValue = e.target.value;
+        if (inputValue.startsWith('#'))
+            e.target.value = inputValue.slice(1), inputValue = e.target.value;
+        if (inputValue.length !== 6 || !/^[a-zA-Z0-9]{6}$/g.test(inputValue))
+            return e.target.closest('.hex').classList.add('incorrect');
+        e.target.closest('.hex').classList.remove('incorrect');
+        json.embed.color = parseInt(inputValue, 16);
+        update(json);
+    })
 };
