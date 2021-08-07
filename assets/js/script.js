@@ -186,7 +186,7 @@ window.onload = () => {
                         <input class="editAuthorLink" type="text" value="${encodeHTML(object.embed?.author?.icon_url || '')}" placeholder="Icon URL" autocomplete="off"/>
                     </div>
                     <div class="editName">
-                        <input class="editAuthorName" type="text" value="${encodeHTML(object.embed?.author?.name || '')}" placeholder="Author name" autocomplete="off" />
+                        <input class="editAuthorName" maxlength="256" type="text" value="${encodeHTML(object.embed?.author?.name || '')}" placeholder="Author name" autocomplete="off" />
                     </div>
                 </div>
                 <form method="post" enctype="multipart/form-data">
