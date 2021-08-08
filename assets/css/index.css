@@ -848,6 +848,7 @@ body.gui .top>.CodeMirror {
     scrollbar-width: thin;
     scrollbar-width: 7px;
     margin-top: 15px;
+    padding-bottom: 20px;
 }
 
 .top>.gui>* {
@@ -884,8 +885,7 @@ body:not(.gui) .top>.gui, body:not(.gui) .bottom, body:not(.gui) .pickerToggle {
     border-radius: 4px;
 }
 
-/* 
-body.gui .chooser>.gui {
+/* body.gui .chooser>.gui {
     background: #41444a;
 }
 
@@ -1276,7 +1276,7 @@ textarea {
 }
 
 .linkName, .linkName .txtCol, .linkName .txtCol>input[type="text"] {
-    width: 100%;
+    width: 93%;
     text-overflow: ellipsis;
 }
 
@@ -1513,6 +1513,7 @@ body {
         transform: translateY(40px);
     }
     50% {
+        opacity: 0;
         transform: translateY(40px);
     }
 }
@@ -1524,7 +1525,8 @@ body {
     border-radius: 5px;
     animation: hexAn .4s ease-in-out;
     box-shadow: 0px -2px 10px 0px #0000001f;
-    right: 0;
+    right: 0px;
+    /* right: 50px; */
     width: 50%;
 }
 
@@ -1748,6 +1750,9 @@ body.emptyEmbed.emptyContent .emptyTxt {
     .pickerToggle>svg {
         width: 17px;
     }
+    .main .side1 {
+        border-right: none;
+    }
     .side1 .item.top {
         padding-top: 10px;
         transform: translateY(10px);
@@ -1755,13 +1760,6 @@ body.emptyEmbed.emptyContent .emptyTxt {
 }
 
 @media screen and (max-width: 530px) {
-    .msgEmbed {
-        margin: 20px 0px;
-        padding: 0.125rem 0 20px 65px;
-    }
-    .avatar {
-        left: 10px;
-    }
     .main .side1 {
         padding: 10px;
     }
@@ -1770,5 +1768,12 @@ body.emptyEmbed.emptyContent .emptyTxt {
     }
     .emptyTxt {
         display: none!important;
+    }
+    .msgEmbed {
+        margin: 20px 0px;
+        padding: 0.125rem 0 20px 65px;
+    }
+    .avatar {
+        left: 10px;
     }
 }

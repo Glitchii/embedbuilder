@@ -2,7 +2,9 @@
 
 Visualize embed or message content from JSON input or provided GUI editor.
 
-This can be used for bot embed commands. Not everyone understands JSON, thus GUI.  
+This can be used for discord bot embed commands. It can also be intergreted into your Discord bot's website.  
+
+Aside the JSON editor, it also includes a GUI editor which converts to JSON for simplicity.
 You can look into the [project boards](https://github.com/Glitchii/embedbuilder/projects/3) if you want to see what is being worked on or want to contribute.
 <br>
 <br>
