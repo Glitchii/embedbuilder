@@ -2,14 +2,45 @@
 // Want to use or contribute to this? https://github.com/Glitchii/embedbuilder
 // If you found an issue, please report it, make a P.R, or use the discussion page. Thanks
 
-var activeFields, colNum = 1, num = 0,
+
+var params = new URL(location).searchParams,
+    dataSpecified = params.get('data'),
+    botName = params.get('username'),
+    botIcon = params.get('avatar'),
+    guiTabs = params.get('guitabs'),
+    useJsonEditor = params.get('editor') === 'json',
+    botVerified = params.get('verified') === 'true',
+    reverseColmns = params.get('reversed') === 'true',
+    activeFields, colNum = 1, num = 0, validationError,
+    jsonToBase64 = (jsonCode, withURL, redirect) => {
+        let data = jsonCode || json;
+        if (typeof data === 'object')
+            data = JSON.stringify(data);
+        data = btoa(escape(data));
+        if (withURL) {
+            let currentURL = new URL(location);
+            currentURL.searchParams.append('data', data);
+            redirect && (window.location = currentURL)
+            data = currentURL.href;
+        }
+        return data;
+    },
+    base64ToJson = data => {
+        jsonData = unescape(atob(data || dataSpecified));
+        if (typeof jsonData === 'string')
+            jsonData = JSON.parse(jsonData);
+        return jsonData;
+    },
     toRGB = (hex, reversed, integer) => {
         if (reversed) return '#' + hex.match(/[\d]+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
         if (integer) return parseInt(hex.match(/[\d]+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join(''), 16);
         if (hex.includes(',')) return hex.match(/[\d]+/g);
         hex = hex.replace('#', '').match(/.{1,2}/g)
         return [parseInt(hex[0], 16), parseInt(hex[1], 16), parseInt(hex[2], 16), 1];
-    }, json = {
+    },
+    mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
+    jsonKeys = ["embed", "content", ...mainKeys],
+    json = {
         content: "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
         embed: {
             title: "Hello ~~people~~ world :wave:",
@@ -64,16 +95,31 @@ var activeFields, colNum = 1, num = 0,
                 }
             ]
         }
-    };
+    }
+
+if (dataSpecified)
+    window.json = base64ToJson();
 
 window.onload = () => {
-    document.querySelectorAll('img.clickable')
-        .forEach(e => e.addEventListener('click', el => window.open(el.target.src)));
+    if (useJsonEditor) document.body.classList.remove('gui');
+    if (botName) document.querySelector('.username').textContent = botName;
+    if (botIcon) document.querySelector('.avatar').src = botIcon;
+    if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
+    if (reverseColmns) {
+        let side1 = document.querySelector('.side1');
+        side1.parentElement.insertBefore(side1.nextElementSibling, side1);
+        document.body.classList.add('reversed');
+    };
+
+    document.querySelectorAll('.clickable > img')
+        .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
+
     let editorHolder = document.querySelector('.editorHolder'),
         guiParent = document.querySelector('.top'),
         embedContent = document.querySelector('.messageContent'),
         embedCont = document.querySelector('.messageContent + .container'),
         gui = guiParent.querySelector('.gui:first-of-type');
+
     window.editor = CodeMirror(elt => editorHolder.parentNode.replaceChild(elt, editorHolder), {
         value: JSON.stringify(json, null, 4),
         gutters: ["CodeMirror-foldgutter", "CodeMirror-lint-markers"],
@@ -109,14 +155,18 @@ window.onload = () => {
                 return txt.length > (length - 3) ? txt.substring(0, length - 3) + '...' : txt;
             return txt;
         }, error = (msg, time) => {
+            if (msg === false)
+                // Hide error element
+                return notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
             notif.innerHTML = msg, notif.style.display = 'block';
             time && setTimeout(() => notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 })
                 .onfinish = () => notif.style.removeProperty('display'), time);
             return false;
         }, allGood = e => {
-            let str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
-            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date") return error('Timestamp is invalid');
-            if (re) { // If a URL is found without a protocol
+            let invalid, err, str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
+            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date")
+                invalid = true, err = 'Timestamp is invalid';
+            else if (re) { // If a URL is found without a protocol
                 if (!/\w+:|\/\/|^\//g.exec(re[2]) && re[2].includes('.')) {
                     let activeInput = document.querySelector('input[class$="link" i]:focus')
                     if (activeInput) {
@@ -127,7 +177,11 @@ window.onload = () => {
                         return true;
                     }
                 }
-                return error(`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
+                invalid = true, err = (`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
+            }
+            if (invalid) {
+                validationError = true;
+                return error(err);
             }
             return true;
         }, markup = (txt, opts) => {
@@ -141,12 +195,12 @@ window.onload = () => {
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
                 .replace(/_(.+?)_/g, '<em>$1</em>')
             if (opts.inlineBlock) txt = txt.replace(/\`([^\`]+?)\`|\`\`([^\`]+?)\`\`|\`\`\`((?:\n|.)+?)\`\`\`/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
-            else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
+            else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x.trim()}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x.trim()}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
             if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
             if (opts.replaceEmojis) txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
             txt = txt
-                .replace(/(?<=\n|^)\s*&#62;\s+([^\n]+)/g, '<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>$1</blockquote></div>')
-                .replace(/\n/g, '<br>');
+                .replace(/&#62; .+(?:\s&#62; .+)*\n?/g, match => `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${match.replace(/&#62; /g, '')}</blockquote></div>`)
+                .replace(/\n/g, '<br>')
             return txt;
         },
         embed = document.querySelector('.embedGrid'),
@@ -155,13 +209,14 @@ window.onload = () => {
         embedDescription = document.querySelector('.embedDescription'),
         embedAuthor = document.querySelector('.embedAuthor'),
         embedFooter = document.querySelector('.embedFooter'),
-        embedImage = document.querySelector('.embedImage'),
-        embedThumbnail = document.querySelector('.embedThumbnail'),
+        embedImage = document.querySelector('.embedImage > img'),
+        embedThumbnail = document.querySelector('.embedThumbnail > img'),
         embedFields = embed.querySelector('.embedFields'),
+        smallerScreen = matchMedia('(max-width: 1015px)'),
         encodeHTML = str => str.replace(/[\u00A0-\u9999<>\&]/g, i => '&#' + i.charCodeAt(0) + ';'),
         tstamp = stringISO => {
             let date = stringISO ? new Date(stringISO) : new Date(),
-                dateArray = date.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' }),
+                dateArray = date.toLocaleString('en-US', { hour: 'numeric', hour12: false, minute: 'numeric' }),
                 today = new Date(),
                 yesterday = new Date(new Date().setDate(today.getDate() - 1));
             return today.toDateString() === date.toDateString() ? `Today at ${dateArray}` :
@@ -429,22 +484,31 @@ window.onload = () => {
                     elm.classList.add('active');
                     if (inlineField) inlineField.querySelector('.ttle~input').focus();
                     else if (input) {
-                        if (!matchMedia('(max-width: 1015px)').matches)
+                        if (!smallerScreen.matches)
                             input.focus();
                         input.selectionStart = input.selectionEnd = input.value.length;
-                    } else if (txt && !matchMedia('(max-width: 1015px)').matches)
+                    } else if (txt && !smallerScreen.matches)
                         txt.focus();
-                    elm.classList.contains('fields') && elm.scrollIntoView({ behavior: "smooth", block: "center" });
+                    if (elm.classList.contains('fields')) {
+                        if (reverseColmns && smallerScreen.matches)
+                            // return elm.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: "end" });
+                            return elm.parentNode.scrollTop = elm.offsetTop;
+                        elm.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
                 }
             })
         })
 
         // Scroll into view when tabs are opened in the GUI.
         let lastTabs = Array.from(document.querySelectorAll('.footer.rows2, .image.largeImg')),
-            requiresView = matchMedia('(max-width: 1015px), (max-height: 845px)');
+            requiresView = matchMedia(`${smallerScreen.media}, (max-height: 845px)`);
         document.querySelectorAll('.gui>.item:not(.fields)').forEach(e => e.addEventListener('click', () => {
-            if (lastTabs.includes(e) || requiresView.matches)
-                e.scrollIntoView({ behavior: 'smooth', block: "center" })
+            if (lastTabs.includes(e) || requiresView.matches) {
+                if (!reverseColmns || !smallerScreen.matches) e.scrollIntoView({ behavior: 'smooth', block: "center" });
+                else if (e.nextElementSibling.classList.contains('edit') && e.classList.contains('active'))
+                    // e.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: "end" });
+                    e.parentNode.scrollTop = e.offsetTop;
+            }
         }));
 
         content = gui.querySelector('.editContent');
@@ -500,12 +564,21 @@ window.onload = () => {
             update(json);
         }))
 
-        if (opts?.activate) {
-            let elements = opts.activate;
-            Array.from(elements).map(el => el.className).map(clss => '.' + clss.split(' ').slice(0, 2).join('.'))
+        if (opts?.guiTabs) {
+            let tabs = opts.guiTabs.split(/, */), bottomKeys = ['footer', 'image'], topKeys = ['author', 'content'];
+            document.querySelectorAll(`.${tabs.join(', .')}`).forEach(e => e.classList.add('active'));
+
+            // Autoscroll GUI to the bottom if necessary.
+            if (!tabs.some(item => topKeys.includes(item)) && tabs.some(item => bottomKeys.includes(item))) {
+                let gui2 = document.querySelector('.top .gui');
+                gui2.scrollTo({ top: gui2.scrollHeight });
+            }
+        } else if (opts?.activate) {
+            Array.from(opts.activate).map(el => el.className).map(clss => '.' + clss.split(' ').slice(0, 2).join('.'))
                 .forEach(clss => document.querySelectorAll(clss)
                     .forEach(e => e.classList.add('active')))
-        } else['.item.author', '.item.description'].forEach(clss => document.querySelector(clss).classList.add('active'));
+        } else
+            document.querySelectorAll('.item.author, .item.description').forEach(clss => clss.classList.add('active'));
 
         if (opts?.newField) {
             let last = fields.children[fields.childElementCount - 2], el = last.querySelector('.designerFieldName > input');
@@ -551,7 +624,7 @@ window.onload = () => {
         }))
     }
 
-    buildGui(json);
+    buildGui(json, { guiTabs });
     fields = gui.querySelector('.fields ~ .edit');
     update = data => {
         try {
@@ -563,21 +636,31 @@ window.onload = () => {
             if (data.embed && Object.keys(data.embed).length) {
                 let e = data.embed;
                 if (!allGood(e)) return;
+                validationError = false;
                 if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + encodeHTML(url(e.url)) + '">' + encodeHTML(e.title) + '</a>' : encodeHTML(e.title)}`, { replaceEmojis: true, inlineBlock: true }));
                 else hide(embedTitle);
                 if (e.description) display(embedDescription, markup(encodeHTML(e.description), { inEmbed: true, replaceEmojis: true }));
                 else hide(embedDescription);
-                if (e.color) embed.closest('.embed').style.borderColor = encodeHTML(typeof e.color === 'number' ? '#' + e.color.toString(16).padStart(6, "0") : e.color);
+                if (e.color) embed.closest('.embed').style.borderColor = (typeof e.color === 'number' ? '#' + e.color.toString(16).padStart(6, "0") : e.color);
                 else embed.closest('.embed').style.removeProperty('border-color');
-                if (e.author && e.author.name) display(embedAuthor, `
-                    ${e.author.icon_url ? '<img class="embedAuthorIcon" src="' + encodeHTML(url(e.author.icon_url)) + '">' : ''}
-                    ${e.author.url ? '<a class="embedAuthorNameLink embedLink embedAuthorName" href="' + encodeHTML(url(e.author.url)) + '" target="_blank">' + encodeHTML(e.author.name) + '</a>' : '<span class="embedAuthorName">' + encodeHTML(e.author.name) + '</span>'}`, 'flex');
+                if (e.author?.name) display(embedAuthor, `
+                ${e.author.icon_url ? '<img class="embedAuthorIcon" src="' + encodeHTML(url(e.author.icon_url)) + '">' : ''}
+                ${e.author.url ? '<a class="embedAuthorNameLink embedLink embedAuthorName" href="' + encodeHTML(url(e.author.url)) + '" target="_blank">' + encodeHTML(e.author.name) + '</a>' : '<span class="embedAuthorName">' + encodeHTML(e.author.name) + '</span>'}`, 'flex');
                 else hide(embedAuthor);
-                if (e.thumbnail && e.thumbnail.url) embedThumbnail.src = encodeHTML(e.thumbnail.url), embedThumbnail.style.display = 'block';
-                else hide(embedThumbnail);
-                if (e.image && e.image.url) embedImage.src = encodeHTML(e.image.url), embedImage.style.display = 'block';
-                else hide(embedImage);
-                if (e.footer && e.footer.text) display(embedFooter, `
+                let pre = embed.querySelector('.markup pre');
+                if (e.thumbnail?.url) {
+                    embedThumbnail.src = e.thumbnail.url,
+                        embedThumbnail.parentElement.style.display = 'block';
+                    if (pre) pre.style.maxWidth = '90%';
+                } else {
+                    hide(embedThumbnail.parentElement);
+                    if (pre) pre.style.removeProperty('max-width');
+                }
+                if (e.image?.url)
+                    embedImage.src = e.image.url,
+                        embedImage.parentElement.style.display = 'block';
+                else hide(embedImage.parentElement);
+                if (e.footer?.text) display(embedFooter, `
                     ${e.footer.icon_url ? '<img class="embedFooterIcon" src="' + encodeHTML(url(e.footer.icon_url)) + '">' : ''}<span class="embedFooterText">
                         ${encodeHTML(e.footer.text)}
                     ${e.timestamp ? '<span class="embedFooterSeparator">•</span>' + encodeHTML(tstamp(e.timestamp)) : ''}</span></div>`, 'flex');
@@ -585,58 +668,98 @@ window.onload = () => {
                 else hide(embedFooter);
                 if (e.fields) {
                     embedFields.innerHTML = '';
-                    e.fields.forEach(f => {
+                    let index, gridCol;
+
+                    e.fields.forEach((f, i) => {
                         if (f.name && f.value) {
-                            if (!f.inline) {
-                                let el = embedFields.insertBefore(document.createElement('div'), null);
-                                el.outerHTML = `
-                            <div class="embedField" style="grid-column: 1 / 13;">
-                                <div class="embedFieldName">${markup(encodeHTML(f.name), { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
-                                <div class="embedFieldValue">${markup(encodeHTML(f.value), { inEmbed: true, replaceEmojis: true })}</div>
-                            </div>`;
-                            } else {
-                                el = embedFields.insertBefore(document.createElement('div'), null);
-                                el.outerHTML = `
-                            <div class="embedField ${num}" style="grid-column: ${colNum} / ${colNum + 4};">
-                                <div class="embedFieldName">${markup(encodeHTML(f.name), { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
-                                <div class="embedFieldValue">${markup(encodeHTML(f.value), { inEmbed: true, replaceEmojis: true })}</div>
-                            </div>`;
-                                colNum = (colNum === 9 ? 1 : colNum + 4);
-                                num++;
+                            let fieldElement = embedFields.insertBefore(document.createElement('div'), null);
+                            // Figuring out if there are only two fields on a row to give them more space.
+                            // e.fields = json.embeds.fields.
+
+                            // if both the field of index 'i' and the next field on its right are inline and -
+                            if (e.fields[i].inline && e.fields[i + 1]?.inline &&
+                                // it's the first field in the embed or -
+                                ((i === 0 && e.fields[i + 2] && !e.fields[i + 2].inline) || ((
+                                    // it's not the first field in the embed but the previous field is not inline or - 
+                                    i > 0 && !e.fields[i - 1].inline ||
+                                    // it has 3 or more fields behind it and 3 of those are inline except the 4th one back if it exists -
+                                    i >= 3 && e.fields[i - 1].inline && e.fields[i - 2].inline && e.fields[i - 3].inline && (e.fields[i - 4] ? !e.fields[i - 4].inline : !e.fields[i - 4])
+                                    // or it's the first field on the last row or the last field on the last row is not inline or it's the first field in a row and it's the last field on the last row.
+                                ) && (i == e.fields.length - 2 || !e.fields[i + 2].inline))) || i % 3 === 0 && i == e.fields.length - 2) {
+                                // then make the field halfway (and the next field will take the other half of the embed).
+                                index = i, gridCol = '1 / 7';
                             }
+                            // The next field.
+                            if (index === i - 1)
+                                gridCol = '7 / 13';
+
+                            if (!f.inline)
+                                fieldElement.outerHTML = `
+                                    <div class="embedField" style="grid-column: 1 / 13;">
+                                        <div class="embedFieldName">${markup(encodeHTML(f.name), { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
+                                        <div class="embedFieldValue">${markup(encodeHTML(f.value), { inEmbed: true, replaceEmojis: true })}</div>
+                                    </div>`;
+                            else {
+                                if (i && !e.fields[i - 1].inline) colNum = 1;
+
+                                fieldElement.outerHTML = `
+                                    <div class="embedField ${num}${gridCol ? ' colNum-2' : ''}" style="grid-column: ${gridCol || (colNum + ' / ' + (colNum + 4))};">
+                                        <div class="embedFieldName">${markup(encodeHTML(f.name), { inEmbed: true, replaceEmojis: true, inlineBlock: true })}</div>
+                                        <div class="embedFieldValue">${markup(encodeHTML(f.value), { inEmbed: true, replaceEmojis: true })}</div>
+                                    </div>`;
+
+                                if (index !== i) gridCol = false;
+                            }
+                            colNum = (colNum === 9 ? 1 : colNum + 4);
+                            num++;
                         }
                     });
+
+                    document.querySelectorAll('.embedField[style="grid-column: 1 / 5;"]').forEach(e => {
+                        if (!e.nextElementSibling || e.nextElementSibling.style.gridColumn === '1 / 13')
+                            e.style.gridColumn = '1 / 13';
+                    });
                     colNum = 1;
-                    let len = e.fields.filter(f => f.inline).length;
-                    if (len === 2 || (len > 3 && len % 2 !== 0)) {
-                        let children = embedFields.children;
-                        children[0] && (children[0].style.gridColumn = '1 / 7');
-                        children[1] && (children[1].style.gridColumn = '7 / 13');
-                        embed.style.maxWidth = "408px";
-                    } else
-                        embed.style.removeProperty('max-width');
+
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
                 document.body.classList.remove('emptyEmbed');
                 document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
-                notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
+                error(false);
                 twemoji.parse(msgEmbed);
             } else document.body.classList.add('emptyEmbed');
             if (!embedCont.innerText)
                 document.body.classList.add('emptyEmbed');
         } catch (e) {
+            console.log(e);
             error(e);
         }
     }
 
     editor.on('change', editor => {
-        //// Autofill when " key is typed on new line
+        // // Autofill when " key is typed on new line
         // let line = editor.getCursor().line, text = editor.getLine(line)
-        // if (text.trim() === '"'){
-        // editor.replaceRange(text.trim() + ': ', { line, ch: line.length });
-        // editor.setCursor(line, text.length)
+        // if (text.trim() === '"') {
+        //     editor.replaceRange(text.trim() + ': ', { line, ch: line.length });
+        //     editor.setCursor(line, text.length)
         // }
-        try { update(JSON.parse(editor.getValue())); }
+
+        let jsonData = JSON.parse(editor.getValue()), dataKeys = Object.keys(jsonData);
+        if (!dataKeys.includes('embed') && !dataKeys.includes('embed') && mainKeys.some(key => dataKeys.includes(key))) {
+            editor.setValue(JSON.stringify({ embed: jsonData }, null, 4));
+            editor.refresh();
+        }
+
+        try {
+            if (dataKeys.length && !jsonKeys.some(key => dataKeys.includes(key))) {
+                let usedKeys = dataKeys.filter(key => !jsonKeys.includes(key));
+                if (usedKeys.length > 2)
+                    return error(`'${usedKeys[0] + "', '" + usedKeys.slice(1, usedKeys.length - 1).join("', '")}', and '${usedKeys[usedKeys.length - 1]}' are invalid keys.`);
+                return error(`'${usedKeys.length == 2 ? usedKeys[0] + "' and '" + usedKeys[usedKeys.length - 1] + "' are invalid keys." : usedKeys[0] + "' is an invalid key."}`);
+            } else if (!validationError)
+                error(false);
+            update(jsonData);
+        }
         catch (e) {
             if (editor.getValue()) return;
             document.body.classList.add('emptyEmbed');
@@ -706,10 +829,11 @@ window.onload = () => {
     })
 
     document.querySelector('.opt.json').addEventListener('click', () => {
-        editor.setValue(JSON.stringify(json, null, 4));
+        let jsonData = JSON.stringify(json, null, 4);
+        editor.setValue(jsonData === '{}' ? '{\n\t\n}' : jsonData);
         editor.refresh();
         document.body.classList.remove('gui');
-        // if (!matchMedia('(max-width: 1015px)').matches)
+        // if (!smallerScreen.matches)
         editor.focus();
         activeFields = document.querySelectorAll('.gui > .item.active');
         if (document.querySelector('section.low'))
@@ -720,11 +844,20 @@ window.onload = () => {
         json = {};
         embed.style.removeProperty('border-color');
         picker.source.style.removeProperty('background');
-        update(json); buildGui(json); editor.setValue(JSON.stringify(json, null, 4));
+        update(json); buildGui(json); editor.setValue('{\n\t\n}');
         document.querySelectorAll('.gui>.item').forEach(e => e.classList.add('active'));
-        if (!matchMedia('(max-width: 1015px)').matches)
+        if (!smallerScreen.matches)
             content.focus();
     })
+
+    document.querySelectorAll('.img').forEach(e => {
+        if (e.nextElementSibling?.classList.contains('spinner-container'))
+            e.addEventListener('error', el => {
+                el.target.style.removeProperty('display');
+                el.target.nextElementSibling.style.display = 'block';
+            })
+    })
+
     let pickInGuiMode = false;
     togglePicker = pickLater => {
         colrs.classList.toggle('display');
@@ -738,8 +871,6 @@ window.onload = () => {
     document.body.addEventListener('click', e => {
         if (e.target.classList.contains('low') || (e.target.classList.contains('top') && colrs.classList.contains('display')))
             togglePicker();
-        // else if (e.target === picker.source && document.querySelector('.colrs.picking'))
-        //     removePicker();
     })
 
     document.querySelector('.colrs .hex>div').addEventListener('input', e => {

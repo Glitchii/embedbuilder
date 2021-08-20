@@ -36,7 +36,7 @@
         <script src="./assets/js/components.js"></script>
         <script src="./assets/js/script.js"></script>
     </head>
-    <body class="gui">
+    <body class="gui emptyEmbed">
         <div class="main">
             <section class="side1">
                 <div class="chooser">
@@ -184,7 +184,13 @@
                     <div class="contents">
                         <img src="https://cdn.discordapp.com/embed/avatars/1.png" class="avatar" alt=" " />
                         <h2>
-                            <span class="username" role="button">Discord Bot</span><span class="botTag"><span class="botText" style="top: 1.12px;">BOT</span></span>
+                            <span class="username" role="button">Discord Bot</span>
+                            <span class="botTag">
+                                <svg aria-label="Verified bot" class="botTagVerified" aria-hidden="false" width="16" height="16" viewBox="0 0 16 15.2">
+                                    <path d="M7.4,11.17,4,8.62,5,7.26l2,1.53L10.64,4l1.36,1Z" fill="currentColor"></path>
+                                 </svg>                                 
+                                <span class="botText">BOT</span>
+                            </span>
                             <span class="timeText"></span>
                         </h2>
                     </div>
@@ -196,8 +202,28 @@
                                 <div class="embedTitle embedMargin"></div>
                                 <div class="embedDescription embedMargin"></div>
                                 <div class="embedFields"></div>
-                                <img class="imageWrapper clickable embedMedia embedImage" />
-                                <img class="imageWrapper clickable embedThumbnail" />
+                                <div class="imageWrapper clickable embedMedia embedImage">
+                                    <img class="img" onload="this.nextElementSibling?.style.removeProperty('display');"  />
+                                    <div class="spinner-container" style="display: block;">
+                                        <span class="spinner">
+                                            <span class="inner">
+                                                <span class="wanderingCubesItem"></span>
+                                                <span class="wanderingCubesItem"></span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="imageWrapper clickable embedThumbnail">
+                                    <img class="img" onload="this.nextElementSibling?.style.removeProperty('display');" />
+                                    <div class="spinner-container" style="display: block;">
+                                        <span class="spinner">
+                                            <span class="inner">
+                                                <span class="wanderingCubesItem"></span>
+                                                <span class="wanderingCubesItem"></span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="embedFooter embedMargin"></div>
                             </div>
                         </div>

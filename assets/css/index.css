@@ -1,3 +1,43 @@
+@font-face {
+    font-family: DsWhitney;
+    src: local("Whitney"), url("../fonts/whitney-300.woff2"), url("../fonts/whitney-300.woff");
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: DsWhitney;
+    src: local("Whitney"), url("../fonts/whitney-400.woff2"), url("../fonts/whitney-400.woff");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: DsWhitney;
+    src: local("Whitney"), url("../fonts/whitney-500.woff2"), url("../fonts/whitney-500.woff");
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: DsWhitney;
+    src: local("Whitney"), url("../fonts/whitney-600.woff2"), url("../fonts/whitney-600.woff");
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: DsWhitney;
+    src: local("Whitney"), url("../fonts/whitney-700.woff2"), url("../fonts/whitney-700.woff");
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
 * {
     outline: none;
     box-sizing: border-box;
@@ -21,7 +61,7 @@ body {
     line-height: 1;
     margin: 0px;
     padding: 0px;
-    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     overflow: hidden;
     background-color: var(--fullEmbedBackground);
     color: #fff;
@@ -113,6 +153,7 @@ body.gui .side1 .item.top {
     overflow: auto;
     scrollbar-color: #26272d #36393f;
     scrollbar-width: thin;
+    font-family: DsWhitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 ::-webkit-scrollbar {
@@ -198,12 +239,12 @@ a img {
 }
 
 ::-webkit-input-placeholder, body, button, input, select, textarea {
-    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-rendering: optimizelegibility;
 }
 
 ::placeholder, body, button, input, select, textarea {
-    font-family: Whitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-rendering: optimizelegibility;
 }
 
@@ -233,11 +274,23 @@ img[alt] {
     line-height: 1.375rem;
 }
 
+.botTagVerified {
+    display: none;
+}
+
 .contents {
     position: static;
     margin-left: 0px;
     padding-left: 0px;
     text-indent: 0px;
+}
+
+.contents.verified .botTag {
+    padding-left: 0;
+}
+
+.contents.verified .botTagVerified {
+    display: block;
 }
 
 .avatar {
@@ -318,7 +371,9 @@ img[alt] {
 }
 
 .imageWrapper img {
-    position: absolute;
+    /* position: absolute; */
+    width: 100%;
+    height: 100%;
 }
 
 .clickable {
@@ -355,7 +410,7 @@ img[alt] {
 
 .embedGrid {
     overflow: hidden;
-    max-width: 516px;
+    max-width: 520px;
     padding: 0.5rem 1rem 1rem 0.75rem;
     display: inline-grid;
     grid-template-columns: auto;
@@ -415,7 +470,7 @@ img[alt] {
     max-width: 100%;
 }
 
-.embedImage, .embedThumbnail {
+/* .embedImage, .embedThumbnail {
     display: block;
     object-fit: fill;
 }
@@ -438,6 +493,24 @@ img[alt] {
     justify-self: end;
     width: 80px;
     height: 80px;
+} */
+
+.embedImage img, .embedThumbnail img {
+    display: block;
+    object-fit: fill;
+    border-radius: 4px;
+}
+
+.embedThumbnail {
+    grid-area: 1 / 2 / 8 / 2;
+    margin-left: 16px;
+    margin-top: 8px;
+    flex-shrink: 0;
+    justify-self: end;
+    /* <> */
+    width: 80px;
+    height: 80px;
+    /* <> */
 }
 
 .embedFooter {
@@ -648,8 +721,77 @@ u {
     white-space: pre-wrap;
 }
 
-.markup pre, .markup>blockquote {
+.markup>blockquote, .markup pre {
     max-width: 90%;
+}
+
+.embed {
+    max-width: 100%;
+}
+
+/* Spinner */
+
+.spinner-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background-color: #2d2f34;
+    transform: translate(-50%, -50%);
+    top: -50%;
+    left: 50%;
+    display: none;
+}
+
+.embedImage > .spinner-container {
+    background: none;
+}
+
+.spinner-container .spinner {
+    display: -webkit-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.spinner-container .spinner .inner {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    contain: paint;
+}
+
+@keyframes spinner-wandering-cubes {
+    25% {
+        transform: translateX(22px) rotate(-90deg) scale(.5);
+    }
+    50% {
+        transform: translateX(22px) translateY(22px) rotate(-180deg);
+    }
+    75% {
+        transform: translateX(0) translateY(22px) rotate(-270deg) scale(.5);
+    }
+    to {
+        transform: rotate(-1turn);
+    }
+}
+
+.spinner-container .spinner .inner .wanderingCubesItem {
+    background-color: #7981f0;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: spinner-wandering-cubes 1.8s ease-in-out infinite;
+}
+
+.spinner-container .spinner .inner span:last-child {
+    animation-delay: -.9s;
 }
 
 .markup pre {
@@ -1727,6 +1869,10 @@ body.emptyEmbed.emptyContent .emptyTxt {
         display: none;
         animation: colrsAn .1s ease-out;
         box-shadow: 0px 5px 15px 0px #0000004f;
+    }
+    body.reversed .bottom .colrs {
+        left: 50%;
+        transform: translateX(-50%);
     }
     body.gui .side1 .item.top {
         height: 85%;
