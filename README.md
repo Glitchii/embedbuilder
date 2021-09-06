@@ -37,7 +37,6 @@ verified    Displays a verified badge on the bot tag when set to true.
 reverse     Reverse the preview and editors position.
 nouser      Display embed or message content with no username or avatar.
 embed       Displa only the embed with no editor
-editor=json Use the JSON editor by default instead of the GUI.
 guitabs=    Specify what gui tabs to display comma seperated.
             Example: `guitabs=author` or `guitabs=image,footer`
 ```
