@@ -4,13 +4,16 @@
 
 
 var params = new URL(location).searchParams,
+    hasParam = param => params.get(param) !== null,
     dataSpecified = params.get('data'),
     botName = params.get('username'),
     botIcon = params.get('avatar'),
     guiTabs = params.get('guitabs'),
     useJsonEditor = params.get('editor') === 'json',
-    botVerified = params.get('verified') === 'true',
-    reverseColmns = params.get('reversed') === 'true',
+    botVerified = hasParam('verified'),
+    reverseColmns = hasParam('reverse'),
+    noUser = hasParam('nouser'),
+    onlyEmbed = hasParam('embed'),
     activeFields, colNum = 1, num = 0, validationError,
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         let data = jsonCode || json;
@@ -101,14 +104,23 @@ if (dataSpecified)
     window.json = base64ToJson();
 
 window.onload = () => {
-    if (useJsonEditor) document.body.classList.remove('gui');
-    if (botName) document.querySelector('.username').textContent = botName;
-    if (botIcon) document.querySelector('.avatar').src = botIcon;
-    if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
+    let body = document.body;
+
+    if (onlyEmbed) body.classList.add('only-embed');
+    else {
+        document.querySelector('.side1.noDisplay').classList.remove('noDisplay');
+        if (useJsonEditor) body.classList.remove('gui');
+    }
+    if (noUser) body.classList.add('no-user');
+    else {
+        if (botName) document.querySelector('.username').textContent = botName;
+        if (botIcon) document.querySelector('.avatar').src = botIcon;
+        if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
+    }
     if (reverseColmns) {
         let side1 = document.querySelector('.side1');
         side1.parentElement.insertBefore(side1.nextElementSibling, side1);
-        document.body.classList.add('reversed');
+        body.classList.add('reversed');
     };
 
     document.querySelectorAll('.clickable > img')
@@ -883,4 +895,6 @@ window.onload = () => {
         json.embed.color = parseInt(inputValue, 16);
         update(json);
     })
+
+    if (onlyEmbed) document.querySelector('.side1')?.remove();
 };

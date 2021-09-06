@@ -1,6 +1,6 @@
 @font-face {
     font-family: DsWhitney;
-    src: local("Whitney"), url("../fonts/whitney-300.woff2"), url("../fonts/whitney-300.woff");
+    src: local("Whitney"), url("../fonts/whitney-300.woff");
     font-style: normal;
     font-weight: 300;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: DsWhitney;
-    src: local("Whitney"), url("../fonts/whitney-400.woff2"), url("../fonts/whitney-400.woff");
+    src: local("Whitney"), url("../fonts/whitney-400.woff");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
     font-family: DsWhitney;
-    src: local("Whitney"), url("../fonts/whitney-500.woff2"), url("../fonts/whitney-500.woff");
+    src: local("Whitney"), url("../fonts/whitney-500.woff");
     font-style: normal;
     font-weight: 500;
     font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
     font-family: DsWhitney;
-    src: local("Whitney"), url("../fonts/whitney-600.woff2"), url("../fonts/whitney-600.woff");
+    src: local("Whitney"), url("../fonts/whitney-600.woff");
     font-style: normal;
     font-weight: 600;
     font-display: swap;
@@ -32,7 +32,7 @@
 
 @font-face {
     font-family: DsWhitney;
-    src: local("Whitney"), url("../fonts/whitney-700.woff2"), url("../fonts/whitney-700.woff");
+    src: local("Whitney"), url("../fonts/whitney-700.woff");
     font-style: normal;
     font-weight: 700;
     font-display: swap;
@@ -67,11 +67,18 @@ body {
     color: #fff;
 }
 
+body.no-user .msgEmbed>.contents, .botTagVerified, .embedGrid>* {
+    display: none;
+}
+
 .main {
     position: absolute;
     width: 100%;
     height: 100%;
     display: grid;
+}
+
+body:not(.only-embed) .main {
     grid-template-columns: 45% 55%;
 }
 
@@ -147,7 +154,7 @@ body.gui .side1 .item.top {
 
 .main .side2 {
     height: 100%;
-    background-color: var(--fullEmbedBackground);
+    /* background-color: var(--fullEmbedBackground); */
     justify-content: center;
     vertical-align: center;
     overflow: auto;
@@ -266,16 +273,16 @@ img[alt] {
     padding: calc(0.125rem + 10px) 20px 20px 92px;
 }
 
+body.no-user .msgEmbed {
+    padding-left: 35px;
+}
+
 .msgEmbed:hover {
     background-color: #04040512;
 }
 
 .embedTitle>* {
     line-height: 1.375rem;
-}
-
-.botTagVerified {
-    display: none;
 }
 
 .contents {
@@ -582,10 +589,6 @@ img[alt] {
     color: #fff;
 }
 
-.embedGrid>* {
-    display: none;
-}
-
 .messageContent {
     user-select: text;
     margin-left: -72px;
@@ -658,6 +661,10 @@ u {
     border-radius: 4px;
     color: var(--header-secondary);
     text-size-adjust: none;
+}
+
+.embedMargin {
+    word-break: break-all;
 }
 
 .embed blockquote {
@@ -742,7 +749,7 @@ u {
     display: none;
 }
 
-.embedImage > .spinner-container {
+.embedImage>.spinner-container {
     background: none;
 }
 
@@ -1761,6 +1768,10 @@ body {
     pointer-events: none;
 }
 
+.noDisplay {
+    display: none!important;
+}
+
 @keyframes clearAn {
     0% {
         transform: rotate(10deg);
@@ -1806,26 +1817,6 @@ body.emptyEmbed.emptyContent .emptyTxt {
 
 ::-webkit-scrollbar-thumb {
     background: #202225;
-}
-
-@media screen and (max-width: 1270px) {
-    .fieldNumber::before {
-        right: 300%;
-    }
-}
-
-@media screen and (max-height: 760px) {
-    .bottom .colrs {
-        bottom: 10px;
-    }
-    body.gui .side1 .item.top {
-        height: 65%;
-        max-width: 100%;
-        width: 100%;
-    }
-    .bottom {
-        margin: 40px 0 0 0 !important;
-    }
 }
 
 @media screen and (max-width: 1015px) {
@@ -1905,6 +1896,20 @@ body.emptyEmbed.emptyContent .emptyTxt {
     }
 }
 
+@media screen and (max-height: 760px) {
+    .bottom .colrs {
+        bottom: 10px;
+    }
+    body.gui .side1 .item.top {
+        height: 65%;
+        max-width: 100%;
+        width: 100%;
+    }
+    .bottom {
+        margin: 40px 0 0 0 !important;
+    }
+}
+
 @media screen and (max-width: 530px) {
     .main .side1 {
         padding: 10px;
@@ -1919,7 +1924,17 @@ body.emptyEmbed.emptyContent .emptyTxt {
         margin: 20px 0px;
         padding: 0.125rem 0 20px 65px;
     }
+    body.no-user .msgEmbed {
+        padding-left: 25px;
+        margin-top: 13px;
+    }
     .avatar {
         left: 10px;
+    }
+}
+
+@media screen and (max-width: 490px) {
+    .markup>blockquote, .markup pre {
+        max-width: 99%;
     }
 }

@@ -12,7 +12,7 @@ Aside the JSON editor, it also includes a GUI editor which converts to JSON for 
 # Supported URL Parameters
 
 ## Editor param (/?editor=json)
-The GUI editor is used by default. If 'editor' parameter is set with the editor set to "json", the website will use the JSON editor by default instead when the website loads. Setting the value to anything else other than 'json' will be ignored.
+The GUI editor is used by default. If 'editor' parameter is set with it's value set to "json", the website will use the JSON editor by default instead. Setting the value to anything else other than 'json' will be ignored.
 
 Example URL: https://glitchii.github.io/embedbuilder/?editor=json
 
@@ -27,18 +27,22 @@ https://glitchii.github.io/embedbuilder/?data=JTdCJTIyZW1iZWQlMjIlM0ElN0IlMjJ0aX
 <!-- `username=`: Used to set the deafult name of the bot.  
 `avatar=`: If a valid URL is given, that will be the avatar/icon of the bot.  
 `verified=`: Whether or not the bot should have a verified badge (true/false).  -->
+Params that end with `=` in the list below need a value, those that don't will always be truthy when set either with or with no value.
 ```
 Parameter   Description
 ---------   -----------
-username=   Used to set the deafult name of the bot.  
-avatar=     If a valid URL is given, that will be the avatar or icon of the bot.  
-verified=   Displays a verified badge on the bot tag when set to true.  
-reversed=   Reverse the preview and editors position.  
+username=   Used to set the deafult name of the bot.
+avatar=     If a valid URL is given, that will be the avatar or icon of the bot.
+verified    Displays a verified badge on the bot tag when set to true.
+reverse     Reverse the preview and editors position.
+nouser      Display embed or message content with no username or avatar.
+embed       Displa only the embed with no editor
+editor=json Use the JSON editor by default instead of the GUI.
 guitabs=    Specify what gui tabs to display comma seperated.
             Example: `guitabs=author` or `guitabs=image,footer`
 ```
 ### Example URL with all parameters:
-https://glitchii.github.io/embedbuilder/?username=Troy&verified=true&reversed=true&guitabs=image,footer&avatar=https://cdn.discordapp.com/avatars/663074487335649292/576eb5f13519b9da10ba7807bdd83fab.webp?size=128
+https://glitchii.github.io/embedbuilder/?username=Troy&verified&reverse&guitabs=image,footer&avatar=https://cdn.discordapp.com/avatars/663074487335649292/576eb5f13519b9da10ba7807bdd83fab.webp?size=128
 
 >## Intergretting into your website
 >You are free to use this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formmaters' eg. '{ server_name }' or '{ user_name }' etc. A not so bad downside would be that you'd probably  have to keep up with fixes and updates.  
