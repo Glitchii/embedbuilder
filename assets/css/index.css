@@ -67,7 +67,7 @@ body {
     color: #fff;
 }
 
-body.no-user .msgEmbed>.contents, .botTagVerified, .embedGrid>* {
+body.no-user .msgEmbed>.contents {
     display: none;
 }
 
@@ -154,7 +154,6 @@ body.gui .side1 .item.top {
 
 .main .side2 {
     height: 100%;
-    /* background-color: var(--fullEmbedBackground); */
     justify-content: center;
     vertical-align: center;
     overflow: auto;
@@ -283,6 +282,10 @@ body.no-user .msgEmbed {
 
 .embedTitle>* {
     line-height: 1.375rem;
+}
+
+.botTagVerified {
+    display: none;
 }
 
 .contents {
@@ -587,6 +590,10 @@ body.no-user .msgEmbed {
 
 .embedAuthorName, .embedFieldName, .embedTitle {
     color: #fff;
+}
+
+.embedGrid>* {
+    display: none;
 }
 
 .messageContent {
