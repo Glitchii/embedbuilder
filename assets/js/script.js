@@ -16,14 +16,11 @@ var params = new URL(location).searchParams,
     onlyEmbed = hasParam('embed'),
     activeFields, colNum = 1, num = 0, validationError,
     jsonToBase64 = (jsonCode, withURL, redirect) => {
-        let data = jsonCode || json;
-        if (typeof data === 'object')
-            data = JSON.stringify(data);
-        data = btoa(escape(data));
+        data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
             let currentURL = new URL(location);
             currentURL.searchParams.append('data', data);
-            redirect && (window.location = currentURL)
+            if (redirect) window.location = currentURL;
             data = currentURL.href;
         }
         return data;
@@ -740,8 +737,8 @@ window.onload = () => {
                 error(false);
                 twemoji.parse(msgEmbed);
             } else document.body.classList.add('emptyEmbed');
-            if (!embedCont.innerText)
-                document.body.classList.add('emptyEmbed');
+            if (!embedCont.innerText) document.body.classList.add('emptyEmbed');
+            json = data;
         } catch (e) {
             console.log(e);
             error(e);
