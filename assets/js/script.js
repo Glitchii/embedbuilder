@@ -206,7 +206,7 @@ window.onload = () => {
             if (opts.inlineBlock) txt = txt.replace(/\`([^\`]+?)\`|\`\`([^\`]+?)\`\`|\`\`\`((?:\n|.)+?)\`\`\`/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
             else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x.trim()}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x.trim()}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
             if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
-            if (opts.replaceEmojis) txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
+            if (opts.replaceEmojis) txt = txt.replace(/(?:!code(?: \w+=".+")?>[^>]+)(?:!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
             txt = txt
                 .replace(/&#62; .+(?:\s&#62; .+)*\n?/g, match => `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${match.replace(/&#62; /g, '')}</blockquote></div>`)
                 .replace(/\n/g, '<br>')
