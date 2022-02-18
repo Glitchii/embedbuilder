@@ -15,6 +15,7 @@ var params = new URL(location).searchParams,
     noUser = hasParam('nouser'),
     onlyEmbed = hasParam('embed'),
     activeFields, colNum = 1, num = 0, validationError,
+    autoUpdateURL = localStorage.getItem('autoUpdateURL'),
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
@@ -98,38 +99,41 @@ var params = new URL(location).searchParams,
     }
 
 if (dataSpecified)
-    window.json = base64ToJson();
+    json = base64ToJson();
 
-window.onload = () => {
-    let body = document.body;
-
-    if (onlyEmbed) body.classList.add('only-embed');
+addEventListener('load', () => {
+    if (onlyEmbed)
+        document.body.classList.add('only-embed');
     else {
         document.querySelector('.side1.noDisplay').classList.remove('noDisplay');
-        if (useJsonEditor) body.classList.remove('gui');
+        if (useJsonEditor)
+            document.body.classList.remove('gui');
     }
-    if (noUser) body.classList.add('no-user');
+    if (noUser)
+        document.body.classList.add('no-user');
     else {
         if (botName) document.querySelector('.username').textContent = botName;
         if (botIcon) document.querySelector('.avatar').src = botIcon;
         if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
     }
     if (reverseColmns) {
-        let side1 = document.querySelector('.side1');
+        const side1 = document.querySelector('.side1');
         side1.parentElement.insertBefore(side1.nextElementSibling, side1);
-        body.classList.add('reversed');
+        document.body.classList.add('reversed');
     };
+    if (autoUpdateURL)
+        document.querySelector('.top-btn.menu .item.auto input').checked = true;
 
     document.querySelectorAll('.clickable > img')
         .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
 
-    let editorHolder = document.querySelector('.editorHolder'),
+    const editorHolder = document.querySelector('.editorHolder'),
         guiParent = document.querySelector('.top'),
         embedContent = document.querySelector('.messageContent'),
         embedCont = document.querySelector('.messageContent + .container'),
         gui = guiParent.querySelector('.gui:first-of-type');
 
-    window.editor = CodeMirror(elt => editorHolder.parentNode.replaceChild(elt, editorHolder), {
+    editor = CodeMirror(elt => editorHolder.parentNode.replaceChild(elt, editorHolder), {
         value: JSON.stringify(json, null, 4),
         gutters: ["CodeMirror-foldgutter", "CodeMirror-lint-markers"],
         scrollbarStyle: "overlay",
@@ -157,7 +161,7 @@ window.onload = () => {
     });
 
     editor.focus();
-    let notif = document.querySelector('.notification'),
+    const notif = document.querySelector('.notification'),
         url = (url) => /^(https?:)?\/\//g.exec(url) ? url : '//' + url,
         makeShort = (txt, length, mediaWidth) => {
             if (mediaWidth && window.matchMedia(`(max-width:${mediaWidth}px)`).matches)
@@ -167,7 +171,8 @@ window.onload = () => {
             if (msg === false)
                 // Hide error element
                 return notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
-            notif.innerHTML = msg, notif.style.display = 'block';
+            notif.innerHTML = msg;
+            notif.style.display = 'block';
             time && setTimeout(() => notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 })
                 .onfinish = () => notif.style.removeProperty('display'), time);
             return false;
@@ -193,23 +198,51 @@ window.onload = () => {
                 return error(err);
             }
             return true;
+        }, innerHTML = (element, html) => {
+            // console.log(element, html);
+            element.innerHTML = html;
+            return element;
         }, markup = (txt, opts) => {
+            if (opts.replaceEmojis)
+                txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, p) => p && emojis[p] ? emojis[p] : match);
+
             txt = txt
-                .replace(/\&#60;:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
-                .replace(/\&#60;a:[^:]+:(\d+)\&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
+                /** Markdown */
+                .replace(/&#60;:[^:]+:(\d+)&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+                .replace(/&#60;a:[^:]+:(\d+)&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
                 .replace(/~~(.+?)~~/g, '<s>$1</s>')
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/__(.+?)__/g, '<u>$1</u>')
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
                 .replace(/_(.+?)_/g, '<em>$1</em>')
-            if (opts.inlineBlock) txt = txt.replace(/\`([^\`]+?)\`|\`\`([^\`]+?)\`\`|\`\`\`((?:\n|.)+?)\`\`\`/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
-            else txt = txt.replace(/\`\`\`(\w{1,15})?\n((?:\n|.)+?)\`\`\`|\`\`(.+?)\`\`(?!\`)|\`([^\`]+?)\`/g, (m, w, x, y, z) => w && x ? `<pre><code class="${w}">${x.trim()}</code></pre>` : x ? `<pre><code class="hljs nohighlight">${x.trim()}</code></pre>` : y || z ? `<code class="inline">${y || z}</code>` : m);
-            if (opts.inEmbed) txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
-            if (opts.replaceEmojis) txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, x) => x && emojis[x] ? emojis[x] : match);
-            txt = txt
-                .replace(/&#62; .+(?:\s&#62; .+)*\n?/g, match => `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${match.replace(/&#62; /g, '')}</blockquote></div>`)
-                .replace(/\n/g, '<br>')
+                // Replace >>> and > with block quotes. &#62; is HTML code for >
+                .replace(/^(?: *&#62;&#62;&#62; +([\s\S]*))|^(?: *&#62;(?!&#62;&#62;) +([^\n]*)(\n *&#62;(?!&#62;&#62;) +([^\n]*))*\n?)/mg, (m, b, c) =>
+                    `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${b || c}</blockquote></div>`)
+
+                /** Mentions */
+                .replace(/&#60;#\d+&#62;/g, () => `<span class="mention channel interactive">channel</span>`)
+                .replace(/&#60;@(?:&#38;|!)?\d+&#62;|@(?:everyone|here)/g, match => {
+                    if (match.startsWith('@')) return `<span class="mention">${match}</span>`
+                    else return `<span class="mention interactive">@user</span>`
+                })
+
+            if (opts.inlineBlock)
+                // Treat both inline code and code blocks as inline code
+                txt = txt.replace(/`([^`]+?)`|``([^`]+?)``|```((?:\n|.)+?)```/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
+            else {
+                // Code block
+                txt = txt.replace(/```(?:([a-z0-9_+\-.]+?)\n)?\n*([^\n][^]*?)\n*```/ig, (m, w, x) => {
+                    if (w) return `<pre><code class="${w}">${x.trim()}</code></pre>`
+                    else return `<pre><code class="hljs nohighlight">${x.trim()}</code></pre>`
+                });
+                // Inline code
+                txt = txt.replace(/`([^`]+?)`|``([^`]+?)``/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m)
+            }
+
+            if (opts.inEmbed)
+                txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
+
             return txt;
         },
         embed = document.querySelector('.embedGrid'),
@@ -232,7 +265,7 @@ window.onload = () => {
                 yesterday.toDateString() === date.toDateString() ? `Yesterday at ${dateArray}` :
                     `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
         }, display = (el, data, displayType) => {
-            if (data) el.innerHTML = data;
+            if (data) innerHTML(el, data);
             el.style.display = displayType || "unset";
         }, hide = el => el.style.removeProperty('display'),
         imgSrc = (elm, src, remove) => remove ? elm.style.removeProperty('content') : elm.style.content = `url(${src})`;
@@ -405,7 +438,7 @@ window.onload = () => {
                 </form>
             </div>`;
 
-        let fieldsEditor = gui.querySelector('.fields ~ .edit'), addField = `
+        const fieldsEditor = gui.querySelector('.fields ~ .edit'), addField = `
             <div class="addField">
                 <p>New Field</p>
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" x="0" y="0" viewBox="0 0 477.867 477.867" xml:space="preserve">
@@ -639,7 +672,7 @@ window.onload = () => {
         try {
             if (!data.content) document.body.classList.add('emptyContent');
             else {
-                embedContent.innerHTML = markup(encodeHTML(data.content), { replaceEmojis: true });
+                innerHTML(embedContent, markup(encodeHTML(data.content), { replaceEmojis: true }));
                 document.body.classList.remove('emptyContent');
             }
             if (data.embed && Object.keys(data.embed).length) {
@@ -676,7 +709,7 @@ window.onload = () => {
                 else if (e.timestamp) display(embedFooter, `<span class="embedFooterText">${encodeHTML(tstamp(e.timestamp))}</span></div>`, 'flex');
                 else hide(embedFooter);
                 if (e.fields) {
-                    embedFields.innerHTML = '';
+                    innerHTML(embedFields, '');
                     let index, gridCol;
 
                     e.fields.forEach((f, i) => {
@@ -733,12 +766,19 @@ window.onload = () => {
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
                 document.body.classList.remove('emptyEmbed');
-                document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
+                for (block of document.querySelectorAll('.markup pre > code'))
+                    hljs.highlightBlock(block);
                 error(false);
                 twemoji.parse(msgEmbed);
             } else document.body.classList.add('emptyEmbed');
             if (!embedCont.innerText) document.body.classList.add('emptyEmbed');
             json = data;
+            if (autoUpdateURL) {
+                // Update data param in url.
+                const url = new URL(location.href);
+                url.searchParams.set('data', jsonToBase64(json));
+                history.replaceState(null, null, url.href);
+            }
         } catch (e) {
             console.log(e);
             error(e);
@@ -772,7 +812,7 @@ window.onload = () => {
         catch (e) {
             if (editor.getValue()) return;
             document.body.classList.add('emptyEmbed');
-            embedContent.innerHTML = '';
+            innerHTML(embedContent, '');
         }
     });
 
@@ -824,8 +864,8 @@ window.onload = () => {
     }, 1000)
 
     document.querySelector('.timeText').innerText = tstamp();
-    document.querySelectorAll('.markup pre > code').forEach((block) => hljs.highlightBlock(block));
-
+    for (block of document.querySelectorAll('.markup pre > code'))
+        hljs.highlightBlock(block);
     document.querySelector('.opt.gui').addEventListener('click', () => {
         json = JSON.parse(editor.getValue() || '{}');
         buildGui(json, { activate: activeFields });
@@ -857,6 +897,21 @@ window.onload = () => {
         document.querySelectorAll('.gui>.item').forEach(e => e.classList.add('active'));
         if (!smallerScreen.matches)
             content.focus();
+    })
+
+    document.querySelector('.top-btn.menu').addEventListener('click', e => {
+        if (e.target.closest('.item.datalink'))
+            prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
+        else if (e.target.closest('.item.auto')) {
+            const input = e.target.closest('.item.auto').querySelector('input');
+            input.checked = !input.checked;
+            autoUpdateURL = input.checked;
+            if (input.checked) localStorage.setItem('autoUpdateURL', true);
+            else localStorage.removeItem('autoUpdateURL');
+            update(json);
+        }
+
+        e.target.closest('.top-btn').classList.toggle('active')
     })
 
     document.querySelectorAll('.img').forEach(e => {
@@ -894,4 +949,4 @@ window.onload = () => {
     })
 
     if (onlyEmbed) document.querySelector('.side1')?.remove();
-};
+});

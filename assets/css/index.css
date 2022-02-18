@@ -223,15 +223,15 @@ a, abbr, acronym, address, applet, big, blockquote, body, caption, cite, code, d
 }
 
 .cm-string {
-    color: #92deea!important;
+    color: #92deea !important;
 }
 
 .cm-string~.cm-string {
-    color: #c3e88d!important;
+    color: #c3e88d !important;
 }
 
 .cm-number {
-    color: #d19a66!important;
+    color: #d19a66 !important;
 }
 
 code, [class^="cm-"] {
@@ -260,6 +260,50 @@ a, button, div, input, label, select, span, strong, textarea {
 
 img[alt] {
     text-indent: -9999px;
+}
+
+.\@ {
+    background-color: hsla(38, calc(var(--saturation-factor, 1)*95.7%), 54.1%, 0.1);
+}
+
+.\@::before {
+    content: "";
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    pointer-events: none;
+    width: 2px;
+}
+
+.mention {
+    background-color: hsla(235, calc(85.6%), 64.7%, 0.3);
+    transition: background-color 50ms ease-out, color 50ms ease-out;
+    border-radius: 3px;
+    padding: 0 2px;
+    font-weight: 500;
+    position: relative;
+}
+
+.mention.channel::before {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='hsl(236,calc(83.3%),92.9%)' fill-rule='evenodd' clip-rule='evenodd' d='M5.88657 21C5.57547 21 5.3399 20.7189 5.39427 20.4126L6.00001 17H2.59511C2.28449 17 2.04905 16.7198 2.10259 16.4138L2.27759 15.4138C2.31946 15.1746 2.52722 15 2.77011 15H6.35001L7.41001 9H4.00511C3.69449 9 3.45905 8.71977 3.51259 8.41381L3.68759 7.41381C3.72946 7.17456 3.93722 7 4.18011 7H7.76001L8.39677 3.41262C8.43914 3.17391 8.64664 3 8.88907 3H9.87344C10.1845 3 10.4201 3.28107 10.3657 3.58738L9.76001 7H15.76L16.3968 3.41262C16.4391 3.17391 16.6466 3 16.8891 3H17.8734C18.1845 3 18.4201 3.28107 18.3657 3.58738L17.76 7H21.1649C21.4755 7 21.711 7.28023 21.6574 7.58619L21.4824 8.58619C21.4406 8.82544 21.2328 9 20.9899 9H17.41L16.35 15H19.7549C20.0655 15 20.301 15.2802 20.2474 15.5862L20.0724 16.5862C20.0306 16.8254 19.8228 17 19.5799 17H16L15.3632 20.5874C15.3209 20.8261 15.1134 21 14.8709 21H13.8866C13.5755 21 13.3399 20.7189 13.3943 20.4126L14 17H8.00001L7.36325 20.5874C7.32088 20.8261 7.11337 21 6.87094 21H5.88657ZM9.41045 9L8.35045 15H14.3504L15.4104 9H9.41045Z'%3E%3C/path%3E%3C/svg%3E");
+	width: 1.05rem;
+	height: 1.3rem;
+	-o-object-fit: contain;
+	object-fit: contain;
+	position: relative;
+	left: .125rem;
+	top: 3px;
+	display: inline-block;
+	margin-right: .125rem;
+    color: hsl(236, calc(83.3%),92.9%);
+}
+
+.mention.interactive:hover {
+    color: #fff;
+    cursor: pointer;
+    background-color: hsl(235, calc(85.6%), 64.7%);
 }
 
 .msgEmbed {
@@ -783,12 +827,15 @@ u {
     25% {
         transform: translateX(22px) rotate(-90deg) scale(.5);
     }
+
     50% {
         transform: translateX(22px) translateY(22px) rotate(-180deg);
     }
+
     75% {
         transform: translateX(0) translateY(22px) rotate(-270deg) scale(.5);
     }
+
     to {
         transform: rotate(-1turn);
     }
@@ -827,13 +874,13 @@ u {
 .CodeMirror {
     background-color: #212121;
     color: #eff;
-    width: 100%!important;
-    height: 100%!important;
-    background-color: inherit!important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: inherit !important;
 }
 
 .CodeMirror-lint-marker-error, .CodeMirror-lint-message-error {
-    background-image: none!important;
+    background-image: none !important;
 }
 
 .CodeMirror-lint-marker-error:after, .CodeMirror-lint-message-error:before {
@@ -850,15 +897,15 @@ u {
     color: #f45711;
     font-size: 20px;
     position: relative;
-    left: -15px!important;
-    top: 1px!important;
+    left: -15px !important;
+    top: 1px !important;
 }
 
 .CodeMirror-lint-tooltip {
     box-shadow: 1px 10px 15px rgb(0 0 0 / 17%);
-    background-color: #202225!important;
-    border: 1px solid #373a40!important;
-    color: #cacaca!important;
+    background-color: #202225 !important;
+    border: 1px solid #373a40 !important;
+    color: #cacaca !important;
 }
 
 .CodeMirror-lint-message {
@@ -866,11 +913,11 @@ u {
 }
 
 .CodeMirror-code .CodeMirror-gutter-wrapper .CodeMirror-gutter-elt {
-    left: 0px!important;
+    left: 0px !important;
 }
 
 .CodeMirror-gutters {
-    background: #292b2f!important;
+    background: #292b2f !important;
     display: none;
 }
 
@@ -879,41 +926,41 @@ u {
 }
 
 .CodeMirror-lint-marker.CodeMirror-lint-marker-error {
-    left: 15px!important;
+    left: 15px !important;
 }
 
 .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
-    padding: 0 15px!important;
+    padding: 0 15px !important;
 }
 
 .CodeMirror-foldmarker {
-    color: #e5ecff!important;
-    text-shadow: none!important;
+    color: #e5ecff !important;
+    text-shadow: none !important;
     font-size: 20px;
 }
 
 .CodeMirror-cursor {
     border-left: 2px solid #6ba6ff !important;
-    height: 17px!important;
+    height: 17px !important;
 }
 
 .CodeMirror-scrollbar-filler {
-    display: none!important;
+    display: none !important;
 }
 
 .CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div {
-    background: #202225!important;
+    background: #202225 !important;
 }
 
 .cm-s-material-darker .cm-comment {
-    color: #5d616b!important;
+    color: #5d616b !important;
 }
 
 .cm-s-material-darker .CodeMirror-matchingbracket {
-    text-decoration: none!important;
-    background-color: rgb(173 192 212 / 3%)!important;
+    text-decoration: none !important;
+    background-color: rgb(173 192 212 / 3%) !important;
     color: #b9c3d6 !important;
-    border-bottom: 1px solid #c2d6ff!important;
+    border-bottom: 1px solid #c2d6ff !important;
     /* border: 1px solid #bacdf347; */
 }
 
@@ -1186,14 +1233,14 @@ body:not(.gui) .chooser>.back {
     transform: none;
     width: 100%;
     height: 100%;
-    top: 0!important;
-    left: 0!important;
+    top: 0 !important;
+    left: 0 !important;
     border-radius: 10px;
     overflow: hidden;
 }
 
 .color-picker>div {
-    height: 100%!important;
+    height: 100% !important;
 }
 
 .colrs.picking .colRight .cTop>*:not(.color-picker), .colrs.picking .colRight .pallets, .colrs:not(.picking) .colRight .colBack, .colrs:not(.picking) .hex>div {
@@ -1201,7 +1248,7 @@ body:not(.gui) .chooser>.back {
 }
 
 .color-picker\:a {
-    display: none!important;
+    display: none !important;
 }
 
 @keyframes colBackAn {
@@ -1375,7 +1422,7 @@ input, textarea {
 textarea {
     font-size: 13px;
     min-width: 100%;
-    max-width: 100%!important;
+    max-width: 100% !important;
     height: 75px;
     max-height: 200px;
 }
@@ -1480,7 +1527,7 @@ input[type="file"], button[type="submit"] {
 }
 
 .largeImg+.edit {
-    height: auto!important;
+    height: auto !important;
 }
 
 .largeImg.image+.edit .editIcon .imgParent {
@@ -1668,6 +1715,7 @@ body {
         opacity: 0;
         transform: translateY(40px);
     }
+
     50% {
         opacity: 0;
         transform: translateY(40px);
@@ -1739,7 +1787,8 @@ body {
     opacity: 1;
 }
 
-.clear {
+.top-btn {
+    --bgc: #27282e;
     left: 140px;
     position: absolute;
     cursor: pointer;
@@ -1747,10 +1796,75 @@ body {
     transform: translate(0, -5px);
     padding: 8.5px;
     border-radius: 100%;
-    background: #27282e;
+    background: var(--bgc);
     width: 35px;
     height: 35px;
     transition: .5s ease;
+}
+
+.top-btn>svg {
+    width: 20px;
+    height: 100%;
+    position: relative;
+    left: -2.5px;
+    top: -2px;
+}
+
+.top-btn.menu {
+    left: auto;
+    right: 20px;
+    background: transparent;
+}
+
+.top-btn.menu:hover {
+    background: var(--bgc);
+}
+
+.top-btn.menu>svg {
+    left: -1.5px;
+    transition: transform .2s ease;
+}
+
+.top-btn.menu>.box {
+    display: none;
+    padding: 13px;
+    min-width: 160px;
+    /* height: 200px; */
+    background: var(--bgc);
+    margin: 15px 0 0 0;
+    border-radius: 10px;
+    position: absolute;
+    right: 0;
+    box-shadow: #00000026 0px 7px 29px 0px;
+    width: max-content;
+}
+
+.top-btn.menu>.box .item {
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    transition: .5s ease;
+}
+
+.top-btn.menu>.box .item:hover {
+    background: #35373f;
+}
+
+.top-btn.menu>.box .item.datalink>svg {
+    transform: translateY(3px);
+}
+
+.top-btn.menu.active {
+    background: var(--bgc);
+}
+
+.top-btn.menu.active>.box {
+    display: block;
+}
+
+.top-btn.menu.active>svg {
+    transform: rotate(90deg);
 }
 
 @keyframes emptyTxtAn {
@@ -1776,25 +1890,28 @@ body {
 }
 
 .noDisplay {
-    display: none!important;
+    display: none !important;
 }
 
 @keyframes clearAn {
     0% {
         transform: rotate(10deg);
     }
+
     25% {
         transform: rotate(-10deg);
     }
+
     50% {
         transform: rotate(10deg);
     }
+
     75% {
         transform: rotate(-13deg);
     }
 }
 
-.clear:hover>svg {
+.top-btn.clear:hover>svg {
     animation: clearAn 1s ease-in-out forwards;
     transform-origin: top right;
 }
@@ -1807,14 +1924,6 @@ body.emptyEmbed.emptyContent .emptyTxt {
     display: block;
     position: absolute;
     top: 800%;
-}
-
-.clear>svg {
-    width: 20px;
-    height: 100%;
-    position: relative;
-    left: -2.5px;
-    top: -2px;
 }
 
 ::-webkit-scrollbar {
@@ -1830,36 +1939,44 @@ body.emptyEmbed.emptyContent .emptyTxt {
     section.low .top>.gui {
         opacity: .6;
         filter: blur(2px) brightness(.99);
-        pointer-events: none!important;
+        pointer-events: none !important;
     }
+
     section.low {
-        height: 50%!important;
+        height: 50% !important;
         transition: .4s ease;
     }
+
     section {
         transition: .5s ease;
     }
+
     body.emptyEmbed.emptyContent section.side1:not(.low) {
         height: 300%;
     }
-    .clear {
+
+    .top-btn {
         position: absolute;
         cursor: pointer;
         z-index: 5;
         left: 135px;
     }
+
     .main {
         display: flex;
         flex-direction: column;
     }
+
     .side1 .item.top {
         height: 100%;
     }
+
     .notification .inline {
         margin-top: 5px;
         background-color: #20222500;
         border: none;
     }
+
     .bottom .colrs {
         bottom: 40px;
         top: 100px;
@@ -1868,18 +1985,22 @@ body.emptyEmbed.emptyContent .emptyTxt {
         animation: colrsAn .1s ease-out;
         box-shadow: 0px 5px 15px 0px #0000004f;
     }
+
     body.reversed .bottom .colrs {
         left: 50%;
         transform: translateX(-50%);
     }
+
     body.gui .side1 .item.top {
         height: 85%;
         max-width: 100%;
         width: 100%;
     }
+
     .bottom {
         margin: 40px 0 0 0 !important;
     }
+
     .pickerToggle {
         display: block;
         position: absolute;
@@ -1891,12 +2012,15 @@ body.emptyEmbed.emptyContent .emptyTxt {
         bottom: auto;
         margin-left: 15px;
     }
+
     .pickerToggle>svg {
         width: 17px;
     }
+
     .main .side1 {
         border-right: none;
     }
+
     .side1 .item.top {
         padding-top: 10px;
         transform: translateY(10px);
@@ -1907,11 +2031,13 @@ body.emptyEmbed.emptyContent .emptyTxt {
     .bottom .colrs {
         bottom: 10px;
     }
+
     body.gui .side1 .item.top {
         height: 65%;
         max-width: 100%;
         width: 100%;
     }
+
     .bottom {
         margin: 40px 0 0 0 !important;
     }
@@ -1921,20 +2047,25 @@ body.emptyEmbed.emptyContent .emptyTxt {
     .main .side1 {
         padding: 10px;
     }
+
     .top>.gui {
         margin-top: 5px;
     }
+
     .emptyTxt {
-        display: none!important;
+        display: none !important;
     }
+
     .msgEmbed {
         margin: 20px 0px;
         padding: 0.125rem 0 20px 65px;
     }
+
     body.no-user .msgEmbed {
         padding-left: 25px;
         margin-top: 13px;
     }
+
     .avatar {
         left: 10px;
     }
