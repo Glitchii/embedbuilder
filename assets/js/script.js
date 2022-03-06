@@ -163,11 +163,7 @@ addEventListener('load', () => {
     editor.focus();
     const notif = document.querySelector('.notification'),
         url = (url) => /^(https?:)?\/\//g.exec(url) ? url : '//' + url,
-        makeShort = (txt, length, mediaWidth) => {
-            if (mediaWidth && window.matchMedia(`(max-width:${mediaWidth}px)`).matches)
-                return txt.length > (length - 3) ? txt.substring(0, length - 3) + '...' : txt;
-            return txt;
-        }, error = (msg, time) => {
+        error = (msg, time) => {
             if (msg === false)
                 // Hide error element
                 return notif.animate({ opacity: '0', bottom: '-50px', offset: 1 }, { easing: 'ease', duration: 500 }).onfinish = () => notif.style.removeProperty('display');
@@ -177,25 +173,8 @@ addEventListener('load', () => {
                 .onfinish = () => notif.style.removeProperty('display'), time);
             return false;
         }, allGood = e => {
-            let invalid, err, str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
-            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date")
+            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date") {
                 invalid = true, err = 'Timestamp is invalid';
-            else if (re) { // If a URL is found without a protocol
-                if (!/\w+:|\/\/|^\//g.exec(re[2]) && re[2].includes('.')) {
-                    let activeInput = document.querySelector('input[class$="link" i]:focus')
-                    if (activeInput) {
-                        lastPos = activeInput.selectionStart + 7;
-                        activeInput.value = `http://${re[2]}`;
-                        update(JSON.parse(str.replace(re[0], `${re[1]}http://${re[2]}"`)));
-                        activeInput.setSelectionRange(lastPos, lastPos)
-                        return true;
-                    }
-                }
-                invalid = true, err = (`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
-            }
-            if (invalid) {
-                validationError = true;
-                return error(err);
             }
             return true;
         }, innerHTML = (element, html) => {
