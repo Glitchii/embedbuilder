@@ -11,12 +11,20 @@ var params = new URL(location).searchParams,
     guiTabs = params.get('guitabs'),
     useJsonEditor = params.get('editor') === 'json',
     botVerified = hasParam('verified'),
-    reverseColmns = hasParam('reverse'),
+    reverseColumns = hasParam('reverse'),
     noUser = hasParam('nouser'),
     onlyEmbed = hasParam('embed'),
     activeFields, colNum = 1, num = 0, validationError,
     allowPlaceholders = hasParam('placeholders'),
     autoUpdateURL = localStorage.getItem('autoUpdateURL'),
+    autoParams = hasParam('autoparams') || localStorage.getItem('autoParams'),
+    toggleStored = item => {
+        const found = localStorage.getItem(item);
+        if (!found) return localStorage.setItem(item, true);
+
+        localStorage.removeItem(item);
+        return found;
+    },
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
@@ -39,6 +47,21 @@ var params = new URL(location).searchParams,
         if (hex.includes(',')) return hex.match(/[\d]+/g);
         hex = hex.replace('#', '').match(/.{1,2}/g)
         return [parseInt(hex[0], 16), parseInt(hex[1], 16), parseInt(hex[2], 16), 1];
+    },
+    reverse = (reversed, callback) => {
+        const side = document.querySelector(reversed ? '.side2' : '.side1');
+        if (side.nextElementSibling) side.parentElement.insertBefore(side.nextElementSibling, side);
+        else side.parentElement.insertBefore(side, side.parentElement.firstElementChild);
+
+        const isReversed = document.body.classList.toggle('reversed');
+        if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
+    },
+    urlOptions = ({ remove, set }) => {
+        const url = new URL(location.href);
+        if (remove) url.searchParams.delete(remove);
+        if (set) url.searchParams.set(set[0], set[1]);
+        // history.replaceState(null, null, url.href);
+        history.replaceState(null, null, url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&'));
     },
     mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
     jsonKeys = ["embed", "content", ...mainKeys],
@@ -105,7 +128,7 @@ if (dataSpecified)
 if (allowPlaceholders)
     allowPlaceholders = params.get('placeholders') === 'errors' ? 1 : 2;
 
-addEventListener('load', () => {
+addEventListener('DOMContentLoaded', () => {
     if (onlyEmbed)
         document.body.classList.add('only-embed');
     else {
@@ -120,14 +143,12 @@ addEventListener('load', () => {
         if (botIcon) document.querySelector('.avatar').src = botIcon;
         if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
     }
-    if (reverseColmns) {
-        const side1 = document.querySelector('.side1');
-        side1.parentElement.insertBefore(side1.nextElementSibling, side1);
-        document.body.classList.add('reversed');
-    };
+    if (reverseColumns || localStorage.getItem('reverseColumns'))
+        reverse();
     if (autoUpdateURL)
         document.querySelector('.top-btn.menu .item.auto input').checked = true;
-
+    if (autoParams)
+        document.querySelector('.auto-params > input').checked = true;
     document.querySelectorAll('.clickable > img')
         .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
 
@@ -182,10 +203,11 @@ addEventListener('load', () => {
             return false;
         }, allGood = e => {
             let invalid, err, str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
-            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date")
+            if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date") {
                 if (allowPlaceholders === 2) return true;
-            if (!allowPlaceholders) invalid = true, err = 'Timestamp is invalid';
-            else if (re) { // If a URL is found without a protocol
+                if (!allowPlaceholders)
+                    invalid = true, err = 'Timestamp is invalid';
+            } else if (re) { // If a URL is found without a protocol
                 if (!/\w+:|\/\/|^\//g.exec(re[2]) && re[2].includes('.')) {
                     let activeInput = document.querySelector('input[class$="link" i]:focus')
                     if (activeInput && !allowPlaceholders) {
@@ -538,7 +560,7 @@ addEventListener('load', () => {
                     } else if (txt && !smallerScreen.matches)
                         txt.focus();
                     if (elm.classList.contains('fields')) {
-                        if (reverseColmns && smallerScreen.matches)
+                        if (reverseColumns && smallerScreen.matches)
                             // return elm.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: "end" });
                             return elm.parentNode.scrollTop = elm.offsetTop;
                         elm.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -552,7 +574,7 @@ addEventListener('load', () => {
             requiresView = matchMedia(`${smallerScreen.media}, (max-height: 845px)`);
         document.querySelectorAll('.gui>.item:not(.fields)').forEach(e => e.addEventListener('click', () => {
             if (lastTabs.includes(e) || requiresView.matches) {
-                if (!reverseColmns || !smallerScreen.matches) e.scrollIntoView({ behavior: 'smooth', block: "center" });
+                if (!reverseColumns || !smallerScreen.matches) e.scrollIntoView({ behavior: 'smooth', block: "center" });
                 else if (e.nextElementSibling.classList.contains('edit') && e.classList.contains('active'))
                     // e.nextElementSibling.scrollIntoView({ behavior: 'smooth', block: "end" });
                     e.parentNode.scrollTop = e.offsetTop;
@@ -779,12 +801,8 @@ addEventListener('load', () => {
             } else document.body.classList.add('emptyEmbed');
             if (!embedCont.innerText) document.body.classList.add('emptyEmbed');
             json = data;
-            if (autoUpdateURL) {
-                // Update data param in url.
-                const url = new URL(location.href);
-                url.searchParams.set('data', jsonToBase64(json));
-                history.replaceState(null, null, url.href);
-            }
+            if (autoUpdateURL)
+                urlOptions({ set: ['data', jsonToBase64(json)] })
         } catch (e) {
             console.log(e);
             error(e);
@@ -907,16 +925,27 @@ addEventListener('load', () => {
 
     document.querySelector('.top-btn.menu').addEventListener('click', e => {
         if (e.target.closest('.item.datalink'))
-            prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
-        else if (e.target.closest('.item.auto')) {
-            const input = e.target.closest('.item.auto').querySelector('input');
-            input.checked = e.target === input ? input.checked : !input.checked;
+            return prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
+
+        const input = e.target.closest('.item')?.querySelector('input');
+        if (input) input.checked = !input.checked;
+
+        if (e.target.closest('.item.auto')) {
             autoUpdateURL = input.checked;
             if (input.checked) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
             update(json);
-        }
+        } else if (e.target.closest('.item.reverse')) {
+            reverse(reverseColumns);
+            reverseColumns = !reverseColumns;
+            toggleStored('reverseColumns');
+        } else if (e.target.closest('.item.auto-params')) {
+            if (input.checked) localStorage.setItem('autoParams', true);
+            else localStorage.removeItem('autoParams');
+            autoParams = input.checked;
 
+            console.log(input?.checked, e.target.closest('.item.auto-params'))
+        }
         e.target.closest('.top-btn').classList.toggle('active')
     })
 

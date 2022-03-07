@@ -43,6 +43,7 @@ placeholders=errors     This also disables automatic insertion of 'http' for url
                         Except, warnings won't be silenced. The user will still see a warning that a url or timestamp (etc.) is incorrect for 5 seconds.
 
 ```
+<small>Case matters, all parameters should be lowercase.</small>
 ### Example URL with all* the above parameters:
 https://glitchii.github.io/embedbuilder/?username=Troy&verified&reverse&guitabs=image,footer&avatar=https://cdn.discordapp.com/avatars/663074487335649292/576eb5f13519b9da10ba7807bdd83fab.webp
 
