@@ -146,7 +146,7 @@ addEventListener('DOMContentLoaded', () => {
     if (reverseColumns || localStorage.getItem('reverseColumns'))
         reverse();
     if (autoUpdateURL)
-        document.querySelector('.top-btn.menu .item.auto input').checked = true;
+        document.body.classList.add('autoUpdateURL');
     if (autoParams)
         document.querySelector('.auto-params > input').checked = true;
     document.querySelectorAll('.clickable > img')
@@ -931,8 +931,8 @@ addEventListener('DOMContentLoaded', () => {
         if (input) input.checked = !input.checked;
 
         if (e.target.closest('.item.auto')) {
-            autoUpdateURL = input.checked;
-            if (input.checked) localStorage.setItem('autoUpdateURL', true);
+            autoUpdateURL = document.body.classList.toggle('autoUpdateURL');
+            if (autoUpdateURL) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
             update(json);
         } else if (e.target.closest('.item.reverse')) {

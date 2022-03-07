@@ -71,6 +71,10 @@ body.no-user .msgEmbed>.contents {
     display: none;
 }
 
+.hidden {
+    display: none;
+}
+
 .main {
     position: absolute;
     width: 100%;
@@ -1865,17 +1869,31 @@ body {
     transform: translateX(-50%);
 }
 
-/* .top-btn.menu>.box .item>svg {
-    transform: translateY(3px);
-} */
-
-.top-btn.menu>.box .item>* {
+.top-btn.menu>.box .item> :is(*, *>svg) {
+    display: flex;
     align-self: flex-end;
     margin: 0;
 }
 
 .top-btn.menu>.box .item>input {
     pointer-events: none;
+}
+.top-btn.menu > .box .item > .icon::after {
+    display: none;
+	position: absolute;
+	content: "";
+	width: 4px;
+	height: 4px;
+	background: #00bb9c;
+	z-index: 1000000;
+	border-radius: 100%;
+	left: 7px;
+	transform: translateY(7px);
+}
+
+body.autoUpdateURL .top-btn.menu > .box .item.auto > .icon::after,
+body.reversed .top-btn.menu > .box .item.reverse > .icon::after {
+    display: block;
 }
 
 .top-btn.menu.active {
