@@ -15,6 +15,7 @@ var params = new URL(location).searchParams,
     noUser = hasParam('nouser'),
     onlyEmbed = hasParam('embed'),
     activeFields, colNum = 1, num = 0, validationError,
+    allowPlaceholders = hasParam('placeholders'),
     autoUpdateURL = localStorage.getItem('autoUpdateURL'),
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
@@ -101,11 +102,14 @@ var params = new URL(location).searchParams,
 if (dataSpecified)
     json = base64ToJson();
 
+if (allowPlaceholders)
+    allowPlaceholders = params.get('placeholders') === 'errors' ? 1 : 2;
+
 addEventListener('load', () => {
     if (onlyEmbed)
         document.body.classList.add('only-embed');
     else {
-        document.querySelector('.side1.noDisplay').classList.remove('noDisplay');
+        document.querySelector('.side1.noDisplay')?.classList.remove('noDisplay');
         if (useJsonEditor)
             document.body.classList.remove('gui');
     }
@@ -179,11 +183,12 @@ addEventListener('load', () => {
         }, allGood = e => {
             let invalid, err, str = JSON.stringify(e, null, 4), re = /("(?:icon_)?url": *")((?!\w+?:\/\/).+)"/g.exec(str);
             if (e.timestamp && new Date(e.timestamp).toString() === "Invalid Date")
-                invalid = true, err = 'Timestamp is invalid';
+                if (allowPlaceholders === 2) return true;
+            if (!allowPlaceholders) invalid = true, err = 'Timestamp is invalid';
             else if (re) { // If a URL is found without a protocol
                 if (!/\w+:|\/\/|^\//g.exec(re[2]) && re[2].includes('.')) {
                     let activeInput = document.querySelector('input[class$="link" i]:focus')
-                    if (activeInput) {
+                    if (activeInput && !allowPlaceholders) {
                         lastPos = activeInput.selectionStart + 7;
                         activeInput.value = `http://${re[2]}`;
                         update(JSON.parse(str.replace(re[0], `${re[1]}http://${re[2]}"`)));
@@ -191,11 +196,12 @@ addEventListener('load', () => {
                         return true;
                     }
                 }
-                invalid = true, err = (`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
+                if (allowPlaceholders !== 2)
+                    invalid = true, err = (`URL should have a protocol. Did you mean <span class="inline full short">http://${makeShort(re[2], 30, 600).replace(' ', '')}</span>?`);
             }
             if (invalid) {
                 validationError = true;
-                return error(err);
+                return error(err, 5000);
             }
             return true;
         }, innerHTML = (element, html) => {
@@ -904,7 +910,7 @@ addEventListener('load', () => {
             prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
         else if (e.target.closest('.item.auto')) {
             const input = e.target.closest('.item.auto').querySelector('input');
-            input.checked = !input.checked;
+            input.checked = e.target === input ? input.checked : !input.checked;
             autoUpdateURL = input.checked;
             if (input.checked) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
