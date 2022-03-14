@@ -29,7 +29,7 @@ var params = new URL(location).searchParams,
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
             let currentURL = new URL(location);
-            currentURL.searchParams.append('data', data);
+            currentURL.searchParams.append('data', data.replace(/%3D/g, '='));
             if (redirect) window.location = currentURL;
             data = currentURL.href;
         }
