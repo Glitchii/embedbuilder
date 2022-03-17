@@ -2,10 +2,9 @@
 // Want to use or contribute to this? https://github.com/Glitchii/embedbuilder
 // If you found an issue, please report it, make a P.R, or use the discussion page. Thanks
 
-if (!window.options)
-    options = {};
+options = top.options || {};
 
-var params = new URL(location).searchParams,
+var params = new URL(top.location.href).searchParams,
     hasParam = param => params.get(param) !== null,
     dataSpecified = options.dataSpecified || params.get('data'),
     username = params.get('username') || options.username,
@@ -30,9 +29,9 @@ var params = new URL(location).searchParams,
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
-            let currentURL = new URL(location);
+            let currentURL = new URL(top.location);
             currentURL.searchParams.append('data', data);
-            if (redirect) window.location = currentURL;
+            if (redirect) top.location = currentURL;
             // Replace %3D ('=' url encoded) with '='
             data = currentURL.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
         }
@@ -60,7 +59,7 @@ var params = new URL(location).searchParams,
         if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
     },
     urlOptions = ({ remove, set }) => {
-        const url = new URL(location.href);
+        const url = new URL(top.location.href);
         if (remove) url.searchParams.delete(remove);
         if (set) url.searchParams.set(set[0], set[1]);
         // history.replaceState(null, null, url.href);
@@ -153,7 +152,7 @@ addEventListener('DOMContentLoaded', () => {
     if (autoParams)
         document.querySelector('.auto-params > input').checked = true;
     document.querySelectorAll('.clickable > img')
-        .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
+        .forEach(e => e.parentElement.addEventListener('mouseup', el => top.open(el.target.src)));
 
     const editorHolder = document.querySelector('.editorHolder'),
         guiParent = document.querySelector('.top'),
@@ -192,7 +191,7 @@ addEventListener('DOMContentLoaded', () => {
     const notif = document.querySelector('.notification'),
         url = (url) => /^(https?:)?\/\//g.exec(url) ? url : '//' + url,
         makeShort = (txt, length, mediaWidth) => {
-            if (mediaWidth && window.matchMedia(`(max-width:${mediaWidth}px)`).matches)
+            if (mediaWidth && matchMedia(`(max-width:${mediaWidth}px)`).matches)
                 return txt.length > (length - 3) ? txt.substring(0, length - 3) + '...' : txt;
             return txt;
         }, error = (msg, time) => {
@@ -550,7 +549,7 @@ addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.gui > .item').forEach(e => {
             e.addEventListener('click', el => {
                 let elm = (el.target.closest('.top>.gui>.item') || el.target);
-                if (elm.classList.contains('active')) window.getSelection().anchorNode !== elm && elm.classList.remove('active');
+                if (elm.classList.contains('active')) getSelection().anchorNode !== elm && elm.classList.remove('active');
                 else {
                     let inlineField = elm.closest('.inlineField'),
                         input = elm.nextElementSibling.querySelector('input[type="text"]'),
@@ -639,7 +638,7 @@ addEventListener('DOMContentLoaded', () => {
         }))
 
         if (opts?.guiTabs) {
-            let tabs = opts.guiTabs.split(/, */), bottomKeys = ['footer', 'image'], topKeys = ['author', 'content'];
+            let tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs, bottomKeys = ['footer', 'image'], topKeys = ['author', 'content'];
             document.querySelectorAll(`.${tabs.join(', .')}`).forEach(e => e.classList.add('active'));
 
             // Autoscroll GUI to the bottom if necessary.

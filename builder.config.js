@@ -7,7 +7,7 @@ options = {
     noUser:             false,
     hasParam:           false,
     dataSpecified:      false,
-    guiTabs:            'author,description',
+    guiTabs:            ['author', 'description'],
     useJsonEditor:      false,
     reverseColumns:     false,
     onlyEmbed:          false,
