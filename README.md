@@ -29,7 +29,7 @@ Params that end with `=` in the list below need a value, those that don't will a
 Parameter               Description
 ---------               -----------
 username=               Used to set the default name of the bot.
-avatar=                 If a valid URL is given, that will be the avatar or icon of the bot.
+avatar=                 Avatar for the bot. Either URL encode it or make this the last param.
 verified                Displays a verified badge on the bot tag when set to true.
 reverse                 Reverse the preview and editors position.
 nouser                  Display embed or message content with no username or avatar.
@@ -47,6 +47,8 @@ placeholders=errors     This also disables automatic insertion of 'http' for url
 ### Example URL with all* the above parameters:
 https://glitchii.github.io/embedbuilder/?username=Troy&verified&reverse&guitabs=image,footer&avatar=https://cdn.discordapp.com/avatars/663074487335649292/576eb5f13519b9da10ba7807bdd83fab.webp
 
+### Alternative to URL options:
+Alternatively, have JavaScript config file named `builder.config.js`. In this file, define `window.options` to an object containing the params.  Note that some param names and cases will be different from the URL ones. An example [builder.config.js](/builder.config.js) file is included in the repo. The config file is loaded before the [main script](/assets/js/script.js) and because it's a JS file, you can do and probably alter anything else.
 >## Intergretting into your website
 >You are free to use this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formatters' eg. '{ server.name }' or '{ user.name }' etc. A (not so bad) downside would be that you'd probably have to keep up with fixes and updates.  
 If all you want is to have an embed builder in your website with no additional features and maybe using your own bot name and avatar, etc., then you should iframe https://glitchii.github.io/embedbuilder into your website with a few of the parameters above if needed instead.

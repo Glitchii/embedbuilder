@@ -2,22 +2,24 @@
 // Want to use or contribute to this? https://github.com/Glitchii/embedbuilder
 // If you found an issue, please report it, make a P.R, or use the discussion page. Thanks
 
+if (!window.options)
+    options = {};
 
 var params = new URL(location).searchParams,
     hasParam = param => params.get(param) !== null,
-    dataSpecified = params.get('data'),
-    botName = params.get('username'),
-    botIcon = params.get('avatar'),
-    guiTabs = params.get('guitabs'),
-    useJsonEditor = params.get('editor') === 'json',
-    botVerified = hasParam('verified'),
-    reverseColumns = hasParam('reverse'),
-    noUser = hasParam('nouser'),
-    onlyEmbed = hasParam('embed'),
+    dataSpecified = options.dataSpecified || params.get('data'),
+    username = params.get('username') || options.username,
+    avatar = params.get('avatar') || options.avatar,
+    guiTabs = params.get('guitabs') || options.guiTabs,
+    useJsonEditor = params.get('editor') === 'json' || options.useJsonEditor,
+    verified = hasParam('verified') || options.botVerified,
+    reverseColumns = hasParam('reverse') || options.reverseColumns,
+    noUser = hasParam('nouser') || options.noUser,
+    onlyEmbed = hasParam('embed') || options.onlyEmbed,
+    allowPlaceholders = hasParam('placeholders') || options.allowPlaceholders,
+    autoUpdateURL = localStorage.getItem('autoUpdateURL') || options.autoUpdateURL,
+    autoParams = localStorage.getItem('autoParams') || hasParam('autoparams') || options.autoParams,
     activeFields, colNum = 1, num = 0, validationError,
-    allowPlaceholders = hasParam('placeholders'),
-    autoUpdateURL = localStorage.getItem('autoUpdateURL'),
-    autoParams = hasParam('autoparams') || localStorage.getItem('autoParams'),
     toggleStored = item => {
         const found = localStorage.getItem(item);
         if (!found) return localStorage.setItem(item, true);
@@ -140,9 +142,9 @@ addEventListener('DOMContentLoaded', () => {
     if (noUser)
         document.body.classList.add('no-user');
     else {
-        if (botName) document.querySelector('.username').textContent = botName;
-        if (botIcon) document.querySelector('.avatar').src = botIcon;
-        if (botVerified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
+        if (username) document.querySelector('.username').textContent = username;
+        if (avatar) document.querySelector('.avatar').src = avatar;
+        if (verified) document.querySelector('.msgEmbed > .contents').classList.add('verified');
     }
     if (reverseColumns || localStorage.getItem('reverseColumns'))
         reverse();
@@ -245,9 +247,10 @@ addEventListener('DOMContentLoaded', () => {
                 .replace(/__(.+?)__/g, '<u>$1</u>')
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
                 .replace(/_(.+?)_/g, '<em>$1</em>')
-                // Replace >>> and > with block quotes. &#62; is HTML code for >
-                .replace(/^(?: *&#62;&#62;&#62; +([\s\S]*))|^(?: *&#62;(?!&#62;&#62;) +([^\n]*)(\n *&#62;(?!&#62;&#62;) +([^\n]*))*\n?)/mg, (m, b, c) =>
-                    `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${b || c}</blockquote></div>`)
+                // Replace >>> and > with block-quotes. &#62; is HTML code for >
+                .replace(/^(?: *&#62;&#62;&#62; ([\s\S]*))|(?:^ *&#62;(?!&#62;&#62;) +.+\n)+(?:^ *&#62;(?!&#62;&#62;) .+\n?)+|^(?: *&#62;(?!&#62;&#62;) ([^\n]*))(\n?)/mg, (all, match1, match2, newLine) => {
+                    return `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${match1 || match2 || newLine ? match1 || match2 : all.replace(/^ *&#62; /gm, '')}</blockquote></div>`;
+                })
 
                 /** Mentions */
                 .replace(/&#60;#\d+&#62;/g, () => `<span class="mention channel interactive">channel</span>`)
