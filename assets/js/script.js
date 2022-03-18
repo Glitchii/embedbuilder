@@ -943,8 +943,8 @@ addEventListener('DOMContentLoaded', () => {
             reverseColumns = !reverseColumns;
             toggleStored('reverseColumns');
         } else if (e.target.closest('.item.noUser')) {
-            document.body.classList.toggle('no-user');
             if (options.avatar) document.querySelector('img.avatar').src = options.avatar;
+            document.body.classList.toggle('no-user');
             toggleStored('noUser');
         } else if (e.target.closest('.item.auto-params')) {
             if (input.checked) localStorage.setItem('autoParams', true);
