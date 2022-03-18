@@ -5,7 +5,6 @@ options = {
     avatar:             'https://cdn.discordapp.com/embed/avatars/1.png',
     verified:           false,
     noUser:             false,
-    hasParam:           false,
     dataSpecified:      false,
     guiTabs:            ['author', 'description'],
     useJsonEditor:      false,

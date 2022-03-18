@@ -13,7 +13,7 @@ var params = new URL(top.location.href).searchParams,
     useJsonEditor = params.get('editor') === 'json' || options.useJsonEditor,
     verified = hasParam('verified') || options.verified,
     reverseColumns = hasParam('reverse') || options.reverseColumns,
-    noUser = hasParam('nouser') || options.noUser,
+    noUser = localStorage.getItem('noUser') || hasParam('nouser') || options.noUser,
     onlyEmbed = hasParam('embed') || options.onlyEmbed,
     allowPlaceholders = hasParam('placeholders') || options.allowPlaceholders,
     autoUpdateURL = localStorage.getItem('autoUpdateURL') || options.autoUpdateURL,
@@ -927,7 +927,7 @@ addEventListener('DOMContentLoaded', () => {
     })
 
     document.querySelector('.top-btn.menu').addEventListener('click', e => {
-        if (e.target.closest('.item.datalink'))
+        if (e.target.closest('.item.dataLink'))
             return prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
 
         const input = e.target.closest('.item')?.querySelector('input');
@@ -942,6 +942,9 @@ addEventListener('DOMContentLoaded', () => {
             reverse(reverseColumns);
             reverseColumns = !reverseColumns;
             toggleStored('reverseColumns');
+        } else if (e.target.closest('.item.noUser')) {
+            document.body.classList.toggle('no-user');
+            toggleStored('noUser');
         } else if (e.target.closest('.item.auto-params')) {
             if (input.checked) localStorage.setItem('autoParams', true);
             else localStorage.removeItem('autoParams');
@@ -987,4 +990,29 @@ addEventListener('DOMContentLoaded', () => {
     })
 
     if (onlyEmbed) document.querySelector('.side1')?.remove();
+
+    document.querySelector('.top-btn.copy').addEventListener('click', e => {
+        const mark = e.target.closest('.top-btn.copy').querySelector('.mark'),
+            jsonData = JSON.stringify(json, null, 4),
+            next = () => {
+                mark.classList.remove('hidden');
+                mark.previousElementSibling.classList.add('hidden');
+
+                setTimeout(() => {
+                    mark.classList.add('hidden');
+                    mark.previousElementSibling.classList.remove('hidden');
+                }, 1500);
+            }
+
+        if (!navigator.clipboard?.writeText(jsonData).then(next).catch(err => alert('Could not copy to clipboard: ' + err.message))) {
+            const textarea = document.createElement('textarea');
+            textarea.value = jsonData;
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, 50000);
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            next();
+        }
+    });
 });

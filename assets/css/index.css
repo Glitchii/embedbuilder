@@ -1806,6 +1806,26 @@ body {
     transition: .5s ease;
 }
 
+.top-btn.copy {
+    left: 190px;
+}
+
+.top-btn.copy>svg {
+    width: 15px;
+    left: 1px;
+    top: -.5px;
+}
+
+.top-btn.copy>svg.mark {
+    width: 18px;
+    left: -1px;
+}
+
+.top-btn.copy>svg * {
+    fill: var(#fff);
+    transition: all .3s ease;
+}
+
 .top-btn>svg {
     width: 20px;
     height: 100%;
@@ -1878,21 +1898,23 @@ body {
 .top-btn.menu>.box .item>input {
     pointer-events: none;
 }
-.top-btn.menu > .box .item > .icon::after {
+
+.top-btn.menu>.box .item>.icon::after {
     display: none;
-	position: absolute;
-	content: "";
-	width: 4px;
-	height: 4px;
-	background: #00bb9c;
-	z-index: 1000000;
-	border-radius: 100%;
-	left: 7px;
-	transform: translateY(7px);
+    position: absolute;
+    content: "";
+    width: 4px;
+    height: 4px;
+    background: #00bb9c;
+    z-index: 1000000;
+    border-radius: 100%;
+    left: 7px;
+    transform: translateY(7px);
 }
 
-body.autoUpdateURL .top-btn.menu > .box .item.auto > .icon::after,
-body.reversed .top-btn.menu > .box .item.reverse > .icon::after {
+body.autoUpdateURL .top-btn.menu>.box .item.auto>.icon::after,
+body.no-user .top-btn.menu>.box .item.noUser>.icon::after,
+body.reversed .top-btn.menu>.box .item.reverse>.icon::after {
     display: block;
 }
 
@@ -2047,7 +2069,7 @@ body.emptyEmbed.emptyContent .emptyTxt {
         position: absolute;
         cursor: pointer;
         z-index: 5;
-        left: 170px;
+        left: 226px;
         border-left: 2px solid #4c5057;
         padding-left: 15px;
         bottom: auto;
@@ -2056,6 +2078,7 @@ body.emptyEmbed.emptyContent .emptyTxt {
 
     .pickerToggle>svg {
         width: 17px;
+        transform: translateY(2px);
     }
 
     .main .side1 {
