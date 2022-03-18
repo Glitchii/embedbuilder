@@ -164,6 +164,7 @@ body.gui .side1 .item.top {
     scrollbar-color: #26272d #36393f;
     scrollbar-width: thin;
     font-family: DsWhitney, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: var(--fullEmbedBackground);
 }
 
 ::-webkit-scrollbar {
@@ -2110,6 +2111,7 @@ body.emptyEmbed.emptyContent .emptyTxt {
 @media screen and (max-width: 530px) {
     .main .side1 {
         padding: 10px;
+        padding-bottom: 17px;
     }
 
     .top>.gui {
