@@ -2111,7 +2111,7 @@ body.emptyEmbed.emptyContent .emptyTxt {
 @media screen and (max-width: 530px) {
     .main .side1 {
         padding: 10px;
-        padding-bottom: 17px;
+        padding-bottom: 25px;
     }
 
     .top>.gui {
