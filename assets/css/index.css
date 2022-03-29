@@ -1291,6 +1291,7 @@ body:not(.gui) .chooser>.back {
     margin: 8px auto;
     border-radius: 7px;
     background: linear-gradient(90deg, #212226, #21222600);
+    background: #2122269c;
     position: relative;
     z-index: 2;
 }

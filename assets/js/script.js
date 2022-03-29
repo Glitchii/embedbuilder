@@ -238,8 +238,8 @@ addEventListener('DOMContentLoaded', () => {
 
             txt = txt
                 /** Markdown */
-                .replace(/&#60;:[^:]+:(\d+)&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
-                .replace(/&#60;a:[^:]+:(\d+)&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
+                .replace(/&#60;:\w+:(\d{18})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+                .replace(/&#60;a:\w+:(\d{18})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
                 .replace(/~~(.+?)~~/g, '<s>$1</s>')
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -606,15 +606,15 @@ addEventListener('DOMContentLoaded', () => {
         })
 
         gui.querySelectorAll('textarea, input').forEach(e => e.addEventListener('input', el => {
-            let value = el.target.value, field = el.target.closest('.field');
+            const value = el.target.value, field = el.target.closest('.field');
             if (field) {
-                let jsonField = json.embed.fields[Array.from(fields.children).filter(e => e.className === 'field').indexOf(field)];
+                const jsonField = json.embed.fields[Array.from(fields.children).filter(e => e.className === 'field').indexOf(field)];
                 if (jsonField) {
                     if (el.target.type === 'text') jsonField.name = value;
                     else if (el.target.type === 'textarea') jsonField.value = value;
                     else jsonField.inline = el.target.checked;
                 } else {
-                    let obj = {}
+                    const obj = {}
                     if (el.target.type === 'text') obj.name = value;
                     else if (el.target.type === 'textarea') obj.value = value;
                     else obj.inline = el.target.checked;
@@ -688,7 +688,7 @@ addEventListener('DOMContentLoaded', () => {
                 }).catch(err => error(`Request to tempfile.site failed with error: ${err}`, 5000))
         }
 
-        let files = document.querySelectorAll('input[type="file"]');
+        const files = document.querySelectorAll('input[type="file"]');
         files.forEach(f => f.addEventListener('change', e => {
             if (f.files) {
                 upload(e.target.parentElement);
@@ -707,58 +707,66 @@ addEventListener('DOMContentLoaded', () => {
                 document.body.classList.remove('emptyContent');
             }
             if (data.embed && Object.keys(data.embed).length) {
-                let e = data.embed;
-                if (!allGood(e)) return;
+                const emb = data.embed;
+                if (!allGood(emb)) return;
+                
                 validationError = false;
-                if (e.title) display(embedTitle, markup(`${e.url ? '<a class="anchor" target="_blank" href="' + encodeHTML(url(e.url)) + '">' + encodeHTML(e.title) + '</a>' : encodeHTML(e.title)}`, { replaceEmojis: true, inlineBlock: true }));
+                if (emb.title) display(embedTitle, markup(`${emb.url ? '<a class="anchor" target="_blank" href="' + encodeHTML(url(emb.url)) + '">' + encodeHTML(emb.title) + '</a>' : encodeHTML(emb.title)}`, { replaceEmojis: true, inlineBlock: true }));
                 else hide(embedTitle);
-                if (e.description) display(embedDescription, markup(encodeHTML(e.description), { inEmbed: true, replaceEmojis: true }));
+                
+                if (emb.description) display(embedDescription, markup(encodeHTML(emb.description), { inEmbed: true, replaceEmojis: true }));
                 else hide(embedDescription);
-                if (e.color) embed.closest('.embed').style.borderColor = (typeof e.color === 'number' ? '#' + e.color.toString(16).padStart(6, "0") : e.color);
+                
+                if (emb.color) embed.closest('.embed').style.borderColor = (typeof emb.color === 'number' ? '#' + emb.color.toString(16).padStart(6, "0") : emb.color);
                 else embed.closest('.embed').style.removeProperty('border-color');
-                if (e.author?.name) display(embedAuthor, `
-                ${e.author.icon_url ? '<img class="embedAuthorIcon" src="' + encodeHTML(url(e.author.icon_url)) + '">' : ''}
-                ${e.author.url ? '<a class="embedAuthorNameLink embedLink embedAuthorName" href="' + encodeHTML(url(e.author.url)) + '" target="_blank">' + encodeHTML(e.author.name) + '</a>' : '<span class="embedAuthorName">' + encodeHTML(e.author.name) + '</span>'}`, 'flex');
+                
+                if (emb.author?.name) display(embedAuthor, `
+                    ${emb.author.icon_url ? '<img class="embedAuthorIcon" src="' + encodeHTML(url(emb.author.icon_url)) + '">' : ''}
+                    ${emb.author.url ? '<a class="embedAuthorNameLink embedLink embedAuthorName" href="' + encodeHTML(url(emb.author.url)) + '" target="_blank">' + encodeHTML(emb.author.name) + '</a>' : '<span class="embedAuthorName">' + encodeHTML(emb.author.name) + '</span>'}`, 'flex');
                 else hide(embedAuthor);
-                let pre = embed.querySelector('.markup pre');
-                if (e.thumbnail?.url) {
-                    embedThumbnail.src = e.thumbnail.url,
+                
+                const pre = embed.querySelector('.markup pre');
+                if (emb.thumbnail?.url) {
+                    embedThumbnail.src = emb.thumbnail.url,
                         embedThumbnail.parentElement.style.display = 'block';
                     if (pre) pre.style.maxWidth = '90%';
                 } else {
                     hide(embedThumbnail.parentElement);
                     if (pre) pre.style.removeProperty('max-width');
                 }
-                if (e.image?.url)
-                    embedImage.src = e.image.url,
+                
+                if (emb.image?.url)
+                    embedImage.src = emb.image.url,
                         embedImage.parentElement.style.display = 'block';
                 else hide(embedImage.parentElement);
-                if (e.footer?.text) display(embedFooter, `
-                    ${e.footer.icon_url ? '<img class="embedFooterIcon" src="' + encodeHTML(url(e.footer.icon_url)) + '">' : ''}<span class="embedFooterText">
-                        ${encodeHTML(e.footer.text)}
-                    ${e.timestamp ? '<span class="embedFooterSeparator">•</span>' + encodeHTML(tstamp(e.timestamp)) : ''}</span></div>`, 'flex');
-                else if (e.timestamp) display(embedFooter, `<span class="embedFooterText">${encodeHTML(tstamp(e.timestamp))}</span></div>`, 'flex');
+                
+                if (emb.footer?.text) display(embedFooter, `
+                    ${emb.footer.icon_url ? '<img class="embedFooterIcon" src="' + encodeHTML(url(emb.footer.icon_url)) + '">' : ''}<span class="embedFooterText">
+                        ${encodeHTML(emb.footer.text)}
+                    ${emb.timestamp ? '<span class="embedFooterSeparator">•</span>' + encodeHTML(tstamp(emb.timestamp)) : ''}</span></div>`, 'flex');
+                else if (emb.timestamp) display(embedFooter, `<span class="embedFooterText">${encodeHTML(tstamp(emb.timestamp))}</span></div>`, 'flex');
                 else hide(embedFooter);
-                if (e.fields) {
+                
+                if (emb.fields) {
                     innerHTML(embedFields, '');
                     let index, gridCol;
 
-                    e.fields.forEach((f, i) => {
+                    emb.fields.forEach((f, i) => {
                         if (f.name && f.value) {
                             let fieldElement = embedFields.insertBefore(document.createElement('div'), null);
                             // Figuring out if there are only two fields on a row to give them more space.
                             // e.fields = json.embeds.fields.
 
                             // if both the field of index 'i' and the next field on its right are inline and -
-                            if (e.fields[i].inline && e.fields[i + 1]?.inline &&
+                            if (emb.fields[i].inline && emb.fields[i + 1]?.inline &&
                                 // it's the first field in the embed or -
-                                ((i === 0 && e.fields[i + 2] && !e.fields[i + 2].inline) || ((
+                                ((i === 0 && emb.fields[i + 2] && !emb.fields[i + 2].inline) || ((
                                     // it's not the first field in the embed but the previous field is not inline or - 
-                                    i > 0 && !e.fields[i - 1].inline ||
+                                    i > 0 && !emb.fields[i - 1].inline ||
                                     // it has 3 or more fields behind it and 3 of those are inline except the 4th one back if it exists -
-                                    i >= 3 && e.fields[i - 1].inline && e.fields[i - 2].inline && e.fields[i - 3].inline && (e.fields[i - 4] ? !e.fields[i - 4].inline : !e.fields[i - 4])
+                                    i >= 3 && emb.fields[i - 1].inline && emb.fields[i - 2].inline && emb.fields[i - 3].inline && (emb.fields[i - 4] ? !emb.fields[i - 4].inline : !emb.fields[i - 4])
                                     // or it's the first field on the last row or the last field on the last row is not inline or it's the first field in a row and it's the last field on the last row.
-                                ) && (i == e.fields.length - 2 || !e.fields[i + 2].inline))) || i % 3 === 0 && i == e.fields.length - 2) {
+                                ) && (i == emb.fields.length - 2 || !emb.fields[i + 2].inline))) || i % 3 === 0 && i == emb.fields.length - 2) {
                                 // then make the field halfway (and the next field will take the other half of the embed).
                                 index = i, gridCol = '1 / 7';
                             }
@@ -773,7 +781,7 @@ addEventListener('DOMContentLoaded', () => {
                                         <div class="embedFieldValue">${markup(encodeHTML(f.value), { inEmbed: true, replaceEmojis: true })}</div>
                                     </div>`;
                             else {
-                                if (i && !e.fields[i - 1].inline) colNum = 1;
+                                if (i && !emb.fields[i - 1].inline) colNum = 1;
 
                                 fieldElement.outerHTML = `
                                     <div class="embedField ${num}${gridCol ? ' colNum-2' : ''}" style="grid-column: ${gridCol || (colNum + ' / ' + (colNum + 4))};">
@@ -796,13 +804,20 @@ addEventListener('DOMContentLoaded', () => {
 
                     display(embedFields, undefined, 'grid');
                 } else hide(embedFields);
+
                 document.body.classList.remove('emptyEmbed');
                 for (block of document.querySelectorAll('.markup pre > code'))
                     hljs.highlightBlock(block);
+
                 error(false);
                 twemoji.parse(msgEmbed);
-            } else document.body.classList.add('emptyEmbed');
-            if (!embedCont.innerText) document.body.classList.add('emptyEmbed');
+            } else
+                document.body.classList.add('emptyEmbed');
+            
+            // Make sure that the embed has no text or any visible images such as custom emojis before hiding.
+            if (!embedCont.innerText && !document.querySelector('.messageContent + .container .embedGrid > [style*=display] img'))
+                document.body.classList.add('emptyEmbed');
+
             json = data;
             if (autoUpdateURL)
                 urlOptions({ set: ['data', jsonToBase64(json)] })
