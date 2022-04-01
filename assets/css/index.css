@@ -79,6 +79,10 @@ body.no-user .msgEmbed>.contents {
     display: none;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .main {
     position: absolute;
     width: 100%;
@@ -86,7 +90,7 @@ body.no-user .msgEmbed>.contents {
     display: grid;
 }
 
-body:not(.only-embed) .main {
+body:not(.no-preview):not(.no-editor) .main {
     grid-template-columns: 45% 55%;
 }
 
@@ -1143,7 +1147,7 @@ body:not(.gui) .chooser>.back {
 
 .bottom .colrs {
     z-index: 5;
-    animation: colrsAn .5s ease-out;
+    animation: colrsAn .25s ease-out;
     background: #212226;
     border-radius: 10px;
     width: 250px;
@@ -1801,7 +1805,6 @@ body {
     --bgc: #27282e;
     left: 140px;
     position: absolute;
-    cursor: pointer;
     z-index: 5;
     transform: translate(0, -5px);
     padding: 8.5px;
@@ -1810,6 +1813,10 @@ body {
     width: 35px;
     height: 35px;
     transition: .5s ease;
+}
+
+.top-btn:not(.active) {
+    cursor: pointer;
 }
 
 .top-btn.copy {
@@ -1881,8 +1888,9 @@ body {
     align-content: center;
 }
 
-.top-btn.menu>.box .item:hover {
+.top-btn.menu>.box .item.normal:hover {
     background: #35373f;
+    cursor: pointer;
 }
 
 .vs {
@@ -1895,13 +1903,42 @@ body {
     transform: translateX(-50%);
 }
 
-.top-btn.menu>.box .item> :is(*, *>svg) {
+.top-btn.menu>.box .item.normal> :is(*, *>svg) {
     display: flex;
     align-self: flex-end;
     margin: 0;
 }
 
-.top-btn.menu>.box .item>input {
+.item.toggle {
+    display: block;
+}
+
+.item.toggle .inner .toggles {
+    display: flex;
+    gap: 2em;
+}
+
+.item.toggle .inner .toggles .item {
+    align-items: center;
+    background: #35363e;
+    padding: 5px 10px;
+}
+
+.item.toggle .inner .toggles .item * {
+    pointer-events: none;
+}
+
+.item.toggle .inner .title {
+    text-align: left;
+    margin: 10px 0;
+    opacity: .5;
+    text-transform: uppercase;
+    font-size: 79%;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.item.toggle .item.toggle .item.toggle .item.toggle .top-btn.menu>.box .item>input {
     pointer-events: none;
 }
 
@@ -1995,6 +2032,96 @@ body.emptyEmbed.emptyContent .emptyTxt {
     top: 800%;
 }
 
+body.no-editor.no-preview .side1 .chooser {
+    background: transparent;
+}
+
+body.no-editor .side1 :not(.needed):not(.needed *) {
+    display: none !important;
+}
+
+body.no-editor .main .side1,
+body.no-preview .main .side2 {
+    height: auto;
+    padding-bottom: 5px;
+    background: transparent;
+}
+
+body:is(.no-preview, .no-editor) .main {
+    display: flex;
+    flex-direction: column;
+}
+
+body.no-editor .side1 .chooser :is(.back, .opt) {
+    /* display: none; */
+    opacity: .25;
+    pointer-events: none;
+}
+
+body.no-editor .side1 .chooser.needed> :not(.menu) {
+    display: none !important;
+}
+
+body.no-editor .side1 {
+    position: absolute;
+}
+
+/* body.no-editor .side1 .chooser {
+    background: transparent;
+} */
+
+/* body.no-editor .side1 {
+	display: none !important;
+} */
+
+body.no-preview .side2 {
+    display: none !important;
+}
+
+/* body.no-editor .bottom .colrs {
+    left: 20px;
+    top: 90px;
+    bottom: 0;
+} */
+
+body.no-editor .bottom .colrs {
+    left: 20px;
+    top: 90px;
+    bottom: 0;
+    display: none;
+}
+
+
+body.no-editor .pickerToggle {
+    display: block;
+    position: absolute;
+    cursor: pointer;
+    z-index: 5;
+    left: 226px;
+    border-left: 2px solid #4c5057;
+    padding-left: 15px;
+    bottom: auto;
+    margin-left: 15px;
+}
+
+body.no-editor .pickerToggle>svg {
+    width: 17px;
+    transform: translateY(2px);
+}
+
+body.no-editor .main .side1 {
+    border-right: none;
+}
+
+body.no-editor .side1 .item.top {
+    padding-top: 10px;
+    transform: translateY(10px);
+}
+
+body.no-editor .bottom .colrs.display {
+    display: grid;
+}
+
 ::-webkit-scrollbar {
     width: 7px;
     background: #292b2f00;
@@ -2049,7 +2176,8 @@ body.emptyEmbed.emptyContent .emptyTxt {
     .bottom .colrs {
         bottom: 40px;
         top: 100px;
-        left: 10px;
+        top: 90px;
+        left: 20px;
         display: none;
         animation: colrsAn .1s ease-out;
         box-shadow: 0px 5px 15px 0px #0000004f;
@@ -2066,7 +2194,7 @@ body.emptyEmbed.emptyContent .emptyTxt {
         width: 100%;
     }
 
-    .bottom {
+    body:not(.no-editor) .bottom {
         margin: 40px 0 0 0 !important;
     }
 

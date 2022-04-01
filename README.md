@@ -41,7 +41,9 @@ placeholders            Silences some warrnings, e.g. warrnings about missing ur
                         This param is useful when your bot allows having placeholders in place of a URL eg. `{ server.url }`
 placeholders=errors     This also disables automatic insertion of 'http' for urls without a protocol.
                         Except, warnings won't be silenced. The user will still see a warning that a url or timestamp (etc.) is incorrect for 5 seconds.
-
+hideditor               Hides the editor.
+hidepreview             Hides the preview.
+hidemenu                Hides the three dotted menu.
 ```
 <small>Case matters, all parameters should be lowercase.</small>
 ### Example URL with all* the above parameters:
@@ -53,7 +55,7 @@ This will only work through iframe or a cloned repo of the builder: Have a JavaS
 >## Intergretting into your website
 >You are free to use this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formatters' eg. '{ server.name }' or '{ user.name }' etc. A (not so bad) downside would be that you'd probably have to keep up with fixes and updates.
 <br>
-To over come that, and if all you want is to have an embed builder in your website with no additional features and maybe using your own bot name and avatar, etc., then you might iframe https://glitchii.github.io/embedbuilder into your website with a few of the parameters above if needed instead. The downside to this is that due to security reasons, browsers won't allow features like updating URL parameter to work through iframes, whoever URL options will still be read from the top holder of the iframe, those are probably the only features that won't work and thus are removed from the GUI menu when embeded in iframe.
+To over come that, and if all you want is to have an embed builder in your website with no additional features and maybe using your own bot name and avatar, etc., then you might iframe https://glitchii.github.io/embedbuilder into your website with a few of the parameters above if needed instead. The downside to this is that due to security reasons, browsers won't allow features like updating URL parameter to work through iframes, whoever URL options will still be read from the top holder of the iframe, those are probably the only features that won't work and thus are removed from the GUI menu when embeded in iframe. `builder.config.js` also won't be seen in iframe
 
 
 <br><br>

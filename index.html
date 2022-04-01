@@ -40,7 +40,7 @@
     <body class="gui emptyEmbed">
         <div class="main">
             <section class="side1 noDisplay">
-                <div class="chooser">
+                <div class="chooser needed">
                     <div class="back"></div>
                     <div class="gui opt">
                         <p>GUI</p>
@@ -121,7 +121,7 @@
                                 </div>
                                 <div>Get data link</div>
                             </div>
-                            <div class="item normal auto">
+                            <div class="item normal auto no-frame">
                                 <!-- <input type="checkbox" id="auto" name="auto" autocomplete="off" class="hidden"> -->
                                 <div class="icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" x="0" y="0" viewBox="0 0 48 48" xml:space="preserve" width="16" height="16">
@@ -158,8 +158,8 @@
                                 </div>
                                 <div>Hide username and avatar</div>
                             </div>
-                            <div class="vs auto-url"></div>
-                            <div class="item auto-params">
+                            <div class="vs no-frame"></div>
+                            <div class="item normal auto-params no-frame">
                                 <input id="auto" name="auto" autocomplete="off" type="checkbox">
                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" x="0" y="0" viewBox="0 0 512 512" xml:space="preserve" width="16" height="16" fill="currentColor" style="display: none;">
                                     <g>
@@ -168,6 +168,22 @@
                                 </svg>
                                 <div>Auto-update URL options</div>
                             </div>
+                            <div class="vs no-frame"></div>
+                            <div class="item toggle">
+                                <div class="inner">
+                                    <div class="title">Toggle on or off</div>
+                                    <div class="toggles">
+                                        <div class="item pointer editor">
+                                            <input autocomplete="off" type="checkbox" checked>
+                                            <span>Editor</span>
+                                        </div>
+                                        <div class="item pointer preview">
+                                            <input autocomplete="off" type="checkbox" checked>
+                                            <span>Preview</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,7 +191,7 @@
                     <div class="gui"></div>
                     <div class="editorHolder"></div>
                 </div>
-                <div class="bottom item">
+                <div class="bottom item needed">
                     <div class="colrs high">
                         <div class="hex">
                             <div>

@@ -4,7 +4,7 @@
 
 options = window.options || {};
 inIframe = window.inIframe || top !== self;
-currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)[0] : location.href);
+currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)?.[0] || location.href : location.href);
 
 var params = currentURL().searchParams,
     hasParam = param => params.get(param) !== null,
@@ -20,6 +20,9 @@ var params = currentURL().searchParams,
     allowPlaceholders = hasParam('placeholders') || options.allowPlaceholders,
     autoUpdateURL = localStorage.getItem('autoUpdateURL') || options.autoUpdateURL,
     autoParams = localStorage.getItem('autoParams') || hasParam('autoparams') || options.autoParams,
+    hideEditor = localStorage.getItem('hideeditor') || hasParam('hideeditor') || options.hideEditor,
+    hidePreview = localStorage.getItem('hidepreview') || hasParam('hidepreview') || options.hidePreview,
+    hideMenu = localStorage.getItem('hideMenu') || hasParam('hidemenu') || options.hideMenu,
     activeFields, colNum = 1, num = 0, validationError,
     toggleStored = item => {
         const found = localStorage.getItem(item);
@@ -75,7 +78,7 @@ var params = currentURL().searchParams,
     },
     mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
     jsonKeys = ["embed", "content", ...mainKeys],
-    json = {
+    json = window.json || {
         content: "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
         embed: {
             title: "Hello ~~people~~ world :wave:",
@@ -160,9 +163,19 @@ addEventListener('DOMContentLoaded', () => {
     if (autoParams)
         document.querySelector('.auto-params > input').checked = true;
     if (inIframe)
-        // Remove menu options that that don't work in iframe.
-        for (const e of document.querySelectorAll('.top-btn.menu :is(.item.auto, .item.auto-params, .vs.auto-url)'))
+        // Remove menu options that don't work in iframe.
+        for (const e of document.querySelectorAll('.no-frame'))
             e.remove();
+    if (hideMenu)
+        document.querySelector('.top-btn.menu').remove();
+    if (hideEditor) {
+        document.body.classList.add('no-editor');
+        document.querySelector('.toggle .toggles .editor input').checked = false;
+    }
+    if (hidePreview) {
+        document.body.classList.add('no-preview');
+        document.querySelector('.toggle .toggles .preview input').checked = false;
+    }
 
     document.querySelectorAll('.clickable > img')
         .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
@@ -955,7 +968,7 @@ addEventListener('DOMContentLoaded', () => {
             content.focus();
     })
 
-    document.querySelector('.top-btn.menu').addEventListener('click', e => {
+    document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink'))
             return prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
 
@@ -979,6 +992,15 @@ addEventListener('DOMContentLoaded', () => {
             if (input.checked) localStorage.setItem('autoParams', true);
             else localStorage.removeItem('autoParams');
             autoParams = input.checked;
+        } else if (e.target.closest('.toggles>.item')) {
+            const win = input.closest('.item').classList[2];
+            if (input.checked) {
+                document.body.classList.remove(`no-${win}`);
+                localStorage.removeItem(`hide${win}`);
+            } else {
+                document.body.classList.add(`no-${win}`);
+                localStorage.setItem(`hide${win}`, true);
+            }
         }
         e.target.closest('.top-btn').classList.toggle('active')
     })

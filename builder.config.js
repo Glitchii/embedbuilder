@@ -13,7 +13,19 @@ options = {
     allowPlaceholders:  false,
     autoUpdateURL:      false,
     autoParams:         false,
+    hideEditor:         false,
+    hidePreview:        false,
+    hideMenu:           false,
 }
+
+// // Default JSON object
+// json = {
+//     content: "Hello world",
+//     embed: {
+//         title: "A title",
+//         description: "A description",
+//     }
+// }
 
 onload = () => {
     // console.log('Salut 👋');
