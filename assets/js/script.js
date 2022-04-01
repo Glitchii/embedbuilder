@@ -2,9 +2,9 @@
 // Want to use or contribute to this? https://github.com/Glitchii/embedbuilder
 // If you found an issue, please report it, make a P.R, or use the discussion page. Thanks
 
-options = top.options || {};
+options = window.options || {};
 
-var params = new URL(top.location.href).searchParams,
+var params = new URL(window.location.href).searchParams,
     hasParam = param => params.get(param) !== null,
     dataSpecified = options.dataSpecified || params.get('data'),
     username = params.get('username') || options.username,
@@ -29,9 +29,9 @@ var params = new URL(top.location.href).searchParams,
     jsonToBase64 = (jsonCode, withURL, redirect) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
-            let currentURL = new URL(top.location);
+            let currentURL = new URL(window.location);
             currentURL.searchParams.append('data', data);
-            if (redirect) top.location = currentURL;
+            if (redirect) window.location = currentURL;
             // Replace %3D ('=' url encoded) with '='
             data = currentURL.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
         }
@@ -59,7 +59,7 @@ var params = new URL(top.location.href).searchParams,
         if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
     },
     urlOptions = ({ remove, set }) => {
-        const url = new URL(top.location.href);
+        const url = new URL(window.location.href);
         if (remove) url.searchParams.delete(remove);
         if (set) url.searchParams.set(set[0], set[1]);
         // history.replaceState(null, null, url.href);
@@ -152,7 +152,7 @@ addEventListener('DOMContentLoaded', () => {
     if (autoParams)
         document.querySelector('.auto-params > input').checked = true;
     document.querySelectorAll('.clickable > img')
-        .forEach(e => e.parentElement.addEventListener('mouseup', el => top.open(el.target.src)));
+        .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
 
     const editorHolder = document.querySelector('.editorHolder'),
         guiParent = document.querySelector('.top'),
