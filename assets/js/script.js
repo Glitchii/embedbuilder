@@ -167,7 +167,7 @@ addEventListener('DOMContentLoaded', () => {
         for (const e of document.querySelectorAll('.no-frame'))
             e.remove();
     if (hideMenu)
-        document.querySelector('.top-btn.menu').remove();
+        document.querySelector('.top-btn.menu').classList.add('hidden');
     if (hideEditor) {
         document.body.classList.add('no-editor');
         document.querySelector('.toggle .toggles .editor input').checked = false;

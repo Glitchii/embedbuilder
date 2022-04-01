@@ -9,7 +9,6 @@ options = {
     guiTabs:            ['author', 'description'],
     useJsonEditor:      false,
     reverseColumns:     false,
-    onlyEmbed:          false,
     allowPlaceholders:  false,
     autoUpdateURL:      false,
     autoParams:         false,
