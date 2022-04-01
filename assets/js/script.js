@@ -3,8 +3,10 @@
 // If you found an issue, please report it, make a P.R, or use the discussion page. Thanks
 
 options = window.options || {};
+inIframe = window.inIframe || top !== self;
+currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)[0] : location.href);
 
-var params = new URL(window.location.href).searchParams,
+var params = currentURL().searchParams,
     hasParam = param => params.get(param) !== null,
     dataSpecified = options.dataSpecified || params.get('data'),
     username = params.get('username') || options.username,
@@ -26,14 +28,14 @@ var params = new URL(window.location.href).searchParams,
         localStorage.removeItem(item);
         return found;
     },
-    jsonToBase64 = (jsonCode, withURL, redirect) => {
+    jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
-            let currentURL = new URL(window.location);
-            currentURL.searchParams.append('data', data);
-            if (redirect) window.location = currentURL;
+            const url = currentURL();
+            url.searchParams.append('data', data);
+            if (redirect) window.top.location.href = url;
             // Replace %3D ('=' url encoded) with '='
-            data = currentURL.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
+            data = url.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
         }
         return data;
     },
@@ -59,11 +61,17 @@ var params = new URL(window.location.href).searchParams,
         if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
     },
     urlOptions = ({ remove, set }) => {
-        const url = new URL(window.location.href);
+        const url = currentURL(), href = url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&');
         if (remove) url.searchParams.delete(remove);
         if (set) url.searchParams.set(set[0], set[1]);
-        // history.replaceState(null, null, url.href);
-        history.replaceState(null, null, url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&'));
+        try {
+            history.replaceState(null, null, href);
+        } catch (e) {
+            // Most likely embeded in iframe
+            console.message(`${e.name}: ${e.message}`, e);
+            // if (e.name === 'SecurityError')
+            //     window.top.location.href = href;
+        }
     },
     mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
     jsonKeys = ["embed", "content", ...mainKeys],
@@ -151,6 +159,11 @@ addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('autoUpdateURL');
     if (autoParams)
         document.querySelector('.auto-params > input').checked = true;
+    if (inIframe)
+        // Remove menu options that that don't work in iframe.
+        for (const e of document.querySelectorAll('.top-btn.menu :is(.item.auto, .item.auto-params, .vs.auto-url)'))
+            e.remove();
+
     document.querySelectorAll('.clickable > img')
         .forEach(e => e.parentElement.addEventListener('mouseup', el => window.open(el.target.src)));
 
@@ -709,22 +722,22 @@ addEventListener('DOMContentLoaded', () => {
             if (data.embed && Object.keys(data.embed).length) {
                 const emb = data.embed;
                 if (!allGood(emb)) return;
-                
+
                 validationError = false;
                 if (emb.title) display(embedTitle, markup(`${emb.url ? '<a class="anchor" target="_blank" href="' + encodeHTML(url(emb.url)) + '">' + encodeHTML(emb.title) + '</a>' : encodeHTML(emb.title)}`, { replaceEmojis: true, inlineBlock: true }));
                 else hide(embedTitle);
-                
+
                 if (emb.description) display(embedDescription, markup(encodeHTML(emb.description), { inEmbed: true, replaceEmojis: true }));
                 else hide(embedDescription);
-                
+
                 if (emb.color) embed.closest('.embed').style.borderColor = (typeof emb.color === 'number' ? '#' + emb.color.toString(16).padStart(6, "0") : emb.color);
                 else embed.closest('.embed').style.removeProperty('border-color');
-                
+
                 if (emb.author?.name) display(embedAuthor, `
                     ${emb.author.icon_url ? '<img class="embedAuthorIcon" src="' + encodeHTML(url(emb.author.icon_url)) + '">' : ''}
                     ${emb.author.url ? '<a class="embedAuthorNameLink embedLink embedAuthorName" href="' + encodeHTML(url(emb.author.url)) + '" target="_blank">' + encodeHTML(emb.author.name) + '</a>' : '<span class="embedAuthorName">' + encodeHTML(emb.author.name) + '</span>'}`, 'flex');
                 else hide(embedAuthor);
-                
+
                 const pre = embed.querySelector('.markup pre');
                 if (emb.thumbnail?.url) {
                     embedThumbnail.src = emb.thumbnail.url,
@@ -734,19 +747,19 @@ addEventListener('DOMContentLoaded', () => {
                     hide(embedThumbnail.parentElement);
                     if (pre) pre.style.removeProperty('max-width');
                 }
-                
+
                 if (emb.image?.url)
                     embedImage.src = emb.image.url,
                         embedImage.parentElement.style.display = 'block';
                 else hide(embedImage.parentElement);
-                
+
                 if (emb.footer?.text) display(embedFooter, `
                     ${emb.footer.icon_url ? '<img class="embedFooterIcon" src="' + encodeHTML(url(emb.footer.icon_url)) + '">' : ''}<span class="embedFooterText">
                         ${encodeHTML(emb.footer.text)}
                     ${emb.timestamp ? '<span class="embedFooterSeparator">•</span>' + encodeHTML(tstamp(emb.timestamp)) : ''}</span></div>`, 'flex');
                 else if (emb.timestamp) display(embedFooter, `<span class="embedFooterText">${encodeHTML(tstamp(emb.timestamp))}</span></div>`, 'flex');
                 else hide(embedFooter);
-                
+
                 if (emb.fields) {
                     innerHTML(embedFields, '');
                     let index, gridCol;
@@ -813,7 +826,7 @@ addEventListener('DOMContentLoaded', () => {
                 twemoji.parse(msgEmbed);
             } else
                 document.body.classList.add('emptyEmbed');
-            
+
             // Make sure that the embed has no text or any visible images such as custom emojis before hiding.
             if (!embedCont.innerText && !document.querySelector('.messageContent + .container .embedGrid > [style*=display] img'))
                 document.body.classList.add('emptyEmbed');
@@ -822,7 +835,8 @@ addEventListener('DOMContentLoaded', () => {
             if (autoUpdateURL)
                 urlOptions({ set: ['data', jsonToBase64(json)] })
         } catch (e) {
-            console.log(e);
+            console.error(e);
+            console.dir(e);
             error(e);
         }
     }
@@ -965,8 +979,6 @@ addEventListener('DOMContentLoaded', () => {
             if (input.checked) localStorage.setItem('autoParams', true);
             else localStorage.removeItem('autoParams');
             autoParams = input.checked;
-
-            console.log(input?.checked, e.target.closest('.item.auto-params'))
         }
         e.target.closest('.top-btn').classList.toggle('active')
     })
@@ -1032,3 +1044,9 @@ addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+console.__proto__.message = function (title, message, collapse = true) {
+    collapse && this.groupCollapsed(title) || this.group(title);
+    this.dir(message);
+    this.groupEnd();
+}

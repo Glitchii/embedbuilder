@@ -38,11 +38,6 @@
     font-display: swap;
 }
 
-* {
-    outline: none;
-    box-sizing: border-box;
-}
-
 :root {
     --link: #00b0f4;
     --embedTextColor: #dcddde;
@@ -55,6 +50,15 @@
     --background-tertiary: #202225;
     --header-secondary: #b9bbbe;
     --interactive-muted: #4f545c;
+}
+
+* {
+    outline: none;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
 }
 
 body {
