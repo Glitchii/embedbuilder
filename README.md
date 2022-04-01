@@ -50,7 +50,7 @@ hidemenu                Hides the three dotted menu.
 https://glitchii.github.io/embedbuilder/?username=Troy&verified&reverse&guitabs=image,footer&avatar=https://cdn.discordapp.com/avatars/663074487335649292/576eb5f13519b9da10ba7807bdd83fab.webp
 
 ### Alternative to URL options:
-This will only work through iframe or a cloned repo of the builder: Have a JavaScript config file named `builder.config.js`. In this file, define `window.options` to an object containing the params.  Note that some param names and cases will be different from the URL ones. An example [builder.config.js](/builder.config.js) file is included in the repo. The config file is loaded before the [main script](/assets/js/script.js) and because it's a JS file, you can do and probably alter anything else.
+This will only work on a cloned repo of the builder: Have a JavaScript config file named `builder.config.js`. In this file, define `window.options` to an object containing the params.  Note that some param names and cases will be different from the URL ones. An example [builder.config.js](/builder.config.js) file is included in the repo. The config file is loaded before the [main script](/assets/js/script.js) and because it's a JS file, you can do and probably alter anything else.
 
 >## Intergretting into your website
 >You are free to use this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formatters' eg. '{ server.name }' or '{ user.name }' etc. A (not so bad) downside would be that you'd probably have to keep up with fixes and updates.
