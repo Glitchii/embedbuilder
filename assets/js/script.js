@@ -64,7 +64,6 @@ var params = currentURL().searchParams,
         if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
     },
     urlOptions = ({ remove, set }) => {
-        console.log(remove, set);
         const url = currentURL();
         if (remove) url.searchParams.delete(remove);
         if (set) url.searchParams.set(set[0], set[1]);
@@ -970,8 +969,26 @@ addEventListener('DOMContentLoaded', () => {
     })
 
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
-        if (e.target.closest('.item.dataLink'))
-            return prompt('Here\'s the current URL with base64 embed data:', jsonToBase64(json, true));
+        if (e.target.closest('.item.dataLink')) {
+            const data = jsonToBase64(json, true);
+            // With long text inside a 'prompt' on Chromium based browsers, some text will but cut and replaced with '...'.
+            // So, for the Chromium users, we copy to clipboard instead of showing a prompt.
+            if (!window.chrome)
+                return prompt('Here\'s the current URL with base64 embed data:', data);
+            if (location.protocol === 'http:')
+                // Clipboard API only works on HTTPS protocol.
+                navigator.clipboard.writeText(data);
+            else {
+                const input = document.createElement('input');
+                input.value = data;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+            }
+
+            alert('Copied to clipboard.');
+        }
 
         const input = e.target.closest('.item')?.querySelector('input');
         if (input) input.checked = !input.checked;

@@ -2366,25 +2366,9 @@ body.toHook .done .channels .selectOptions .hook {
 
 /* Send button and components **/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.invisible {
+    display: none!important;
+}
 
 ::-webkit-scrollbar {
     width: 7px;
