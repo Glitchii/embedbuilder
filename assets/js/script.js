@@ -35,7 +35,7 @@ var params = currentURL().searchParams,
         data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
         if (withURL) {
             const url = currentURL();
-            url.searchParams.append('data', data);
+            url.searchParams.set('data', data);
             if (redirect) window.top.location.href = url;
             // Replace %3D ('=' url encoded) with '='
             data = url.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
@@ -64,11 +64,12 @@ var params = currentURL().searchParams,
         if (autoParams) isReversed ? urlOptions({ set: ['reverse', ''] }) : urlOptions({ remove: 'reverse' });
     },
     urlOptions = ({ remove, set }) => {
-        const url = currentURL(), href = url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&');
+        console.log(remove, set);
+        const url = currentURL();
         if (remove) url.searchParams.delete(remove);
         if (set) url.searchParams.set(set[0], set[1]);
         try {
-            history.replaceState(null, null, href);
+            history.replaceState(null, null, url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&'));
         } catch (e) {
             // Most likely embeded in iframe
             console.message(`${e.name}: ${e.message}`, e);
@@ -976,6 +977,7 @@ addEventListener('DOMContentLoaded', () => {
         if (input) input.checked = !input.checked;
 
         if (e.target.closest('.item.auto')) {
+            console.log('Burv');
             autoUpdateURL = document.body.classList.toggle('autoUpdateURL');
             if (autoUpdateURL) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
