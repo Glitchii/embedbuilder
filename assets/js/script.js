@@ -281,7 +281,7 @@ addEventListener('DOMContentLoaded', () => {
                 .replace(/&#60;#\d+&#62;/g, () => `<span class="mention channel interactive">channel</span>`)
                 .replace(/&#60;@(?:&#38;|!)?\d+&#62;|@(?:everyone|here)/g, match => {
                     if (match.startsWith('@')) return `<span class="mention">${match}</span>`
-                    else return `<span class="mention interactive">@user</span>`
+                    else return `<span class="mention interactive">@${match.includes('&#38;') ? 'role' : 'user'}</span>`
                 })
 
             if (opts.inlineBlock)
@@ -888,15 +888,15 @@ addEventListener('DOMContentLoaded', () => {
     let picker = new CP(document.querySelector('.picker'), state = { parent: document.querySelector('.cTop') });
     picker.fire('change', toRGB('#41f097'));
 
-    let colrs = document.querySelector('.colrs'),
-        hexInput = colrs.querySelector('.hex>div input'),
+    let colors = document.querySelector('.colors'),
+        hexInput = colors.querySelector('.hex>div input'),
         typingHex = true, exit = false,
         removePicker = () => {
             if (exit) return exit = false;
             if (typingHex) picker.enter();
             else {
                 typingHex = false, exit = true;
-                colrs.classList.remove('picking');
+                colors.classList.remove('picking');
                 picker.exit();
             }
         }
@@ -912,11 +912,11 @@ addEventListener('DOMContentLoaded', () => {
             hexInput.value = json.embed.color.toString(16).padStart(6, '0');
             document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
         }
-        colrs.classList.add('picking')
+        colors.classList.add('picking')
     })
 
-    document.querySelectorAll('.colr').forEach(e => e.addEventListener('click', el => {
-        el = el.target.closest('.colr') || el.target;
+    document.querySelectorAll('.color').forEach(e => e.addEventListener('click', el => {
+        el = el.target.closest('.color') || el.target;
         embed.closest('.embed').style.borderColor = el.style.backgroundColor;
         json.embed && (json.embed.color = toRGB(el.style.backgroundColor, false, true));
         picker.source.style.removeProperty('background');
@@ -1034,7 +1034,7 @@ addEventListener('DOMContentLoaded', () => {
 
     let pickInGuiMode = false;
     togglePicker = pickLater => {
-        colrs.classList.toggle('display');
+        colors.classList.toggle('display');
         document.querySelector('.side1').classList.toggle('low');
         pickLater && (pickInGuiMode = true);
     };
@@ -1043,11 +1043,11 @@ addEventListener('DOMContentLoaded', () => {
     update(json);
 
     document.body.addEventListener('click', e => {
-        if (e.target.classList.contains('low') || (e.target.classList.contains('top') && colrs.classList.contains('display')))
+        if (e.target.classList.contains('low') || (e.target.classList.contains('top') && colors.classList.contains('display')))
             togglePicker();
     })
 
-    document.querySelector('.colrs .hex>div').addEventListener('input', e => {
+    document.querySelector('.colors .hex>div').addEventListener('input', e => {
         let inputValue = e.target.value;
         if (inputValue.startsWith('#'))
             e.target.value = inputValue.slice(1), inputValue = e.target.value;

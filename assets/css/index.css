@@ -1138,16 +1138,16 @@ body:not(.gui) .chooser>.back {
     max-width: 90%;
 }
 
-@keyframes colrsAn {
+@keyframes colorsAn {
     0% {
         transform: translateX(-200px);
         opacity: 0;
     }
 }
 
-.bottom .colrs {
+.bottom .colors {
     z-index: 5;
-    animation: colrsAn .25s ease-out;
+    animation: colorsAn .25s ease-out;
     background: #212226;
     border-radius: 10px;
     width: 250px;
@@ -1160,11 +1160,11 @@ body:not(.gui) .chooser>.back {
     grid-template-columns: 5% 27.5% 67.5%;
 }
 
-.bottom .colrs .colr {
+.bottom .colors .color {
     background: #41f097;
 }
 
-.bottom .colrs.display {
+.bottom .colors.display {
     display: grid;
 }
 
@@ -1229,7 +1229,7 @@ body:not(.gui) .chooser>.back {
     transition: .5s;
 }
 
-.colrs:hover .pallets {
+.colors:hover .pallets {
     opacity: 1;
 }
 
@@ -1256,7 +1256,7 @@ body:not(.gui) .chooser>.back {
     height: 100% !important;
 }
 
-.colrs.picking .colRight .cTop>*:not(.color-picker), .colrs.picking .colRight .pallets, .colrs:not(.picking) .colRight .colBack, .colrs:not(.picking) .hex>div {
+.colors.picking .colRight .cTop>*:not(.color-picker), .colors.picking .colRight .pallets, .colors:not(.picking) .colRight .colBack, .colors:not(.picking) .hex>div {
     display: none;
 }
 
@@ -1736,7 +1736,7 @@ body {
     }
 }
 
-.colrs .hex>div {
+.colors .hex>div {
     position: absolute;
     top: -35px;
     background: #212226;
@@ -1748,12 +1748,12 @@ body {
     width: 50%;
 }
 
-.colrs .hex>div>span {
+.colors .hex>div>span {
     padding: 6px 6px 6px 10px;
     display: flex;
 }
 
-.colrs .hex>div>span>span {
+.colors .hex>div>span>span {
     user-select: none;
     padding: 0;
     margin: 0;
@@ -1764,12 +1764,12 @@ body {
     margin-right: 2px;
 }
 
-.colrs .hex>div>span input {
+.colors .hex>div>span input {
     width: 100%;
     opacity: .8;
 }
 
-.colrs .hex.incorrect>div {
+.colors .hex.incorrect>div {
     background: #262121;
 }
 
@@ -2078,13 +2078,13 @@ body.no-preview .side2 {
     display: none !important;
 }
 
-/* body.no-editor .bottom .colrs {
+/* body.no-editor .bottom .colors {
     left: 20px;
     top: 90px;
     bottom: 0;
 } */
 
-body.no-editor .bottom .colrs {
+body.no-editor .bottom .colors {
     left: 20px;
     top: 90px;
     bottom: 0;
@@ -2118,7 +2118,7 @@ body.no-editor .side1 .item.top {
     transform: translateY(10px);
 }
 
-body.no-editor .bottom .colrs.display {
+body.no-editor .bottom .colors.display {
     display: grid;
 }
 
@@ -2421,17 +2421,17 @@ body.toHook .done .channels .selectOptions .hook {
         border: none;
     }
 
-    .bottom .colrs {
+    .bottom .colors {
         bottom: 40px;
         top: 100px;
         top: 90px;
         left: 20px;
         display: none;
-        animation: colrsAn .1s ease-out;
+        animation: colorsAn .1s ease-out;
         box-shadow: 0px 5px 15px 0px #0000004f;
     }
 
-    body.reversed .bottom .colrs {
+    body.reversed .bottom .colors {
         left: 50%;
         transform: translateX(-50%);
     }
@@ -2474,7 +2474,7 @@ body.toHook .done .channels .selectOptions .hook {
 }
 
 @media screen and (max-height: 760px) {
-    .bottom .colrs {
+    .bottom .colors {
         bottom: 10px;
     }
 
