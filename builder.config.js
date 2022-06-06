@@ -15,12 +15,14 @@ options = {
     hideEditor:         false,
     hidePreview:        false,
     hideMenu:           false,
+    multiEmbeds:        false,
+    noMenuMultiEmbeds:  false,
 }
 
-// // Default JSON object
+// Default JSON object
 // json = {
 //     content: "Hello world",
-//     embed: {
+//     embeds: {
 //         title: "A title",
 //         description: "A description",
 //     }

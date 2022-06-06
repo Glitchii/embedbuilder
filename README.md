@@ -44,6 +44,8 @@ placeholders=errors     This also disables automatic insertion of 'http' for url
 hideditor               Hides the editor.
 hidepreview             Hides the preview.
 hidemenu                Hides the three dotted menu.
+multiembeds             Use multi-embeds.
+nomenumultiembeds       Remove multi-embeds option from menu.
 ```
 <small>Case matters, all parameters should be lowercase.</small>
 ### Example URL with all* the above parameters:
@@ -53,13 +55,13 @@ https://glitchii.github.io/embedbuilder/?username=Troy&verified&reverse&guitabs=
 This will only work on a cloned repo of the builder: Have a JavaScript config file named `builder.config.js`. In this file, define `window.options` to an object containing the params.  Note that some param names and cases will be different from the URL ones. An example [builder.config.js](/builder.config.js) file is included in the repo. The config file is loaded before the [main script](/assets/js/script.js) and because it's a JS file, you can do and probably alter anything else.
 
 >## Intergretting into your website
->You are free to use this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formatters' eg. '{ server.name }' or '{ user.name }' etc. A (not so bad) downside would be that you'd probably have to keep up with fixes and updates.
+>You are free to use/fork/clone this in your website. Intergretting into your websites allows sending the embed to Discord with a few changes, and using 'formatters' eg. '{ server.name }' or '{ user.name }' etc. A (not so bad) downside would be that you'd probably have to keep up with fixes and updates.
 <br>
-To over come that, and if all you want is to have an embed builder in your website with no additional features and maybe using your own bot name and avatar, etc., then you might iframe https://glitchii.github.io/embedbuilder into your website with a few of the parameters above if needed instead. The downside to this is that due to security reasons, browsers won't allow features like updating URL parameter to work through iframes, whoever URL options will still be read from the top holder of the iframe, those are probably the only features that won't work and thus are removed from the GUI menu when embeded in iframe. `builder.config.js` also won't be seen in iframe
+If you want to keep up to date and all you want is to have an embed builder in your website with no additional features and maybe using your own bot name and avatar, etc., then you might iframe https://glitchii.github.io/embedbuilder into your website with a few of the parameters above if needed instead. The downside to this is that due to security reasons, browsers won't allow features like updating URL parameter to work through iframes, whoever URL options will still be read from the top holder of the iframe, those are probably the only features that won't work and thus are removed from the GUI menu when embeded in iframe. `builder.config.js` also won't be seen in iframe
 
 
 <br><br>
-You can look into the [project boards](https://github.com/Glitchii/embedbuilder/projects/3) to see what is being worked on or want to contribute.  
+You can look into the [project boards](https://github.com/Glitchii/embedbuilder/projects/3) to see what is being worked on or If you want to contribute.  
 <br>
 <small> Example integration: https://troybot.xyz/embed</small>  
 [To Do](https://github.com/Glitchii/embedbuilder/projects/3) | [Discussions](https://github.com/Glitchii/embedbuilder/discussions/1)
