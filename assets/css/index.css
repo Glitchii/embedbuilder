@@ -184,6 +184,7 @@ body.gui .side1 .item.top {
 }
 
 .main .side2::-webkit-scrollbar-thumb {
+    border-radius: 50px;
     background: #26272d;
 }
 
@@ -1187,6 +1188,20 @@ body.gui .top>.CodeMirror {
     padding-bottom: 20px;
 }
 
+
+@media screen and (min-height: 850px) {
+    .top>.gui:not(:hover)::-webkit-scrollbar-thumb {
+        background: #22242700;
+    }
+}
+
+.top>.gui::-webkit-scrollbar-thumb {
+    background: #2224279a;
+}
+
+.top>.gui::-webkit-scrollbar-thumb:hover {
+    background: #222427;
+}
 .top>.gui * {
     scrollbar-color: #292b2f #202225;
 }
@@ -1196,6 +1211,7 @@ body.gui .top>.CodeMirror {
 }
 
 .top>.gui * ::-webkit-scrollbar-thumb {
+    border-radius: 50px;
     background: #292b2f !important;
 }
 
@@ -2557,6 +2573,7 @@ body.toHook .done .channels .selectOptions .hook {
 }
 
 ::-webkit-scrollbar-thumb {
+    border-radius: 50px;
     background: #202225;
 }
 

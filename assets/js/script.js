@@ -24,7 +24,7 @@ let params = currentURL().searchParams,
     hideEditor = localStorage.getItem('hideeditor') || hasParam('hideeditor') || options.hideEditor,
     hidePreview = localStorage.getItem('hidepreview') || hasParam('hidepreview') || options.hidePreview,
     hideMenu = localStorage.getItem('hideMenu') || hasParam('hidemenu') || options.hideMenu,
-    validationError, activeFields, lastActiveGuiEmbedIndex = -1, unsedEmbeds = [], colNum = 1, num = 0;
+    validationError, activeFields, lastActiveGuiEmbedIndex = -1, lastGuiJson, unsedEmbeds = [], colNum = 1, num = 0;
 
 const guiEmbedIndex = guiEl => {
     const guiEmbed = guiEl?.closest('.guiEmbed');
@@ -569,8 +569,8 @@ addEventListener('DOMContentLoaded', () => {
                 }
 
             // Expand last embed in GUI
-            // const names = gui.querySelectorAll('.guiEmbedName');
-            // names[names.length - 1]?.classList.add('active');
+            const names = gui.querySelectorAll('.guiEmbedName');
+            names[names.length - 1]?.classList.add('active');
         }
 
         for (const e of document.querySelectorAll('.top>.gui .item'))
@@ -752,7 +752,7 @@ addEventListener('DOMContentLoaded', () => {
 
                                 const msg = `File (${res.link}) will be deleted in 5 minutes. To delete it now, go to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`;
                                 console.info(msg);
-                                
+
                                 input.dispatchEvent(new Event('input'));
                                 // !smallerScreen.matches && setTimeout(error, 1500, `Image will be deleted in 5 minutes. To delete it now, go to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`, 20000);
                             }).catch(err => error(`Request to tempfile.site failed with error: ${err}`, 5000))
@@ -1072,6 +1072,11 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.opt.gui').addEventListener('click', () => {
         json = JSON.parse(editor.getValue() || '{}');
+
+        if (lastGuiJson && lastGuiJson !== JSON.stringify(json, null, 4))
+            buildGui(json);
+            
+        lastGuiJson = false
         activeFields = null;
 
         document.body.classList.add('gui');
@@ -1088,6 +1093,7 @@ addEventListener('DOMContentLoaded', () => {
             return error(gui.querySelectorAll('.item.guiEmbedName')[emptyEmbedIndex].innerText.split(':')[0] + ' should not be empty.', 3000);
 
         const jsonStr = JSON.stringify(json, null, 4);
+        lastGuiJson = jsonStr;
 
         document.body.classList.remove('gui');
         editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
@@ -1109,7 +1115,9 @@ addEventListener('DOMContentLoaded', () => {
         buildGui(jsonObject);
         editor.setValue('{\n\t\n}');
 
-        document.querySelectorAll('.gui .item').forEach(e => e.classList.add('active'));
+        for (const e of document.querySelectorAll('.gui .item'))
+            e.classList.add('active');
+
         if (!smallerScreen.matches)
             content.focus();
     })
