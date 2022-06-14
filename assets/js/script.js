@@ -553,7 +553,7 @@ addEventListener('DOMContentLoaded', () => {
             if (child.classList?.[1] === 'content')
                 gui.insertBefore(gui.appendChild(child.cloneNode(true)), gui.appendChild(child.nextElementSibling.cloneNode(true))).nextElementSibling.firstElementChild.value = object.content || '';
             else if (child.classList?.[1] === 'guiEmbedName') {
-                for (const [i, embed] of object.embeds.entries()) {
+                for (const [i, embed] of (object.embeds.length ? object.embeds : [{}]).entries()) {
                     const guiEmbedName = gui.appendChild(child.cloneNode(true))
 
                     guiEmbedName.querySelector('.text').innerHTML = `Embed ${i + 1}${embed.title ? `: <span>${embed.title}</span>` : ''}`;
@@ -1226,8 +1226,9 @@ addEventListener('DOMContentLoaded', () => {
 
         buildEmbed();
         buildGui();
-        // editor.setValue('{\n\t\n}');
-        editor.setValue(JSON.stringify(json, null, 4));
+        
+        const jsonStr = JSON.stringify(json, null, 4);
+        editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
 
         for (const e of document.querySelectorAll('.gui .item'))
             e.classList.add('active');
