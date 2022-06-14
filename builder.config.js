@@ -16,7 +16,7 @@ options = {
     hidePreview: false,
     hideMenu: false,
     multiEmbeds: false,
-    noMenuMultiEmbeds: false,
+    noMultiEmbedsOption: false,
 }
 
 // Default JSON object

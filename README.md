@@ -45,7 +45,9 @@ hideditor               Hides the editor.
 hidepreview             Hides the preview.
 hidemenu                Hides the three dotted menu.
 multiembeds             Use multi-embeds.
-nomenumultiembeds       Remove multi-embeds option from menu.
+nomultiembedsoption     Remove multi-embeds option from the menu.
+                        Together with the 'multiembeds' option, this allows
+                        the developer to force the user to either use only multi-embeds or not.
 ```
 <small>Case matters, all parameters should be lowercase.</small>
 ### Example URL with all* the above parameters:

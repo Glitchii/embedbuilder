@@ -1127,7 +1127,22 @@ u {
 }
 
 @keyframes notifAn {
-    from {
+    0% {
+        opacity: var(--startOpacity, 0);
+        bottom: var(--startY, -50px);
+    }
+
+    10% {
+        opacity: 1;
+        bottom: 0px;
+    }
+
+    90% {
+        opacity: 1;
+        bottom: 0px;
+    }
+
+    100% {
         opacity: 0;
         bottom: -50px;
     }
@@ -1135,7 +1150,7 @@ u {
 
 .notification {
     margin-top: 5px;
-    animation: notifAn .5s ease;
+    animation: notifAn var(--time, 10s) ease forwards;
     background-color: #202225;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -1202,6 +1217,7 @@ body.gui .top>.CodeMirror {
 .top>.gui::-webkit-scrollbar-thumb:hover {
     background: #222427;
 }
+
 .top>.gui * {
     scrollbar-color: #292b2f #202225;
 }
@@ -1532,6 +1548,7 @@ textarea {
     position: relative;
     margin-left: 15px;
     transform: translateY(2px);
+    z-index: 1;
 }
 
 .top>.gui .item:not(.active)+.edit {
@@ -1607,7 +1624,7 @@ textarea {
     height: 80px;
 }
 
-.browse {
+:is(.browse, .footerDate) {
     margin-top: 25px;
     font-size: 13px;
     display: flex;
@@ -1616,11 +1633,11 @@ textarea {
     opacity: .5;
 }
 
-.browse:hover {
+:is(.browse, .footerDate):hover {
     opacity: 1;
 }
 
-.browse>svg {
+:is(.browse, .footerDate)>svg {
     width: 20px;
     position: relative;
     z-index: 6;
@@ -1631,6 +1648,40 @@ textarea {
 
 .browse>p::after {
     content: "Browse";
+}
+
+.footerDate {
+    right: 19px;
+}
+
+.footerDate>p::after {
+    content: "Timestamp";
+}
+
+.footerDate input#timestamp {
+    all: unset;
+    /* transform: translateX(10px); */
+}
+
+.footerDate:is(:hover, :focus-within)>p,
+.footerDate:not(:hover):not(:focus-within)>p+input#timestamp {
+    display: none;
+}
+
+.footerDate>svg {
+    width: 16px;
+    position: relative;
+    z-index: 6;
+    height: 16px;
+    top: 2px;
+}
+
+.footerDate>svg text {
+    font-size: 8px;
+}
+
+input#timestamp::-webkit-calendar-picker-indicator {
+    display: none;
 }
 
 .browse.loading>svg:first-of-type,
@@ -2733,16 +2784,24 @@ body.toHook .done .channels .selectOptions .hook {
     /* padding: 18px 0; */
     margin: auto;
     padding: 10px 0 10px 0;
+    z-index: 1;
 }
 
 .top>.gui .item.guiEmbedName::before {
     content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' viewBox='0 0 24 24' height='30'%3E%3Cpath clip-rule='evenodd' fill='%23fff' d='M16.59 8.59004L12 13.17L7.41 8.59004L6 10L12 16L18 10L16.59 8.59004Z'%3E%3C/path%3E%3C/svg%3E");
     position: absolute;
     /* transform: scale(.8) translate(-40px, -13px); */
-    transform: scale(.7) translate(-40px, -16.5px) rotate(-90deg);
+    transform: scale(.7) translate(-40px, -13.5px) rotate(-90deg);
     opacity: .5;
     pointer-events: none;
     transition: .2s ease;
+}
+
+/* Move icon a bit up for gecko based browsers */
+@supports (-moz-appearance: none) {
+    .top>.gui .item.guiEmbedName::before {
+        transform: scale(.7) translate(-40px, -16.5px) rotate(-90deg);
+    }
 }
 
 .top>.gui .item.guiEmbedName.active::before {
@@ -2784,7 +2843,7 @@ body:not(.multiEmbeds) .top>.gui .item.guiEmbedName {
 .top>.gui .item.guiEmbedName .icon {
     position: absolute;
     right: 19px;
-    top: 5px;
+    top: 7px;
     transition: .5s ease;
     opacity: .1;
 }
@@ -2812,6 +2871,7 @@ body:not(.multiEmbeds) .top>.gui .item.guiEmbedName {
     left: 50%;
     transform: translateX(-50%);
     align-items: center;
+    z-index: 2;
 }
 
 .guiEmbedAdd .icon {
