@@ -256,20 +256,26 @@ delete jsonObject.embed;
 addEventListener('DOMContentLoaded', () => {
     if (reverseColumns || localStorage.getItem('reverseColumns'))
         reverse();
-    if (autoUpdateURL)
-        document.body.classList.add('autoUpdateURL');
     if (autoParams)
-        document.querySelector('.auto-params > input').checked = true;
+        document.querySelector('.item.auto-params > input').checked = true;
     if (hideMenu)
         document.querySelector('.top-btn.menu').classList.add('hidden');
-    if (multiEmbeds)
-        document.body.classList.add('multiEmbeds');
     if (noMultiEmbedsOption)
         document.querySelector('.box .item.multi')?.remove();
     if (inIframe)
         // Remove menu options that don't work in iframe.
         for (const e of document.querySelectorAll('.no-frame'))
             e.remove();
+
+    if (autoUpdateURL) {
+        document.body.classList.add('autoUpdateURL');
+        document.querySelector('.item.auto > input').checked = true;
+    }
+
+    if (multiEmbeds) {
+        document.body.classList.add('multiEmbeds');
+        if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
+    }
 
     if (hideEditor) {
         document.body.classList.add('no-editor');
@@ -288,7 +294,11 @@ addEventListener('DOMContentLoaded', () => {
             document.body.classList.remove('gui');
     }
 
-    if (noUser) document.body.classList.add('no-user');
+    if (noUser) {
+        document.body.classList.add('no-user');
+        if (autoParams) noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
+    }
+
     else {
         if (username) document.querySelector('.username').textContent = username;
         if (avatar) document.querySelector('.avatar').src = avatar;
@@ -314,18 +324,19 @@ addEventListener('DOMContentLoaded', () => {
         foldGutter: true,
         lint: true,
         extraKeys: {
-            // Make tabs four spaces long instead of the default two.
-            Tab: cm => cm.replaceSelection("    ", "end"),
             // Fill in indent spaces on a new line when enter (return) key is pressed.
             Enter: _ => {
-                let cur = editor.getCursor(), end = editor.getLine(cur.line),
-                    leadingSpaces = end.replace(/\S($|.)+/g, '') || '    \n', nextLine = editor.getLine(cur.line + 1);
-                if ((nextLine === undefined || !nextLine.trim()) && !end.substr(cur.ch).trim())
-                    editor.replaceRange('\n', { line: cur.line, ch: cur.ch });
+                const cursor = editor.getCursor();
+                const end = editor.getLine(cursor.line);
+                const leadingSpaces = end.replace(/\S($|.)+/g, '') || '    \n';
+                const nextLine = editor.getLine(cursor.line + 1);
+
+                if ((nextLine === undefined || !nextLine.trim()) && !end.substr(cursor.ch).trim())
+                    editor.replaceRange('\n', { line: cursor.line, ch: cursor.ch });
                 else
                     editor.replaceRange(`\n${end.endsWith('{') ? leadingSpaces + '    ' : leadingSpaces}`, {
-                        line: cur.line,
-                        ch: cur.ch
+                        line: cursor.line,
+                        ch: cursor.ch
                     });
             },
         }
@@ -1113,7 +1124,7 @@ addEventListener('DOMContentLoaded', () => {
                     return error(`'${usedKeys[0] + "', '" + usedKeys.slice(1, usedKeys.length - 1).join("', '")}', and '${usedKeys[usedKeys.length - 1]}' are invalid keys.`);
                 return error(`'${usedKeys.length == 2 ? usedKeys[0] + "' and '" + usedKeys[usedKeys.length - 1] + "' are invalid keys." : usedKeys[0] + "' is an invalid key."}`);
             }
-            
+
             buildEmbed();
 
         } catch (e) {
@@ -1126,10 +1137,10 @@ addEventListener('DOMContentLoaded', () => {
     const picker = new CP(document.querySelector('.picker'),
         state = { parent: document.querySelector('.cTop') });
 
-    picker.fire('change', toRGB('#41f097'));
+    picker.fire?.('change', toRGB('#41f097'));
 
-    let colors = document.querySelector('.colors'),
-        hexInput = colors.querySelector('.hex>div input'),
+    const colors = document.querySelector('.colors'),
+        hexInput = colors?.querySelector('.hex>div input'),
         typingHex = true, exit = false,
 
         removePicker = () => {
@@ -1141,14 +1152,14 @@ addEventListener('DOMContentLoaded', () => {
                 picker.exit();
             }
         }
-    document.querySelector('.colBack').addEventListener('click', () => {
+    document.querySelector('.colBack')?.addEventListener('click', () => {
         picker.self.remove();
         typingHex = false;
         removePicker();
     })
 
-    picker.on('exit', removePicker);
-    picker.on('enter', () => {
+    picker.on?.('exit', removePicker);
+    picker.on?.('enter', () => {
         if (jsonObject?.embed?.color) {
             hexInput.value = jsonObject.embed.color.toString(16).padStart(6, '0');
             document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
@@ -1167,9 +1178,9 @@ addEventListener('DOMContentLoaded', () => {
         picker.source.style.removeProperty('background');
     }))
 
-    hexInput.addEventListener('focus', () => typingHex = true);
+    hexInput?.addEventListener('focus', () => typingHex = true);
     setTimeout(() => {
-        picker.on('change', function (r, g, b, a) {
+        picker.on?.('change', function (r, g, b, a) {
             const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
             const embed = document.querySelectorAll('.msgEmbed .container>.embed')[embedIndex];
             const embedObj = jsonObject.embeds[embedIndex];
@@ -1226,7 +1237,7 @@ addEventListener('DOMContentLoaded', () => {
 
         buildEmbed();
         buildGui();
-        
+
         const jsonStr = JSON.stringify(json, null, 4);
         editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
 
@@ -1266,14 +1277,16 @@ addEventListener('DOMContentLoaded', () => {
             autoUpdateURL = document.body.classList.toggle('autoUpdateURL');
             if (autoUpdateURL) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
-            buildEmbed();
+            urlOptions({ set: ['data', jsonToBase64(json)] });
         } else if (e.target.closest('.item.reverse')) {
             reverse(reverseColumns);
             reverseColumns = !reverseColumns;
             toggleStored('reverseColumns');
         } else if (e.target.closest('.item.noUser')) {
             if (options.avatar) document.querySelector('img.avatar').src = options.avatar;
-            document.body.classList.toggle('no-user');
+
+            const noUser = document.body.classList.toggle('no-user');
+            if (autoParams) noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
             toggleStored('noUser');
         } else if (e.target.closest('.item.auto-params')) {
             if (input.checked) localStorage.setItem('autoParams', true);
@@ -1293,6 +1306,7 @@ addEventListener('DOMContentLoaded', () => {
             multiEmbeds = document.body.classList.toggle('multiEmbeds');
             activeFields = document.querySelectorAll('.gui > .item.active');
 
+            if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
             if (multiEmbeds) localStorage.setItem('multiEmbeds', true);
             else {
                 localStorage.removeItem('multiEmbeds');
@@ -1330,7 +1344,7 @@ addEventListener('DOMContentLoaded', () => {
             togglePicker();
     })
 
-    document.querySelector('.colors .hex>div').addEventListener('input', e => {
+    document.querySelector('.colors .hex>div')?.addEventListener('input', e => {
         let inputValue = e.target.value;
 
         if (inputValue.startsWith('#'))
