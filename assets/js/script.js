@@ -404,12 +404,6 @@ addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    const innerHTML = (element, html) => {
-        // console.log(element, html);
-        element.innerHTML = html;
-        return element;
-    }
-
     const markup = (txt, { replaceEmojis, inlineBlock, inEmbed }) => {
         if (replaceEmojis)
             txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, p) => p && emojis[p] ? emojis[p] : match);
@@ -457,7 +451,7 @@ addEventListener('DOMContentLoaded', () => {
 
 
     const createEmbedFields = (fields, embedFields) => {
-        innerHTML(embedFields, '');
+        embedFields.innerHTML = '';
         let index, gridCol;
 
         for (const [i, f] of fields.entries())
@@ -532,7 +526,7 @@ addEventListener('DOMContentLoaded', () => {
     }
 
     const display = (el, data, displayType) => {
-        if (data) innerHTML(el, data);
+        if (data) el.innerHTML = data;
         el.style.display = displayType || "unset";
     }
 
@@ -949,7 +943,7 @@ addEventListener('DOMContentLoaded', () => {
             if (!jsonObject.content) document.body.classList.add('emptyContent');
             else {
                 // Update embed content in render
-                innerHTML(embedContent, markup(encodeHTML(jsonObject.content), { replaceEmojis: true }));
+                embedContent.innerHTML = markup(encodeHTML(jsonObject.content), { replaceEmojis: true });
                 document.body.classList.remove('emptyContent');
             }
 
@@ -1130,12 +1124,11 @@ addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             if (editor.getValue()) return;
             document.body.classList.add('emptyEmbed');
-            innerHTML(embedContent, '');
+            embedContent.innerHTML = '';
         }
     });
 
-    const picker = new CP(document.querySelector('.picker'),
-        state = { parent: document.querySelector('.cTop') });
+    const picker = new CP(document.querySelector('.picker'), state = { parent: document.querySelector('.cTop') });
 
     picker.fire?.('change', toRGB('#41f097'));
 
@@ -1234,10 +1227,11 @@ addEventListener('DOMContentLoaded', () => {
         json = {};
 
         picker.source.style.removeProperty('background');
-
+        document.querySelector('.msgEmbed .container>.embed')?.remove();
+        
         buildEmbed();
         buildGui();
-
+        
         const jsonStr = JSON.stringify(json, null, 4);
         editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
 
@@ -1251,18 +1245,19 @@ addEventListener('DOMContentLoaded', () => {
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink')) {
             const data = jsonToBase64(jsonObject, true).replace(/=&/g, '&');
-            // With long text inside a 'prompt' on Chromium based browsers, some text will but cut and replaced with '...'.
-            // So, for the Chromium users, we copy to clipboard instead of showing a prompt.
             if (!window.chrome)
+                // With long text inside a 'prompt' on Chromium based browsers, some text will be trimmed off and replaced with '...'.
                 return prompt('Here\'s the current URL with base64 embed data:', data);
-            if (location.protocol === 'http:')
-                // Clipboard API only works on HTTPS protocol.
+
+            // So, for the Chromium users, we copy to clipboard instead of showing a prompt.
+            try {
+                // Clipboard API might only work on HTTPS protocol.
                 navigator.clipboard.writeText(data);
-            else {
-                const input = document.createElement('input');
+            } catch {
+                const input = document.body.appendChild(document.createElement('input'));
                 input.value = data;
-                document.body.appendChild(input);
                 input.select();
+                document.setSelectionRange(0, 50000);
                 document.execCommand('copy');
                 document.body.removeChild(input);
             }
@@ -1361,7 +1356,7 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.top-btn.copy').addEventListener('click', e => {
         const mark = e.target.closest('.top-btn.copy').querySelector('.mark'),
-            jsonData = JSON.stringify(jsonObject, null, 4),
+            jsonData = JSON.stringify(json, null, 4),
             next = () => {
                 mark.classList.remove('hidden');
                 mark.previousElementSibling.classList.add('hidden');
@@ -1373,10 +1368,9 @@ addEventListener('DOMContentLoaded', () => {
             }
 
         if (!navigator.clipboard?.writeText(jsonData).then(next).catch(err => console.log('Could not copy to clipboard: ' + err.message))) {
-            const textarea = document.createElement('textarea');
+            const textarea = document.body.appendChild(document.createElement('textarea'));
 
             textarea.value = jsonData;
-            document.body.appendChild(textarea);
             textarea.select();
             textarea.setSelectionRange(0, 50000);
             document.execCommand('copy');
