@@ -454,7 +454,7 @@ addEventListener('DOMContentLoaded', () => {
         embedFields.innerHTML = '';
         let index, gridCol;
 
-        for (const [i, f] of fields.entries()){
+        for (const [i, f] of fields.entries()) {
             console.log(!!f.name, !!f.value)
             if (f.name && f.value) {
                 const fieldElement = embedFields.insertBefore(document.createElement('div'), null);
@@ -499,7 +499,7 @@ addEventListener('DOMContentLoaded', () => {
                 colNum = (colNum === 9 ? 1 : colNum + 4);
                 num++;
             };
-            };
+        };
 
 
         for (const e of document.querySelectorAll('.embedField[style="grid-column: 1 / 5;"]'))
@@ -912,8 +912,18 @@ addEventListener('DOMContentLoaded', () => {
                     e.classList.add('active');
 
         else if (opts?.guiTabs) {
-            const tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs, bottomKeys = ['footer', 'image'], topKeys = ['author', 'content'];
-            document.querySelectorAll(`.${tabs.join(', .')}`).forEach(e => e.classList.add('active'));
+            const tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs;
+            const bottomKeys = ['footer', 'image'];
+            const topKeys = ['author', 'content'];
+
+
+            // Deactivate the default activated GUI fields
+            for (const e of gui.querySelectorAll('.item:not(.guiEmbedName).active'))
+                e.classList.remove('active');
+
+            // Activate wanted GUI fields
+            for (const e of document.querySelectorAll(`.${tabs.join(', .')}`))
+                e.classList.add('active');
 
             // Autoscroll GUI to the bottom if necessary.
             if (!tabs.some(item => topKeys.includes(item)) && tabs.some(item => bottomKeys.includes(item))) {
@@ -1231,10 +1241,10 @@ addEventListener('DOMContentLoaded', () => {
 
         picker.source.style.removeProperty('background');
         document.querySelector('.msgEmbed .container>.embed')?.remove();
-        
+
         buildEmbed();
         buildGui();
-        
+
         const jsonStr = JSON.stringify(json, null, 4);
         editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
 
