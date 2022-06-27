@@ -454,7 +454,8 @@ addEventListener('DOMContentLoaded', () => {
         embedFields.innerHTML = '';
         let index, gridCol;
 
-        for (const [i, f] of fields.entries())
+        for (const [i, f] of fields.entries()){
+            console.log(!!f.name, !!f.value)
             if (f.name && f.value) {
                 const fieldElement = embedFields.insertBefore(document.createElement('div'), null);
                 // Figuring out if there are only two fields on a row to give them more space.
@@ -497,6 +498,7 @@ addEventListener('DOMContentLoaded', () => {
 
                 colNum = (colNum === 9 ? 1 : colNum + 4);
                 num++;
+            };
             };
 
 
@@ -754,15 +756,16 @@ addEventListener('DOMContentLoaded', () => {
                     const embedObj = jsonObject.embeds[index] ??= {};
 
                     if (field) {
+                        console.log(field)
                         const fieldIndex = Array.from(fields.children).indexOf(field);
                         const jsonField = embedObj.fields[fieldIndex];
-                        const embedField = document.querySelectorAll('.container>.embed')[index]?.querySelectorAll('.embedField')[fieldIndex];
+                        const embedFields = document.querySelectorAll('.container>.embed')[index]?.querySelector('.embedFields');
 
-                        if (jsonField && embedField) {
+                        if (jsonField) {
                             if (el.target.type === 'text') jsonField.name = value;
                             else if (el.target.type === 'textarea') jsonField.value = value;
                             else jsonField.inline = el.target.checked;
-                            createEmbedFields(embedObj.fields, embedField.parentElement);
+                            createEmbedFields(embedObj.fields, embedFields);
                         }
                     } else {
                         switch (el.target.classList?.[0]) {
@@ -1163,11 +1166,11 @@ addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.color').forEach(e => e.addEventListener('click', el => {
         const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
         const embed = document.querySelectorAll('.msgEmbed .container>.embed')[embedIndex];
-        const embedObj = jsonObject.embeds[embedIndex];
+        const embedObj = jsonObject.embeds[embedIndex] ??= {};
 
         const clr = el.target.closest('.color');
         embedObj.color = toRGB(clr.style.backgroundColor, false, true);
-        embed.style.borderColor = clr.style.backgroundColor;
+        embed && (embed.style.borderColor = clr.style.backgroundColor);
         picker.source.style.removeProperty('background');
     }))
 
