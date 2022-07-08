@@ -455,7 +455,6 @@ addEventListener('DOMContentLoaded', () => {
         let index, gridCol;
 
         for (const [i, f] of fields.entries()) {
-            console.log(!!f.name, !!f.value)
             if (f.name && f.value) {
                 const fieldElement = embedFields.insertBefore(document.createElement('div'), null);
                 // Figuring out if there are only two fields on a row to give them more space.
@@ -1257,7 +1256,7 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink')) {
-            const data = jsonToBase64(jsonObject, true).replace(/=&/g, '&');
+            const data = jsonToBase64(json, true).replace(/=&|=$/g, x => x === '=' ? '' : '&');
             if (!window.chrome)
                 // With long text inside a 'prompt' on Chromium based browsers, some text will be trimmed off and replaced with '...'.
                 return prompt('Here\'s the current URL with base64 embed data:', data);
