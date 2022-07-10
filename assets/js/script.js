@@ -98,7 +98,7 @@ const urlOptions = ({ remove, set }) => {
     if (remove) url.searchParams.delete(remove);
     if (set) url.searchParams.set(set[0], set[1]);
     try {
-        history.replaceState(null, null, url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&'));
+        history.replaceState(null, null, url.href.replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&'));
     } catch (e) {
         // Most likely embeded in iframe
         console.message(`${e.name}: ${e.message}`, e);
@@ -164,6 +164,11 @@ const changeLastActiveGuiEmbed = index => {
     }
 }
 
+// Called after building embed for extra work.
+const afterBuilding = () => {
+    autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] });
+}
+
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
     !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'));
@@ -173,6 +178,8 @@ const externalParsing = ({ noEmojis, element } = {}) => {
     const embed = element?.closest('.embed');
     if (embed?.innerText.trim())
         (multiEmbeds ? embed : document.body).classList.remove('emptyEmbed');
+
+    afterBuilding()
 };
 
 let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
@@ -1004,7 +1011,7 @@ addEventListener('DOMContentLoaded', () => {
                         pre?.style.removeProperty('max-width');
                     }
 
-                    return;
+                    return afterBuilding();
                 case 'embedImage':
                     const embedImageLink = embed?.querySelector('.embedImageLink');
                     if (!embedImageLink) return buildEmbed();
@@ -1013,7 +1020,7 @@ addEventListener('DOMContentLoaded', () => {
                         embedImageLink.parentElement.style.display = 'block';
 
 
-                    return;
+                    return afterBuilding();
                 case 'embedFooterText':
                 case 'embedFooterLink':
                 case 'embedFooterTimestamp':
@@ -1099,7 +1106,7 @@ addEventListener('DOMContentLoaded', () => {
             if (!multiEmbeds && !embedCont.innerText.trim() && !embedCont.querySelector('.embedGrid > [style*=display] img'))
                 document.body.classList.add('emptyEmbed');
 
-            autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] })
+            afterBuilding()
         } catch (e) {
             console.error(e);
             error(e);
@@ -1256,7 +1263,7 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink')) {
-            const data = jsonToBase64(json, true).replace(/=&|=$/g, x => x === '=' ? '' : '&');
+            const data = jsonToBase64(json, true).replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&');
             if (!window.chrome)
                 // With long text inside a 'prompt' on Chromium based browsers, some text will be trimmed off and replaced with '...'.
                 return prompt('Here\'s the current URL with base64 embed data:', data);
