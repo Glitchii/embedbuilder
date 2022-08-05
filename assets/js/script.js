@@ -405,8 +405,8 @@ addEventListener('DOMContentLoaded', () => {
 
         txt = txt
             /** Markdown */
-            .replace(/&#60;:\w+:(\d{20})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
-            .replace(/&#60;a:\w+:(\d{20})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
+            .replace(/&#60;:\w+:(\d{1,20})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+            .replace(/&#60;a:\w+:(\d{1,20})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
             .replace(/~~(.+?)~~/g, '<s>$1</s>')
             .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
