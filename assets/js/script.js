@@ -3,6 +3,8 @@
 
 options = window.options || {};
 inIframe = window.inIframe || top !== self;
+mainHost = "glitchii.github.io" // "http://127.0.0.1:65535"
+// mainHost = "127.0.0.1:33953"
 currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)?.[0] || location.href : location.href);
 
 let params = currentURL().searchParams,
@@ -24,6 +26,8 @@ let params = currentURL().searchParams,
     hideEditor = localStorage.getItem('hideeditor') || hasParam('hideeditor') || options.hideEditor,
     hidePreview = localStorage.getItem('hidepreview') || hasParam('hidepreview') || options.hidePreview,
     hideMenu = localStorage.getItem('hideMenu') || hasParam('hidemenu') || options.hideMenu,
+    sourceOption = localStorage.getItem('sourceOption') || hasParam('sourceoption') || options.sourceOption,
+    // sourceInMenu = localStorage.getItem('sourceInMenu') || hasParam('sourceInMenu') || options.sourceInMenu || top.location.host === mainHost,
     validationError, activeFields, lastActiveGuiEmbedIndex = -1, lastGuiJson, colNum = 1, num = 0;
 
 const guiEmbedIndex = guiEl => {
@@ -98,7 +102,7 @@ const urlOptions = ({ remove, set }) => {
     if (remove) url.searchParams.delete(remove);
     if (set) url.searchParams.set(set[0], set[1]);
     try {
-        history.replaceState(null, null, url.href.replace(/=&|=$/g, x => x === '=' ? '' : '&'));
+        history.replaceState(null, null, url.href.replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&'));
     } catch (e) {
         // Most likely embeded in iframe
         console.message(`${e.name}: ${e.message}`, e);
@@ -164,6 +168,11 @@ const changeLastActiveGuiEmbed = index => {
     }
 }
 
+// Called after building embed for extra work.
+const afterBuilding = () => {
+    autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] });
+}
+
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
     !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'));
@@ -173,6 +182,8 @@ const externalParsing = ({ noEmojis, element } = {}) => {
     const embed = element?.closest('.embed');
     if (embed?.innerText.trim())
         (multiEmbeds ? embed : document.body).classList.remove('emptyEmbed');
+
+    afterBuilding()
 };
 
 let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
@@ -256,20 +267,26 @@ delete jsonObject.embed;
 addEventListener('DOMContentLoaded', () => {
     if (reverseColumns || localStorage.getItem('reverseColumns'))
         reverse();
-    if (autoUpdateURL)
-        document.body.classList.add('autoUpdateURL');
     if (autoParams)
-        document.querySelector('.auto-params > input').checked = true;
+        document.querySelector('.item.auto-params > input').checked = true;
     if (hideMenu)
-        document.querySelector('.top-btn.menu').classList.add('hidden');
-    if (multiEmbeds)
-        document.body.classList.add('multiEmbeds');
+        document.querySelector('.top-btn.menu')?.classList.add('hidden');
     if (noMultiEmbedsOption)
         document.querySelector('.box .item.multi')?.remove();
     if (inIframe)
         // Remove menu options that don't work in iframe.
         for (const e of document.querySelectorAll('.no-frame'))
             e.remove();
+
+    if (autoUpdateURL) {
+        document.body.classList.add('autoUpdateURL');
+        document.querySelector('.item.auto > input').checked = true;
+    }
+
+    if (multiEmbeds) {
+        document.body.classList.add('multiEmbeds');
+        if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
+    }
 
     if (hideEditor) {
         document.body.classList.add('no-editor');
@@ -288,7 +305,11 @@ addEventListener('DOMContentLoaded', () => {
             document.body.classList.remove('gui');
     }
 
-    if (noUser) document.body.classList.add('no-user');
+    if (noUser) {
+        document.body.classList.add('no-user');
+        if (autoParams) noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
+    }
+
     else {
         if (username) document.querySelector('.username').textContent = username;
         if (avatar) document.querySelector('.avatar').src = avatar;
@@ -314,18 +335,19 @@ addEventListener('DOMContentLoaded', () => {
         foldGutter: true,
         lint: true,
         extraKeys: {
-            // Make tabs four spaces long instead of the default two.
-            Tab: cm => cm.replaceSelection("    ", "end"),
             // Fill in indent spaces on a new line when enter (return) key is pressed.
             Enter: _ => {
-                let cur = editor.getCursor(), end = editor.getLine(cur.line),
-                    leadingSpaces = end.replace(/\S($|.)+/g, '') || '    \n', nextLine = editor.getLine(cur.line + 1);
-                if ((nextLine === undefined || !nextLine.trim()) && !end.substr(cur.ch).trim())
-                    editor.replaceRange('\n', { line: cur.line, ch: cur.ch });
+                const cursor = editor.getCursor();
+                const end = editor.getLine(cursor.line);
+                const leadingSpaces = end.replace(/\S($|.)+/g, '') || '    \n';
+                const nextLine = editor.getLine(cursor.line + 1);
+
+                if ((nextLine === undefined || !nextLine.trim()) && !end.substr(cursor.ch).trim())
+                    editor.replaceRange('\n', { line: cursor.line, ch: cursor.ch });
                 else
                     editor.replaceRange(`\n${end.endsWith('{') ? leadingSpaces + '    ' : leadingSpaces}`, {
-                        line: cur.line,
-                        ch: cur.ch
+                        line: cursor.line,
+                        ch: cursor.ch
                     });
             },
         }
@@ -393,12 +415,6 @@ addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    const innerHTML = (element, html) => {
-        // console.log(element, html);
-        element.innerHTML = html;
-        return element;
-    }
-
     const markup = (txt, { replaceEmojis, inlineBlock, inEmbed }) => {
         if (replaceEmojis)
             txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, p) => p && emojis[p] ? emojis[p] : match);
@@ -446,10 +462,10 @@ addEventListener('DOMContentLoaded', () => {
 
 
     const createEmbedFields = (fields, embedFields) => {
-        innerHTML(embedFields, '');
+        embedFields.innerHTML = '';
         let index, gridCol;
 
-        for (const [i, f] of fields.entries())
+        for (const [i, f] of fields.entries()) {
             if (f.name && f.value) {
                 const fieldElement = embedFields.insertBefore(document.createElement('div'), null);
                 // Figuring out if there are only two fields on a row to give them more space.
@@ -493,6 +509,7 @@ addEventListener('DOMContentLoaded', () => {
                 colNum = (colNum === 9 ? 1 : colNum + 4);
                 num++;
             };
+        };
 
 
         for (const e of document.querySelectorAll('.embedField[style="grid-column: 1 / 5;"]'))
@@ -521,7 +538,7 @@ addEventListener('DOMContentLoaded', () => {
     }
 
     const display = (el, data, displayType) => {
-        if (data) innerHTML(el, data);
+        if (data) el.innerHTML = data;
         el.style.display = displayType || "unset";
     }
 
@@ -553,7 +570,7 @@ addEventListener('DOMContentLoaded', () => {
             if (child.classList?.[1] === 'content')
                 gui.insertBefore(gui.appendChild(child.cloneNode(true)), gui.appendChild(child.nextElementSibling.cloneNode(true))).nextElementSibling.firstElementChild.value = object.content || '';
             else if (child.classList?.[1] === 'guiEmbedName') {
-                for (const [i, embed] of object.embeds.entries()) {
+                for (const [i, embed] of (object.embeds.length ? object.embeds : [{}]).entries()) {
                     const guiEmbedName = gui.appendChild(child.cloneNode(true))
 
                     guiEmbedName.querySelector('.text').innerHTML = `Embed ${i + 1}${embed.title ? `: <span>${embed.title}</span>` : ''}`;
@@ -567,7 +584,7 @@ addEventListener('DOMContentLoaded', () => {
                     const guiEmbedTemplate = child.nextElementSibling;
 
                     for (const child2 of Array.from(guiEmbedTemplate.children)) {
-                        if (!child2.classList.contains('edit')) {
+                        if (!child2?.classList.contains('edit')) {
                             const row = guiEmbed.appendChild(child2.cloneNode(true));
                             const edit = child2.nextElementSibling?.cloneNode(true);
                             edit?.classList.contains('edit') && guiEmbed.appendChild(edit);
@@ -749,15 +766,16 @@ addEventListener('DOMContentLoaded', () => {
                     const embedObj = jsonObject.embeds[index] ??= {};
 
                     if (field) {
+                        console.log(field)
                         const fieldIndex = Array.from(fields.children).indexOf(field);
                         const jsonField = embedObj.fields[fieldIndex];
-                        const embedField = document.querySelectorAll('.container>.embed')[index]?.querySelectorAll('.embedField')[fieldIndex];
+                        const embedFields = document.querySelectorAll('.container>.embed')[index]?.querySelector('.embedFields');
 
-                        if (jsonField && embedField) {
+                        if (jsonField) {
                             if (el.target.type === 'text') jsonField.name = value;
                             else if (el.target.type === 'textarea') jsonField.value = value;
                             else jsonField.inline = el.target.checked;
-                            createEmbedFields(embedObj.fields, embedField.parentElement);
+                            createEmbedFields(embedObj.fields, embedFields);
                         }
                     } else {
                         switch (el.target.classList?.[0]) {
@@ -904,8 +922,18 @@ addEventListener('DOMContentLoaded', () => {
                     e.classList.add('active');
 
         else if (opts?.guiTabs) {
-            const tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs, bottomKeys = ['footer', 'image'], topKeys = ['author', 'content'];
-            document.querySelectorAll(`.${tabs.join(', .')}`).forEach(e => e.classList.add('active'));
+            const tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs;
+            const bottomKeys = ['footer', 'image'];
+            const topKeys = ['author', 'content'];
+
+
+            // Deactivate the default activated GUI fields
+            for (const e of gui.querySelectorAll('.item:not(.guiEmbedName).active'))
+                e.classList.remove('active');
+
+            // Activate wanted GUI fields
+            for (const e of document.querySelectorAll(`.${tabs.join(', .')}`))
+                e.classList.add('active');
 
             // Autoscroll GUI to the bottom if necessary.
             if (!tabs.some(item => topKeys.includes(item)) && tabs.some(item => bottomKeys.includes(item))) {
@@ -938,7 +966,7 @@ addEventListener('DOMContentLoaded', () => {
             if (!jsonObject.content) document.body.classList.add('emptyContent');
             else {
                 // Update embed content in render
-                innerHTML(embedContent, markup(encodeHTML(jsonObject.content), { replaceEmojis: true }));
+                embedContent.innerHTML = markup(encodeHTML(jsonObject.content), { replaceEmojis: true });
                 document.body.classList.remove('emptyContent');
             }
 
@@ -987,7 +1015,7 @@ addEventListener('DOMContentLoaded', () => {
                         pre?.style.removeProperty('max-width');
                     }
 
-                    return;
+                    return afterBuilding();
                 case 'embedImage':
                     const embedImageLink = embed?.querySelector('.embedImageLink');
                     if (!embedImageLink) return buildEmbed();
@@ -996,7 +1024,7 @@ addEventListener('DOMContentLoaded', () => {
                         embedImageLink.parentElement.style.display = 'block';
 
 
-                    return;
+                    return afterBuilding();
                 case 'embedFooterText':
                 case 'embedFooterLink':
                 case 'embedFooterTimestamp':
@@ -1082,7 +1110,7 @@ addEventListener('DOMContentLoaded', () => {
             if (!multiEmbeds && !embedCont.innerText.trim() && !embedCont.querySelector('.embedGrid > [style*=display] img'))
                 document.body.classList.add('emptyEmbed');
 
-            autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] })
+            afterBuilding()
         } catch (e) {
             console.error(e);
             error(e);
@@ -1113,23 +1141,22 @@ addEventListener('DOMContentLoaded', () => {
                     return error(`'${usedKeys[0] + "', '" + usedKeys.slice(1, usedKeys.length - 1).join("', '")}', and '${usedKeys[usedKeys.length - 1]}' are invalid keys.`);
                 return error(`'${usedKeys.length == 2 ? usedKeys[0] + "' and '" + usedKeys[usedKeys.length - 1] + "' are invalid keys." : usedKeys[0] + "' is an invalid key."}`);
             }
-            
+
             buildEmbed();
 
         } catch (e) {
             if (editor.getValue()) return;
             document.body.classList.add('emptyEmbed');
-            innerHTML(embedContent, '');
+            embedContent.innerHTML = '';
         }
     });
 
-    const picker = new CP(document.querySelector('.picker'),
-        state = { parent: document.querySelector('.cTop') });
+    const picker = new CP(document.querySelector('.picker'), state = { parent: document.querySelector('.cTop') });
 
-    picker.fire('change', toRGB('#41f097'));
+    picker.fire?.('change', toRGB('#41f097'));
 
-    let colors = document.querySelector('.colors'),
-        hexInput = colors.querySelector('.hex>div input'),
+    const colors = document.querySelector('.colors'),
+        hexInput = colors?.querySelector('.hex>div input'),
         typingHex = true, exit = false,
 
         removePicker = () => {
@@ -1141,14 +1168,14 @@ addEventListener('DOMContentLoaded', () => {
                 picker.exit();
             }
         }
-    document.querySelector('.colBack').addEventListener('click', () => {
+    document.querySelector('.colBack')?.addEventListener('click', () => {
         picker.self.remove();
         typingHex = false;
         removePicker();
     })
 
-    picker.on('exit', removePicker);
-    picker.on('enter', () => {
+    picker.on?.('exit', removePicker);
+    picker.on?.('enter', () => {
         if (jsonObject?.embed?.color) {
             hexInput.value = jsonObject.embed.color.toString(16).padStart(6, '0');
             document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
@@ -1159,17 +1186,17 @@ addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.color').forEach(e => e.addEventListener('click', el => {
         const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
         const embed = document.querySelectorAll('.msgEmbed .container>.embed')[embedIndex];
-        const embedObj = jsonObject.embeds[embedIndex];
+        const embedObj = jsonObject.embeds[embedIndex] ??= {};
 
         const clr = el.target.closest('.color');
         embedObj.color = toRGB(clr.style.backgroundColor, false, true);
-        embed.style.borderColor = clr.style.backgroundColor;
+        embed && (embed.style.borderColor = clr.style.backgroundColor);
         picker.source.style.removeProperty('background');
     }))
 
-    hexInput.addEventListener('focus', () => typingHex = true);
+    hexInput?.addEventListener('focus', () => typingHex = true);
     setTimeout(() => {
-        picker.on('change', function (r, g, b, a) {
+        picker.on?.('change', function (r, g, b, a) {
             const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
             const embed = document.querySelectorAll('.msgEmbed .container>.embed')[embedIndex];
             const embedObj = jsonObject.embeds[embedIndex];
@@ -1223,11 +1250,13 @@ addEventListener('DOMContentLoaded', () => {
         json = {};
 
         picker.source.style.removeProperty('background');
+        document.querySelector('.msgEmbed .container>.embed')?.remove();
 
         buildEmbed();
         buildGui();
-        // editor.setValue('{\n\t\n}');
-        editor.setValue(JSON.stringify(json, null, 4));
+
+        const jsonStr = JSON.stringify(json, null, 4);
+        editor.setValue(jsonStr === '{}' ? '{\n\t\n}' : jsonStr);
 
         for (const e of document.querySelectorAll('.gui .item'))
             e.classList.add('active');
@@ -1238,19 +1267,20 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink')) {
-            const data = jsonToBase64(jsonObject, true).replace(/=&/g, '&');
-            // With long text inside a 'prompt' on Chromium based browsers, some text will but cut and replaced with '...'.
-            // So, for the Chromium users, we copy to clipboard instead of showing a prompt.
+            const data = jsonToBase64(json, true).replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&');
             if (!window.chrome)
+                // With long text inside a 'prompt' on Chromium based browsers, some text will be trimmed off and replaced with '...'.
                 return prompt('Here\'s the current URL with base64 embed data:', data);
-            if (location.protocol === 'http:')
-                // Clipboard API only works on HTTPS protocol.
+
+            // So, for the Chromium users, we copy to clipboard instead of showing a prompt.
+            try {
+                // Clipboard API might only work on HTTPS protocol.
                 navigator.clipboard.writeText(data);
-            else {
-                const input = document.createElement('input');
+            } catch {
+                const input = document.body.appendChild(document.createElement('input'));
                 input.value = data;
-                document.body.appendChild(input);
                 input.select();
+                document.setSelectionRange(0, 50000);
                 document.execCommand('copy');
                 document.body.removeChild(input);
             }
@@ -1265,14 +1295,16 @@ addEventListener('DOMContentLoaded', () => {
             autoUpdateURL = document.body.classList.toggle('autoUpdateURL');
             if (autoUpdateURL) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
-            buildEmbed();
+            urlOptions({ set: ['data', jsonToBase64(json)] });
         } else if (e.target.closest('.item.reverse')) {
             reverse(reverseColumns);
             reverseColumns = !reverseColumns;
             toggleStored('reverseColumns');
         } else if (e.target.closest('.item.noUser')) {
             if (options.avatar) document.querySelector('img.avatar').src = options.avatar;
-            document.body.classList.toggle('no-user');
+
+            const noUser = document.body.classList.toggle('no-user');
+            if (autoParams) noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
             toggleStored('noUser');
         } else if (e.target.closest('.item.auto-params')) {
             if (input.checked) localStorage.setItem('autoParams', true);
@@ -1292,6 +1324,7 @@ addEventListener('DOMContentLoaded', () => {
             multiEmbeds = document.body.classList.toggle('multiEmbeds');
             activeFields = document.querySelectorAll('.gui > .item.active');
 
+            if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
             if (multiEmbeds) localStorage.setItem('multiEmbeds', true);
             else {
                 localStorage.removeItem('multiEmbeds');
@@ -1303,7 +1336,7 @@ addEventListener('DOMContentLoaded', () => {
             editor.setValue(JSON.stringify(json, null, 4));
         }
 
-        e.target.closest('.top-btn').classList.toggle('active')
+        e.target.closest('.top-btn')?.classList.toggle('active')
     })
 
     document.querySelectorAll('.img').forEach(e => {
@@ -1329,7 +1362,7 @@ addEventListener('DOMContentLoaded', () => {
             togglePicker();
     })
 
-    document.querySelector('.colors .hex>div').addEventListener('input', e => {
+    document.querySelector('.colors .hex>div')?.addEventListener('input', e => {
         let inputValue = e.target.value;
 
         if (inputValue.startsWith('#'))
@@ -1344,24 +1377,30 @@ addEventListener('DOMContentLoaded', () => {
 
     if (onlyEmbed) document.querySelector('.side1')?.remove();
 
+    const menuMore = document.querySelector('.item.section .inner.more');
+    const menuSource = menuMore?.querySelector('.source');
+
+    if (!sourceOption) menuSource.remove();
+    if (menuMore.childElementCount < 2) menuMore?.classList.add('invisible');
+    if (menuMore.parentElement.childElementCount < 1) menuMore?.parentElement.classList.add('invisible');
+
     document.querySelector('.top-btn.copy').addEventListener('click', e => {
         const mark = e.target.closest('.top-btn.copy').querySelector('.mark'),
-            jsonData = JSON.stringify(jsonObject, null, 4),
+            jsonData = JSON.stringify(json, null, 4),
             next = () => {
-                mark.classList.remove('hidden');
-                mark.previousElementSibling.classList.add('hidden');
+                mark?.classList.remove('hidden');
+                mark?.previousElementSibling?.classList.add('hidden');
 
                 setTimeout(() => {
-                    mark.classList.add('hidden');
-                    mark.previousElementSibling.classList.remove('hidden');
+                    mark?.classList.add('hidden');
+                    mark?.previousElementSibling?.classList.remove('hidden');
                 }, 1500);
             }
 
         if (!navigator.clipboard?.writeText(jsonData).then(next).catch(err => console.log('Could not copy to clipboard: ' + err.message))) {
-            const textarea = document.createElement('textarea');
+            const textarea = document.body.appendChild(document.createElement('textarea'));
 
             textarea.value = jsonData;
-            document.body.appendChild(textarea);
             textarea.select();
             textarea.setSelectionRange(0, 50000);
             document.execCommand('copy');
@@ -1370,6 +1409,12 @@ addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+console.__proto__.message = function (title, message, collapse = true) {
+    collapse && this.groupCollapsed(title) || this.group(title);
+    this.dir(message);
+    this.groupEnd();
+}
 
 Object.defineProperty(window, 'json', {
     // Formarts value properly into 'jsonObject'.
@@ -1407,9 +1452,3 @@ Object.defineProperty(window, 'json', {
         return json;
     },
 });
-
-console.__proto__.message = function (title, message, collapse = true) {
-    collapse && this.groupCollapsed(title) || this.group(title);
-    this.dir(message);
-    this.groupEnd();
-}

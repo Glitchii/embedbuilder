@@ -2129,6 +2129,7 @@ body {
     gap: 10px;
     text-align: center;
     align-content: center;
+    max-width: none;
 }
 
 .top-btn.menu>.box .item.normal:hover {
@@ -2171,7 +2172,7 @@ body {
     pointer-events: none;
 }
 
-.item.toggle .inner .title {
+.item.section .inner .title {
     text-align: left;
     margin: 10px 0;
     opacity: .5;
@@ -2180,6 +2181,22 @@ body {
     font-weight: bold;
     pointer-events: none;
 }
+
+.item.section .inner.more a {
+    all: unset;
+    cursor: pointer;
+    color: #939396fc;
+    /* color: #767d91; */
+}
+
+.item.section .inner.more a:hover {
+    color: #b7c6d3;
+    color: #919bb7;
+}
+
+/* .item.section .inner.more {
+    display: none;
+} */
 
 .item.toggle .item.toggle .item.toggle .item.toggle .top-btn.menu>.box .item>input {
     pointer-events: none;
@@ -2691,7 +2708,7 @@ body.toHook .done .channels .selectOptions .hook {
         width: 100%;
     }
 
-    body:not(.no-editor) .bottom {
+    body:not(.no-editor) section > .bottom {
         margin: 40px 0 0 0 !important;
     }
 
