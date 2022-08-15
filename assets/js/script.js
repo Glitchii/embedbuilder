@@ -1019,7 +1019,7 @@ addEventListener('DOMContentLoaded', () => {
                 case 'embedImage':
                     const embedImageLink = embed?.querySelector('.embedImageLink');
                     if (!embedImageLink) return buildEmbed();
-                    if (!embedObj.image?.url) embedImageLink.hide(parentElement);
+                    if (!embedObj.image?.url) hide(embedImageLink.parentElement);
                     else embedImageLink.src = embedObj.image.url,
                         embedImageLink.parentElement.style.display = 'block';
 
