@@ -1011,7 +1011,7 @@ addEventListener('DOMContentLoaded', () => {
                         embedThumbnailLink.parentElement.style.display = 'block';
                         if (pre) pre.style.maxWidth = '90%';
                     } else {
-                        embedThumbnailLink.hide(parentElement);
+                        hide(embedThumbnailLink.parentElement);
                         pre?.style.removeProperty('max-width');
                     }
 
