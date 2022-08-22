@@ -421,8 +421,8 @@ addEventListener('DOMContentLoaded', () => {
 
         txt = txt
             /** Markdown */
-            .replace(/&#60;:\w+:(\d{18})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
-            .replace(/&#60;a:\w+:(\d{18})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
+            .replace(/&#60;:\w+:(\d{17,19})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
+            .replace(/&#60;a:\w+:(\d{17,20})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.gif"/>')
             .replace(/~~(.+?)~~/g, '<s>$1</s>')
             .replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
             .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -856,9 +856,15 @@ addEventListener('DOMContentLoaded', () => {
                             .then(res => {
                                 browse.classList.remove('loading');
                                 if (!res.ok) {
-                                    console.log(res.error);
+                                    console.log(res.err || res.error);
                                     browse.classList.add('error');
-                                    return setTimeout(() => browse.classList.remove('error'), 5000)
+                                    const p = browse.parentElement.querySelector('.browse.error>p')
+                                    if (res.err) p.dataset.error = res.err || "Request failed. (Check dev-console)";
+
+                                    return setTimeout(() => {
+                                        browse.classList.remove('error');
+                                        delete p.dataset.error;
+                                    }, 7000)
                                 }
 
                                 imgSrc(edit.querySelector('.editIcon > .imgParent'), res.link);
@@ -1011,7 +1017,7 @@ addEventListener('DOMContentLoaded', () => {
                         embedThumbnailLink.parentElement.style.display = 'block';
                         if (pre) pre.style.maxWidth = '90%';
                     } else {
-                        embedThumbnailLink.hide(parentElement);
+                        hide(embedThumbnailLink.parentElement);
                         pre?.style.removeProperty('max-width');
                     }
 
@@ -1019,7 +1025,7 @@ addEventListener('DOMContentLoaded', () => {
                 case 'embedImage':
                     const embedImageLink = embed?.querySelector('.embedImageLink');
                     if (!embedImageLink) return buildEmbed();
-                    if (!embedObj.image?.url) embedImageLink.hide(parentElement);
+                    if (!embedObj.image?.url) hide(embedImageLink.parentElement);
                     else embedImageLink.src = embedObj.image.url,
                         embedImageLink.parentElement.style.display = 'block';
 

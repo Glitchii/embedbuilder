@@ -1696,7 +1696,7 @@ input#timestamp::-webkit-calendar-picker-indicator {
 
 .browse.error>p::after {
     color: #ee9191;
-    content: "Request failed. (Check dev-console)";
+    content: attr(data-error);
 }
 
 .linkName {
