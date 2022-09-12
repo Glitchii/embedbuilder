@@ -199,17 +199,17 @@ let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "ti
             author: {
                 name: "Author name",
                 url: "https://discord.com",
-                icon_url: "https://unsplash.it/100"
+                icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
             },
             thumbnail: {
-                url: "https://unsplash.it/200"
+                url: "https://cdn.discordapp.com/embed/avatars/0.png"
             },
             image: {
-                url: "https://unsplash.it/380/200"
+                url: "http://127.0.0.1:5500/assets/media/banner.png"
             },
             footer: {
                 text: "Footer text",
-                icon_url: "https://unsplash.it/100"
+                icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
             },
             fields: [
                 {
@@ -857,13 +857,13 @@ addEventListener('DOMContentLoaded', () => {
                     const formData = new FormData();
                     const fileInput = createElement({ 'input': { type: 'file', accept: 'image/*' } });
                     const edit = browse.closest('.edit');
-                    const expiration = 24 * 60 * 60
+                    const expiration = 2 * 24 * 60 * 60
 
                     fileInput.onchange = el => {
                         if (el.target.files[0].size > 32 * 1024 * 1024)
                             return uploadError('File is too large. Maximum size is 32 MB.', browse, 5000);
 
-                        formData.append("expiration", expiration); // Expire after 24 hours. Discord caches files.
+                        formData.append("expiration", expiration); // Expire after 2 days. Discord caches files.
                         formData.append("key", options.uploadKey || "93385e22b0619db73a5525140b13491c"); // Add your own key through the uploadKey option.
                         formData.append("image", el.target.files[0]);
                         // formData.append("name", ""); // Uses filename if not specified.
@@ -873,10 +873,9 @@ addEventListener('DOMContentLoaded', () => {
                         fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData })
                             .then(res => res.json())
                             .then(res => {
-                                console.log(res);
                                 browse.classList.remove('loading');
                                 if (!res.success) {
-                                    console.log('Upload error:', res.data?.error || res.error?.message || res);
+                                    console.log('Upload failed:', res.data?.error || res.error?.message || res);
                                     return uploadError(res.data?.error || res.error?.message || "Request failed. (Check dev-console)", browse);
                                 }
 
@@ -888,10 +887,9 @@ addEventListener('DOMContentLoaded', () => {
                                 // focus on the next empty input if the field requires a name or text to display eg. footer or author.
                                 !textInput?.value && textInput?.focus();
 
-                                console.info(msg = `File (${res.data.url}) will be deleted in ${expiration / 60 / 60} hours. To delete it now, visit ${res.data.delete_url} and scroll down to find the delete button.`);
+                                console.info(`${res.data.url} will be deleted in ${expiration / 60 / 60} hours. To delete it now, visit ${res.data.delete_url} and scroll down to find the delete button.`);
 
                                 linkInput.dispatchEvent(new Event('input'));
-                                // !smallerScreen.matches && setTimeout(error, 1500, `Image will be deleted in 5 minutes. To delete it now, go to ${res.data.url.replace('/files', '/del')} and enter this code: ${res.authkey}`, 20000);
                             }).catch(err => {
                                 browse.classList.remove('loading');
                                 error(`Request failed with error: ${err}`)
