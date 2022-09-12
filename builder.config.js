@@ -1,7 +1,7 @@
 /**
  * This script file will (or atleast should) run before the main script file runs.
  * This file should contain stuff like options, global variables (etc.) to be used by the main script.
- * */
+ */
 
 // Options
 

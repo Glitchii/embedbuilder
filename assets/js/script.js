@@ -3,8 +3,7 @@
 
 options = window.options || {};
 inIframe = window.inIframe || top !== self;
-mainHost = "glitchii.github.io" // "http://127.0.0.1:65535"
-// mainHost = "127.0.0.1:33953"
+mainHost = "glitchii.github.io";
 currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)?.[0] || location.href : location.href);
 
 let params = currentURL().searchParams,
@@ -840,53 +839,66 @@ addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.msgEmbed>.container')[guiEmbedIndex(el.target)]?.querySelector('.emptyEmbed')?.classList.remove('emptyEmbed');
                 }
 
+            const uploadError = (message, browse, sleepTime) => {
+                browse.classList.remove('loading');
+                browse.classList.add('error');
+
+                const p = browse.parentElement.querySelector('.browse.error>p')
+                p.dataset.error = message;
+
+                setTimeout(() => {
+                    browse.classList.remove('error');
+                    delete p.dataset.error;
+                }, sleepTime ?? 7000);
+            }
+
             for (const browse of document.querySelectorAll('.browse'))
                 browse.onclick = e => {
                     const formData = new FormData();
                     const fileInput = createElement({ 'input': { type: 'file', accept: 'image/*' } });
                     const edit = browse.closest('.edit');
+                    const expiration = 24 * 60 * 60
 
                     fileInput.onchange = el => {
-                        formData.append('file', el.target.files[0]);
-                        formData.append('datetime', '1m');
+                        if (el.target.files[0].size > 32 * 1024 * 1024)
+                            return uploadError('File is too large. Maximum size is 32 MB.', browse, 5000);
+
+                        formData.append("expiration", expiration); // Expire after 24 hours. Discord caches files.
+                        formData.append("key", options.uploadKey || "93385e22b0619db73a5525140b13491c"); // Add your own key through the uploadKey option.
+                        formData.append("image", el.target.files[0]);
+                        // formData.append("name", ""); // Uses filename if not specified.
+
                         browse.classList.add('loading');
 
-                        fetch('https://tempfile.site/api/files', { method: 'POST', body: formData })
+                        fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: formData })
                             .then(res => res.json())
                             .then(res => {
+                                console.log(res);
                                 browse.classList.remove('loading');
-                                if (!res.ok) {
-                                    console.log(res.err || res.error);
-                                    browse.classList.add('error');
-                                    const p = browse.parentElement.querySelector('.browse.error>p')
-                                    if (res.err) p.dataset.error = res.err || "Request failed. (Check dev-console)";
-
-                                    return setTimeout(() => {
-                                        browse.classList.remove('error');
-                                        delete p.dataset.error;
-                                    }, 7000)
+                                if (!res.success) {
+                                    console.log('Upload error:', res.data?.error || res.error?.message || res);
+                                    return uploadError(res.data?.error || res.error?.message || "Request failed. (Check dev-console)", browse);
                                 }
 
-                                imgSrc(edit.querySelector('.editIcon > .imgParent'), res.link);
+                                imgSrc(edit.querySelector('.editIcon > .imgParent'), res.data.url);
                                 const linkInput = edit.querySelector('input[type=text]');
                                 const textInput = edit.querySelector('input[class$=Name], input[class$=Text]');
 
-                                linkInput.value = res.link;
+                                linkInput.value = res.data.url;
                                 // focus on the next empty input if the field requires a name or text to display eg. footer or author.
                                 !textInput?.value && textInput?.focus();
 
-                                console.info(msg = `File (${res.link}) will be deleted in 5 minutes. To delete it now, go to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`);
+                                console.info(msg = `File (${res.data.url}) will be deleted in ${expiration / 60 / 60} hours. To delete it now, visit ${res.data.delete_url} and scroll down to find the delete button.`);
 
                                 linkInput.dispatchEvent(new Event('input'));
-                                // !smallerScreen.matches && setTimeout(error, 1500, `Image will be deleted in 5 minutes. To delete it now, go to ${res.link.replace('/files', '/del')} and enter this code: ${res.authkey}`, 20000);
+                                // !smallerScreen.matches && setTimeout(error, 1500, `Image will be deleted in 5 minutes. To delete it now, go to ${res.data.url.replace('/files', '/del')} and enter this code: ${res.authkey}`, 20000);
                             }).catch(err => {
                                 browse.classList.remove('loading');
-                                error(`Request to tempfile.site failed with error: ${err}`)
+                                error(`Request failed with error: ${err}`)
                             })
                     }
 
                     fileInput.click();
-                    console.log(fileInput);
                 }
 
             if (multiEmbeds) {
