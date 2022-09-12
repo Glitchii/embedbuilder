@@ -6,7 +6,7 @@ This can be used for discord bot embed commands. It can also be intergreted into
 
 Aside the JSON editor, it also includes a GUI editor which converts to JSON for simplicity.  
 
-![GUI image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/gui.png) ![JSON image](https://raw.githubusercontent.com/Glitchii/embedbuilder/master/assets/media/json.png)  
+![GUI image](https://raw.githubusercontent.com/Glitchii/embedbuilder/main/assets/media/gui.png) ![JSON image](https://raw.githubusercontent.com/Glitchii/embedbuilder/main/assets/media/gui.png)  
 
 
 # Supported URL Parameters

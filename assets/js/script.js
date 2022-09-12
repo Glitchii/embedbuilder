@@ -205,7 +205,7 @@ let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "ti
                 url: "https://cdn.discordapp.com/embed/avatars/0.png"
             },
             image: {
-                url: "http://127.0.0.1:5500/assets/media/banner.png"
+                url: "https://glitchii.github.io/embedbuilder/assets/media/banner.png"
             },
             footer: {
                 text: "Footer text",
