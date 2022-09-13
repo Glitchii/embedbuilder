@@ -158,8 +158,10 @@ body:not(.no-preview):not(.no-editor) .main {
     transform: translateY(10px);
 }
 
-body.gui .side1 .item.top {
-    transform: translateY(20px);
+@media screen and (min-height: 910px) {
+    .side1 .item.top {
+        transform: translateY(20px);
+    }
 }
 
 .top,
@@ -1181,8 +1183,23 @@ u {
 
 body.gui .side1 .item.top {
     max-width: 90%;
-    height: 70%;
+    height: 75%;
     border-radius: 15px;
+}
+
+body.no-preview.gui .side1 .item.top {
+    max-width: 100%;
+}
+
+body.no-preview.gui .bottom .colors {
+    left: 0;
+    margin-left: 20px;
+}
+
+@media screen and (min-width: 1015px) {
+    body.no-preview.gui .top>.gui :is(.item, .item ~ .edit) {
+        width: 95%;
+    }
 }
 
 body.gui .top>.CodeMirror {
@@ -1201,6 +1218,7 @@ body.gui .top>.CodeMirror {
     scrollbar-width: 7px;
     padding-top: 15px;
     padding-bottom: 20px;
+    transition: .5s ease;
 }
 
 
@@ -1307,7 +1325,7 @@ body:not(.gui) .chooser>.back {
     width: 250px;
     height: 130px;
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
     box-shadow: -3px 3px 5px 0px #00000029;
     display: grid;
     grid-template-columns: 27% 73%;
@@ -1624,7 +1642,7 @@ textarea {
     height: 80px;
 }
 
-:is(.browse, .footerDate) {
+.browse, .footerDate {
     margin-top: 25px;
     font-size: 13px;
     display: flex;
@@ -2708,7 +2726,7 @@ body.toHook .done .channels .selectOptions .hook {
         width: 100%;
     }
 
-    body:not(.no-editor) section > .bottom {
+    body:not(.no-editor) section>.bottom {
         margin: 40px 0 0 0 !important;
     }
 
@@ -2739,19 +2757,30 @@ body.toHook .done .channels .selectOptions .hook {
     }
 }
 
-@media screen and (max-height: 760px) {
+@media screen and (max-height: 830px) {
     .bottom .colors {
         bottom: 10px;
     }
 
     body.gui .side1 .item.top {
-        height: 65%;
         max-width: 100%;
         width: 100%;
     }
 
-    .bottom {
+    body:not(.no-editor) section>.bottom {
         margin: 40px 0 0 0 !important;
+    }
+}
+
+@media screen and (max-height: 830px) and (min-width: 1015px) {
+    body.gui .side1 .item.top {
+        height: 72%;
+    }
+}
+
+@media screen and (max-height: 750px) and (min-width: 1015px) {
+    body.gui .side1 .item.top {
+        height: 69%;
     }
 }
 

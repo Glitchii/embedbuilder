@@ -20,7 +20,7 @@ let params = currentURL().searchParams,
     allowPlaceholders = hasParam('placeholders') || options.allowPlaceholders,
     autoUpdateURL = localStorage.getItem('autoUpdateURL') || options.autoUpdateURL,
     noMultiEmbedsOption = localStorage.getItem('noMultiEmbedsOption') || hasParam('nomultiembedsoption') || options.noMultiEmbedsOption,
-    multiEmbeds = noMultiEmbedsOption ? options.multiEmbeds : localStorage.getItem('multiEmbeds') || hasParam('multiembeds') || options.multiEmbeds,
+    multiEmbeds = noMultiEmbedsOption ? options.multiEmbeds ?? true : (localStorage.getItem('multiEmbeds') || hasParam('multiembeds') || options.multiEmbeds) ?? true,
     autoParams = localStorage.getItem('autoParams') || hasParam('autoparams') || options.autoParams,
     hideEditor = localStorage.getItem('hideeditor') || hasParam('hideeditor') || options.hideEditor,
     hidePreview = localStorage.getItem('hidepreview') || hasParam('hidepreview') || options.hidePreview,
@@ -857,13 +857,13 @@ addEventListener('DOMContentLoaded', () => {
                     const formData = new FormData();
                     const fileInput = createElement({ 'input': { type: 'file', accept: 'image/*' } });
                     const edit = browse.closest('.edit');
-                    const expiration = 2 * 24 * 60 * 60
+                    const expiration = 7 * 24 * 60 * 60
 
                     fileInput.onchange = el => {
                         if (el.target.files[0].size > 32 * 1024 * 1024)
                             return uploadError('File is too large. Maximum size is 32 MB.', browse, 5000);
 
-                        formData.append("expiration", expiration); // Expire after 2 days. Discord caches files.
+                        formData.append("expiration", expiration); // Expire after 7 days. Discord caches files.
                         formData.append("key", options.uploadKey || "93385e22b0619db73a5525140b13491c"); // Add your own key through the uploadKey option.
                         formData.append("image", el.target.files[0]);
                         // formData.append("name", ""); // Uses filename if not specified.
@@ -1171,19 +1171,21 @@ addEventListener('DOMContentLoaded', () => {
 
     picker.fire?.('change', toRGB('#41f097'));
 
-    const colors = document.querySelector('.colors'),
-        hexInput = colors?.querySelector('.hex>div input'),
-        typingHex = true, exit = false,
+    const colors = document.querySelector('.colors');
+    const hexInput = colors?.querySelector('.hex>div input');
 
-        removePicker = () => {
-            if (exit) return exit = false;
-            if (typingHex) picker.enter();
-            else {
-                typingHex = false, exit = true;
-                colors.classList.remove('picking');
-                picker.exit();
-            }
+    let typingHex = true, exit = false;
+
+    removePicker = () => {
+        if (exit) return exit = false;
+        if (typingHex) picker.enter();
+        else {
+            typingHex = false, exit = true;
+            colors.classList.remove('picking');
+            picker.exit();
         }
+    }
+
     document.querySelector('.colBack')?.addEventListener('click', () => {
         picker.self.remove();
         typingHex = false;
