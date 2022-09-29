@@ -1194,8 +1194,10 @@ addEventListener('DOMContentLoaded', () => {
 
     picker.on?.('exit', removePicker);
     picker.on?.('enter', () => {
-        if (jsonObject?.embed?.color) {
-            hexInput.value = jsonObject.embed.color.toString(16).padStart(6, '0');
+        const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
+        if (jsonObject?.embeds[embedIndex]?.color) {
+            hexInput.value = jsonObject.embeds[embedIndex].color.toString(16).padStart(6, '0');
+            console.log(hexInput)
             document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
         }
         colors.classList.add('picking')
@@ -1380,6 +1382,7 @@ addEventListener('DOMContentLoaded', () => {
             togglePicker();
     })
 
+    // #0070ff, #5865f2
     document.querySelector('.colors .hex>div')?.addEventListener('input', e => {
         let inputValue = e.target.value;
 
@@ -1389,7 +1392,11 @@ addEventListener('DOMContentLoaded', () => {
             return e.target.closest('.hex').classList.add('incorrect');
 
         e.target.closest('.hex').classList.remove('incorrect');
-        jsonObject.embed.color = parseInt(inputValue, 16);
+        
+        const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
+        jsonObject.embeds[embedIndex].color = parseInt(inputValue, 16);
+        picker.fire?.('change', toRGB(inputValue));
+        
         buildEmbed();
     })
 
