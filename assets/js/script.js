@@ -174,7 +174,7 @@ const afterBuilding = () => {
 
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
-    !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'));
+    !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'), { base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/' });
     for (const block of document.querySelectorAll('.markup pre > code'))
         hljs.highlightBlock(block);
 
