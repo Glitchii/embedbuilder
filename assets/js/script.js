@@ -1472,7 +1472,7 @@ Object.defineProperty(window, 'json', {
         // Convert 'embed' to 'embeds' and delete 'embed' or validate and use 'embeds' if provided.
         const embeds = val.embed ? [val.embed] : embedObjects?.length ? embedObjects : []
         // Convert objects used as values to string and trim whitespace.
-        const content = val.content.toString().trim();
+        const content = val.content?.toString().trim();
 
         jsonObject = {
             ...(content && { content }),
