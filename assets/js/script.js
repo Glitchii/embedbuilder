@@ -1,12 +1,22 @@
-// Want to use or contribute to this? https://github.com/Glitchii/embedbuilder
-// If you find an issue, please report it, make a P.R, or use the discussion page. Thanks
+/**
+ * Discord EmbedBuilder
+ * Contribute or report issues at
+ * https://github.com/Glitchii/embedbuilder
+ */
 
-options = window.options || {};
-inIframe = window.inIframe || top !== self;
+window.options ??= {};
+window.inIframe ??= top !== self;
 mainHost = "glitchii.github.io";
-currentURL = () => new URL(inIframe ? /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g.exec(document.referrer)?.[0] || location.href : location.href);
 
-let params = currentURL().searchParams,
+Object.defineProperty(window, 'currentURL', {
+    get() {
+        // Get the current url or referrer url if in iframe
+        const urlRegex = /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g;
+        return new URL(inIframe ? urlRegex.exec(document.referrer)?.[0] || location.href : location.href);
+    }
+});
+
+let params = currentURL.searchParams,
     hasParam = param => params.get(param) !== null,
     dataSpecified = options.dataSpecified || params.get('data'),
     username = params.get('username') || options.username,
@@ -62,13 +72,16 @@ const createElement = object => {
 
 const jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
     let data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
+    let url = currentURL;
 
     if (withURL) {
-        const url = currentURL();
         url.searchParams.set('data', data);
-        if (redirect) window.top.location.href = url;
-        // Replace %3D ('=' url encoded) with '='
-        data = url.href.replace(/data=\w+(?:%3D)+/g, 'data=' + data);
+        if (redirect)
+            return window.top.location.href = url;
+
+        data = url.href
+            // Replace %3D ('=' url encoded) with '='
+            .replace(/data=\w+(?:%3D)+/g, 'data=' + data);
     }
 
     return data;
@@ -103,10 +116,8 @@ const urlOptions = ({ remove, set }) => {
     try {
         history.replaceState(null, null, url.href.replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&'));
     } catch (e) {
-        // Most likely embeded in iframe
-        console.message(`${e.name}: ${e.message}`, e);
-        // if (e.name === 'SecurityError')
-        //     window.top.location.href = href;
+        // Probably here because of a 'SecurityError' not allowing to change url because we are in an iframe
+        console.info(e);
     }
 };
 
@@ -185,65 +196,68 @@ const externalParsing = ({ noEmojis, element } = {}) => {
     afterBuilding()
 };
 
-let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"],
-    jsonKeys = ["embed", "embeds", "content", ...mainKeys],
-    // 'jsonObject' is used internally, do not change it's value. Use 'json = ...' instead.
-    jsonObject = window.json || {
-        content: "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
-        embed: {
-            title: "Hello ~~people~~ world :wave:",
-            description: "You can use [links](https://discord.com) or emojis :smile: 😎\n```\nAnd also code blocks\n```",
-            color: 0x41f097,
-            timestamp: new Date().toISOString(),
+let embedKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "title", "description", "url", "timestamp"];
+let mainKeys = ["embed", "embeds", "content"];
+let allJsonKeys = [...mainKeys, ...embedKeys];
+
+// 'jsonObject' is used internally, do not change it's value. Assign to 'json' instead.
+// 'json' is the object that is used to build the embed. Assisgning to it also updates the editor.
+let jsonObject = window.json || {
+    content: "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
+    embed: {
+        title: "Hello ~~people~~ world :wave:",
+        description: "You can use [links](https://discord.com) or emojis :smile: 😎\n```\nAnd also code blocks\n```",
+        color: 0x41f097,
+        timestamp: new Date().toISOString(),
+        url: "https://discord.com",
+        author: {
+            name: "Author name",
             url: "https://discord.com",
-            author: {
-                name: "Author name",
-                url: "https://discord.com",
-                icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+            icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+        },
+        thumbnail: {
+            url: "https://cdn.discordapp.com/embed/avatars/0.png"
+        },
+        image: {
+            url: "https://glitchii.github.io/embedbuilder/assets/media/banner.png"
+        },
+        footer: {
+            text: "Footer text",
+            icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+        },
+        fields: [
+            {
+                name: "Field 1, *lorem* **ipsum**, ~~dolor~~",
+                value: "Field value"
             },
-            thumbnail: {
-                url: "https://cdn.discordapp.com/embed/avatars/0.png"
+            {
+                name: "Field 2",
+                value: "You can use custom emojis <:Kekwlaugh:722088222766923847>. <:GangstaBlob:742256196295065661>",
+                inline: false
             },
-            image: {
-                url: "https://glitchii.github.io/embedbuilder/assets/media/banner.png"
+            {
+                name: "Inline field",
+                value: "Fields can be inline",
+                inline: true
             },
-            footer: {
-                text: "Footer text",
-                icon_url: "https://cdn.discordapp.com/embed/avatars/0.png"
+            {
+                name: "Inline field",
+                value: "*Lorem ipsum*",
+                inline: true
             },
-            fields: [
-                {
-                    name: "Field 1, *lorem* **ipsum**, ~~dolor~~",
-                    value: "Field value"
-                },
-                {
-                    name: "Field 2",
-                    value: "You can use custom emojis <:Kekwlaugh:722088222766923847>. <:GangstaBlob:742256196295065661>",
-                    inline: false
-                },
-                {
-                    name: "Inline field",
-                    value: "Fields can be inline",
-                    inline: true
-                },
-                {
-                    name: "Inline field",
-                    value: "*Lorem ipsum*",
-                    inline: true
-                },
-                {
-                    name: "Inline field",
-                    value: "value",
-                    inline: true
-                },
-                {
-                    name: "Another field",
-                    value: "> Nope, didn't forget about this",
-                    inline: false
-                }
-            ]
-        }
+            {
+                name: "Inline field",
+                value: "value",
+                inline: true
+            },
+            {
+                name: "Another field",
+                value: "> Nope, didn't forget about this",
+                inline: false
+            }
+        ]
     }
+}
 
 if (dataSpecified)
     jsonObject = base64ToJson();
@@ -282,7 +296,8 @@ addEventListener('DOMContentLoaded', () => {
 
     if (multiEmbeds) {
         document.body.classList.add('multiEmbeds');
-        if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
+        if (autoParams)
+            multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
     }
 
     if (hideEditor) {
@@ -304,7 +319,8 @@ addEventListener('DOMContentLoaded', () => {
 
     if (noUser) {
         document.body.classList.add('no-user');
-        if (autoParams) noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
+        if (autoParams)
+            noUser ? urlOptions({ set: ['nouser', ''] }) : urlOptions({ remove: 'nouser' });
     }
 
     else {
@@ -1037,7 +1053,6 @@ addEventListener('DOMContentLoaded', () => {
                     else embedImageLink.src = embedObj.image.url,
                         embedImageLink.parentElement.style.display = 'block';
 
-
                     return afterBuilding();
                 case 'embedFooterText':
                 case 'embedFooterLink':
@@ -1149,8 +1164,8 @@ addEventListener('DOMContentLoaded', () => {
             // console.log(editor.getValue(), json);
             const dataKeys = Object.keys(json);
 
-            if (dataKeys.length && !jsonKeys.some(key => dataKeys.includes(key))) {
-                const usedKeys = dataKeys.filter(key => !jsonKeys.includes(key));
+            if (dataKeys.length && !allJsonKeys.some(key => dataKeys.includes(key))) {
+                const usedKeys = dataKeys.filter(key => !allJsonKeys.includes(key));
                 if (usedKeys.length > 2)
                     return error(`'${usedKeys[0] + "', '" + usedKeys.slice(1, usedKeys.length - 1).join("', '")}', and '${usedKeys[usedKeys.length - 1]}' are invalid keys.`);
                 return error(`'${usedKeys.length == 2 ? usedKeys[0] + "' and '" + usedKeys[usedKeys.length - 1] + "' are invalid keys." : usedKeys[0] + "' is an invalid key."}`);
@@ -1204,10 +1219,10 @@ addEventListener('DOMContentLoaded', () => {
         const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
         const embed = document.querySelectorAll('.msgEmbed .container>.embed')[embedIndex];
         const embedObj = jsonObject.embeds[embedIndex] ??= {};
+        const color = el.target.closest('.color');
 
-        const clr = el.target.closest('.color');
-        embedObj.color = toRGB(clr.style.backgroundColor, false, true);
-        embed && (embed.style.borderColor = clr.style.backgroundColor);
+        embedObj.color = toRGB(color.style.backgroundColor, false, true);
+        embed && (embed.style.borderColor = color.style.backgroundColor);
         picker.source.style.removeProperty('background');
     }))
 
@@ -1389,11 +1404,11 @@ addEventListener('DOMContentLoaded', () => {
             return e.target.closest('.hex').classList.add('incorrect');
 
         e.target.closest('.hex').classList.remove('incorrect');
-        
+
         const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
         jsonObject.embeds[embedIndex].color = parseInt(inputValue, 16);
         picker.fire?.('change', toRGB(inputValue));
-        
+
         buildEmbed();
     })
 
@@ -1432,35 +1447,14 @@ addEventListener('DOMContentLoaded', () => {
     });
 });
 
-console.__proto__.message = function (title, message, collapse = true) {
-    collapse && this.groupCollapsed(title) || this.group(title);
-    this.dir(message);
-    this.groupEnd();
-}
-
+// Don't assign to 'jsonObject', assign to 'json' instead.
+// 'jsonObject' is used to store the final json object and used internally.
+// Below is the getter and setter for 'json' which formats the value properly into and out of 'jsonObject'.
 Object.defineProperty(window, 'json', {
-    // Formarts value properly into 'jsonObject'.
     configurable: true,
-    set: val => {
-        // Filter non-json keys and empty json keys.
-        const onlyJson = val.embeds?.filter(j => j.toString() === '[object Object]' && 0 in Object.keys(j));
-
-        // 'jsonObject' always uses multi-embeds even if 'multiEmbeds' option is false.
-        jsonObject = {
-            // Doesn't matter if 'val.content' is undefined.
-            content: val.content,
-            // Convert 'embed' to 'embeds' and delete 'embed' or validate and use 'embeds' if provided.
-            embeds: val.embed ? [val.embed] : onlyJson?.length ? onlyJson : [],
-            ...(delete val.embed && val)
-        };
-
-        // PS. Don't manually assign anything to 'jsonObject', assign to 'json' instead.
-
-        buildEmbed();
-        buildGui();
-    },
-
-    get: () => {
+    // Getter to format 'jsonObject' properly depending on options and other factors
+    // eg. using 'embeds' or 'embed' in output depending on 'multiEmbeds' option.
+    get() {
         const json = {};
 
         if (jsonObject.content)
@@ -1468,9 +1462,72 @@ Object.defineProperty(window, 'json', {
 
         // If 'jsonObject.embeds' array is set and has content. Empty braces ({}) will be filtered as not content.
         if (jsonObject.embeds?.length)
-            if (multiEmbeds) json.embeds = jsonObject.embeds;
-            else json.embed = jsonObject.embeds[0];
+            if (multiEmbeds) json.embeds = jsonObject.embeds.map(cleanEmbed);
+            else json.embed = cleanEmbed(jsonObject.embeds[0]);
 
         return json;
     },
+
+    // Setter for 'json' which formats the value properly into 'jsonObject'.
+    set(val) {
+        // Filter out items which are not objects and not empty objects.
+        const embedObjects = val.embeds?.filter(j => j.constructor === Object && 0 in Object.keys(j));
+        // Convert 'embed' to 'embeds' and delete 'embed' or validate and use 'embeds' if provided.
+        const embeds = val.embed ? [val.embed] : embedObjects?.length ? embedObjects : []
+        // Convert objects used as values to string and trim whitespace.
+        const content = val.content.toString().trim();
+
+        jsonObject = {
+            ...(content && { content }),
+            embeds: embeds.map(cleanEmbed),
+        };
+
+        buildEmbed();
+        buildGui();
+    },
 });
+
+// Embed property props are used to validate embed properties.
+window.embedObjectsProps ??= {
+    author: ["name", "url", "icon_url",],
+    thumbnail: ["url", "proxy_url", "height", "width",],
+    image: ["url", "proxy_url", "height", "width",],
+    fields: { items: ["name", "value", "inline",], },
+    footer: ["text", "icon_url",],
+}
+
+function cleanEmbed(obj, recursing = false) {
+    if (!recursing)
+        // Remove all invalid properties from embed object.
+        for (const key in obj)
+            if (!embedKeys.includes(key))
+                delete obj[key];
+            else if (obj[key].constructor === Object) // Value is an object. eg. 'author'
+                // Remove items that are not in the props of the current key.
+                for (const item in obj[key])
+                    !embedObjectsProps[key].includes(item) && delete obj[key][item];
+
+            else if (obj[key].constructor === Array) // Value is an array. eg. 'fields'
+                // Remove items that are not in the props of the current key.
+                for (const item of obj[key])
+                    for (const i in item)
+                        !embedObjectsProps[key].items.includes(i) && delete item[i];
+
+    // Remove empty properties from embed object.
+    for (const [key, val] of Object.entries(obj))
+        if (val === undefined || val.trim?.() === "")
+            // Remove the key if value is empty
+            delete obj[key];
+        else if (val.constructor === Object)
+            // Remove object (val) if it has no keys or recursively remove empty keys from objects.
+            (!Object.keys(val).length && delete obj[key]) || (obj[key] = cleanEmbed(val, true));
+        else if (val.constructor === Array)
+            // Remove array (val) if it has no keys or recursively remove empty keys from objects in array.
+            !val.length && delete obj[key] || (obj[key] = val.map(k => cleanEmbed(k, true)));
+        else
+            // If object isn't a string, boolean, number, array or object, convert it to string.
+            if (!['string', 'boolean', 'number'].includes(typeof val))
+                obj[key] = val.toString();
+
+    return obj;
+}
