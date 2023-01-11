@@ -80,9 +80,9 @@ const base64ToJson = data => {
 };
 
 const toRGB = (hex, reversed, integer) => {
-    if (reversed) return '#' + hex.match(/[\d]+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
-    if (integer) return parseInt(hex.match(/[\d]+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join(''), 16);
-    if (hex.includes(',')) return hex.match(/[\d]+/g);
+    if (reversed) return '#' + hex.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+    if (integer) return parseInt(hex.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join(''), 16);
+    if (hex.includes(',')) return hex.match(/\d+/g);
     hex = hex.replace('#', '').match(/.{1,2}/g)
     return [parseInt(hex[0], 16), parseInt(hex[1], 16), parseInt(hex[2], 16), 1];
 };
@@ -174,7 +174,7 @@ const afterBuilding = () => {
 
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
-    !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'));
+    !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'), { base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/' });
     for (const block of document.querySelectorAll('.markup pre > code'))
         hljs.highlightBlock(block);
 
@@ -244,8 +244,6 @@ let mainKeys = ["author", "footer", "color", "thumbnail", "image", "fields", "ti
             ]
         }
     }
-
-let multi = () => !!multiEmbeds && json?.embeds;
 
 if (dataSpecified)
     jsonObject = base64ToJson();
@@ -857,7 +855,7 @@ addEventListener('DOMContentLoaded', () => {
                     const formData = new FormData();
                     const fileInput = createElement({ 'input': { type: 'file', accept: 'image/*' } });
                     const edit = browse.closest('.edit');
-                    const expiration = 7 * 24 * 60 * 60
+                    const expiration = 7 * 24 * 60 * 60;
 
                     fileInput.onchange = el => {
                         if (el.target.files[0].size > 32 * 1024 * 1024)
@@ -866,7 +864,7 @@ addEventListener('DOMContentLoaded', () => {
                         formData.append("expiration", expiration); // Expire after 7 days. Discord caches files.
                         formData.append("key", options.uploadKey || "93385e22b0619db73a5525140b13491c"); // Add your own key through the uploadKey option.
                         formData.append("image", el.target.files[0]);
-                        // formData.append("name", ""); // Uses filename if not specified.
+                        // formData.append("name", ""); // Uses original file name if no "name" is not specified.Clear-Host
 
                         browse.classList.add('loading');
 
@@ -1197,7 +1195,6 @@ addEventListener('DOMContentLoaded', () => {
         const embedIndex = multiEmbeds && lastActiveGuiEmbedIndex !== -1 ? lastActiveGuiEmbedIndex : 0;
         if (jsonObject?.embeds[embedIndex]?.color) {
             hexInput.value = jsonObject.embeds[embedIndex].color.toString(16).padStart(6, '0');
-            console.log(hexInput)
             document.querySelector('.hex.incorrect')?.classList.remove('incorrect');
         }
         colors.classList.add('picking')
