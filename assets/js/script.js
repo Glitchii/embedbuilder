@@ -1,5 +1,5 @@
 /**
- * Discord EmbedBuilder
+ * Discord Embed Builder
  * Contribute or report issues at
  * https://github.com/Glitchii/embedbuilder
  */
@@ -116,7 +116,8 @@ const urlOptions = ({ remove, set }) => {
     try {
         history.replaceState(null, null, url.href.replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&'));
     } catch (e) {
-        // Probably here because of a 'SecurityError' not allowing to change url because we are in an iframe
+        // 'SecurityError' when trying to change the url of a different origin
+        // e.g. when trying to change the url of the parent window from an iframe
         console.info(e);
     }
 };
@@ -179,10 +180,7 @@ const changeLastActiveGuiEmbed = index => {
 }
 
 // Called after building embed for extra work.
-const afterBuilding = () => {
-    autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] });
-}
-
+const afterBuilding = () => autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] });
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
     !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'), { base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/' });
@@ -1161,7 +1159,6 @@ addEventListener('DOMContentLoaded', () => {
             }
 
             json = JSON.parse(editor.getValue());
-            // console.log(editor.getValue(), json);
             const dataKeys = Object.keys(json);
 
             if (dataKeys.length && !allJsonKeys.some(key => dataKeys.includes(key))) {
@@ -1487,7 +1484,7 @@ Object.defineProperty(window, 'json', {
     },
 });
 
-// Embed property props are used to validate embed properties.
+// Props used to validate embed properties.
 window.embedObjectsProps ??= {
     author: ["name", "url", "icon_url",],
     thumbnail: ["url", "proxy_url", "height", "width",],
