@@ -199,7 +199,7 @@ let mainKeys = ["embed", "embeds", "content"];
 let allJsonKeys = [...mainKeys, ...embedKeys];
 
 // 'jsonObject' is used internally, do not change it's value. Assign to 'json' instead.
-// 'json' is the object that is used to build the embed. Assisgning to it also updates the editor.
+// 'json' is the object that is used to build the embed. Assigning to it also updates the editor.
 let jsonObject = window.json || {
     content: "You can~~not~~ do `this`.```py\nAnd this.\nprint('Hi')```\n*italics* or _italics_     __*underline italics*__\n**bold**     __**underline bold**__\n***bold italics***  __***underline bold italics***__\n__underline__     ~~Strikethrough~~",
     embed: {
@@ -375,11 +375,11 @@ addEventListener('DOMContentLoaded', () => {
         notif.style.setProperty('--time', time);
         notif.onanimationend = () => notif.style.display = null;
 
-        // If notification element is not already visible, (no other message is already displayed), dispaly it.
+        // If notification element is not already visible, (no other message is already displayed), display it.
         if (!notif.style.display)
             return notif.style.display = 'block', false;
 
-        // If there's a message already diplayed, update it and delay animating out.
+        // If there's a message already displayed, update it and delay animating out.
         notif.style.setProperty('--startY', 0);
         notif.style.setProperty('--startOpacity', 1);
         notif.style.display = null;
@@ -482,7 +482,7 @@ addEventListener('DOMContentLoaded', () => {
                 // Figuring out if there are only two fields on a row to give them more space.
                 // e.fields = json.embeds.fields.
 
-                // if both the field of index 'i' and the next field on its right are inline and -
+                // if both the field of index 'i' and the next field on it's right are inline and -
                 if (fields[i].inline && fields[i + 1]?.inline &&
                     // it's the first field in the embed or -
                     ((i === 0 && fields[i + 2] && !fields[i + 2].inline) || ((
@@ -1145,7 +1145,7 @@ addEventListener('DOMContentLoaded', () => {
     }
 
     editor.on('change', editor => {
-        // If the editor value is not set by the user, reuturn.
+        // If the editor value is not set by the user, return.
         if (JSON.stringify(json, null, 4) === editor.getValue()) return;
 
         try {
@@ -1317,6 +1317,15 @@ addEventListener('DOMContentLoaded', () => {
             alert('Copied to clipboard.');
         }
 
+        if (e.target.closest('.item.download')) {
+    		var downloadAnchorNode = document.createElement('a');
+    		downloadAnchorNode.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 4)));
+    		downloadAnchorNode.setAttribute("download", "embed" + ".json");
+    		document.body.appendChild(downloadAnchorNode); // required for firefox
+    		downloadAnchorNode.click();
+    		downloadAnchorNode.remove();
+        }
+        
         const input = e.target.closest('.item')?.querySelector('input');
         if (input) input.checked = !input.checked;
 
