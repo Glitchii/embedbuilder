@@ -6,7 +6,7 @@
 // Options
 
 // URL options can override the options below.
-// Options set through the menu can override both.
+// Options set through the menu can override both until the page is refreshed.
 options = {
     username: 'Discord Bot',
     avatar: 'https://cdn.discordapp.com/embed/avatars/1.png',
@@ -22,7 +22,7 @@ options = {
     hideEditor: false,
     hidePreview: false,
     hideMenu: false,
-    multiEmbeds: true,
+    single: false,
     noMultiEmbedsOption: false,
     sourceOption: false, // Display link to source code in menu.
 }

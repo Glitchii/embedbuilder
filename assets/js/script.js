@@ -30,7 +30,8 @@ let params = currentURL.searchParams,
     allowPlaceholders = hasParam('placeholders') || options.allowPlaceholders,
     autoUpdateURL = localStorage.getItem('autoUpdateURL') || options.autoUpdateURL,
     noMultiEmbedsOption = localStorage.getItem('noMultiEmbedsOption') || hasParam('nomultiembedsoption') || options.noMultiEmbedsOption,
-    multiEmbeds = noMultiEmbedsOption ? options.multiEmbeds ?? true : (localStorage.getItem('multiEmbeds') || hasParam('multiembeds') || options.multiEmbeds) ?? true,
+    single = noMultiEmbedsOption ? options.single ?? true : (localStorage.getItem('single') || hasParam('single') || options.single) ?? false,
+    multiEmbeds = !single,
     autoParams = localStorage.getItem('autoParams') || hasParam('autoparams') || options.autoParams,
     hideEditor = localStorage.getItem('hideeditor') || hasParam('hideeditor') || options.hideEditor,
     hidePreview = localStorage.getItem('hidepreview') || hasParam('hidepreview') || options.hidePreview,
@@ -110,9 +111,10 @@ const reverse = (reversed, callback) => {
 };
 
 const urlOptions = ({ remove, set }) => {
-    const url = currentURL();
+    const url = currentURL;
     if (remove) url.searchParams.delete(remove);
     if (set) url.searchParams.set(set[0], set[1]);
+    
     try {
         history.replaceState(null, null, url.href.replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&'));
     } catch (e) {
@@ -292,10 +294,10 @@ addEventListener('DOMContentLoaded', () => {
         document.querySelector('.item.auto > input').checked = true;
     }
 
-    if (multiEmbeds) {
-        document.body.classList.add('multiEmbeds');
+    if (single) {
+        document.body.classList.add('single');
         if (autoParams)
-            multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
+            single ? urlOptions({ set: ['single', ''] }) : urlOptions({ remove: 'single' });
     }
 
     if (hideEditor) {
@@ -878,7 +880,7 @@ addEventListener('DOMContentLoaded', () => {
                         formData.append("expiration", expiration); // Expire after 7 days. Discord caches files.
                         formData.append("key", options.uploadKey || "93385e22b0619db73a5525140b13491c"); // Add your own key through the uploadKey option.
                         formData.append("image", el.target.files[0]);
-                        // formData.append("name", ""); // Uses original file name if no "name" is not specified.Clear-Host
+                        // formData.append("name", ""); // Uses original file name if no "name" is not specified.
 
                         browse.classList.add('loading');
 
@@ -1314,18 +1316,12 @@ addEventListener('DOMContentLoaded', () => {
                 document.body.removeChild(input);
             }
 
-            alert('Copied to clipboard.');
+            return alert('Copied to clipboard.');
         }
 
-        if (e.target.closest('.item.download')) {
-    		var downloadAnchorNode = document.createElement('a');
-    		downloadAnchorNode.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 4)));
-    		downloadAnchorNode.setAttribute("download", "embed" + ".json");
-    		document.body.appendChild(downloadAnchorNode); // required for firefox
-    		downloadAnchorNode.click();
-    		downloadAnchorNode.remove();
-        }
-        
+        if (e.target.closest('.item.download'))
+            return createElement({ a: { download: 'embed' + '.json', href: 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(json, null, 4)) } }).click();
+
         const input = e.target.closest('.item')?.querySelector('input');
         if (input) input.checked = !input.checked;
 
@@ -1359,10 +1355,10 @@ addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem(`hide${win}`, true);
             }
         } else if (e.target.closest('.item.multi') && !noMultiEmbedsOption) {
-            multiEmbeds = document.body.classList.toggle('multiEmbeds');
+            multiEmbeds = !document.body.classList.toggle('single');
             activeFields = document.querySelectorAll('.gui > .item.active');
 
-            if (autoParams) multiEmbeds ? urlOptions({ set: ['multiembeds', ''] }) : urlOptions({ remove: 'multiembeds' });
+            if (autoParams) !multiEmbeds ? urlOptions({ set: ['single', ''] }) : urlOptions({ remove: 'single' });
             if (multiEmbeds) localStorage.setItem('multiEmbeds', true);
             else {
                 localStorage.removeItem('multiEmbeds');

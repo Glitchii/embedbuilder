@@ -2235,7 +2235,7 @@ body {
 
 body.autoUpdateURL .top-btn.menu>.box .item.auto>.icon::after,
 body.no-user .top-btn.menu>.box .item.noUser>.icon::after,
-body.multiEmbeds .top-btn.menu>.box .item.multi>.icon::after,
+body:not(.single) .top-btn.menu>.box .item.multi>.icon::after,
 body.reversed .top-btn.menu>.box .item.reverse>.icon::after {
     display: block;
 }
@@ -2854,9 +2854,9 @@ body.toHook .done .channels .selectOptions .hook {
     transform: scale(.7) translate(-40px, -15.5px);
 }
 
-body.multiEmbeds .top>.gui .item.guiEmbedName:not(.active)+.guiEmbed,
-body:not(.multiEmbeds) .guiEmbedAdd,
-body:not(.multiEmbeds) .top>.gui .item.guiEmbedName {
+body:not(.single) .top>.gui .item.guiEmbedName:not(.active)+.guiEmbed,
+body.single .guiEmbedAdd,
+body.single .top>.gui .item.guiEmbedName {
     display: none;
 }
 

@@ -44,10 +44,11 @@ placeholders=errors     This also disables automatic insertion of 'http' for url
 hideditor               Hides the editor.
 hidepreview             Hides the preview.
 hidemenu                Hides the three dotted menu.
-multiembeds             Use multi-embeds.
+single                  Use only a single embed instead of the default multi-embeds. JSON structure will be different too.
+                        When 'nomultiembedsoption' is set, this option is ignored and default builder config is used.
 nomultiembedsoption     Remove multi-embeds option from the menu.
-                        Together with the 'multiembeds' option, this allows
-                        the developer to force the user to either use only multi-embeds or not.
+                        Together with the 'single' option, this allows
+                        the developer to force the user to either use only a single or multi-embeds.
 sourceOption            Display link to source code in menu. (Off by deafult unless enabled or top domain host is glitchii.github.io)
 ```
 <small>Case matters, all parameters should be lowercase.</small>
