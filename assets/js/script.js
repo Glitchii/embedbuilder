@@ -8,15 +8,7 @@ window.options ??= {};
 window.inIframe ??= top !== self;
 mainHost = "glitchii.github.io";
 
-Object.defineProperty(window, 'currentURL', {
-    get() {
-        // Get the current url or referrer url if in iframe
-        const urlRegex = /(https?:\/\/(?:[\d\w]+\.)?[\d\w\.]+(?::\d+)?)/g;
-        return new URL(inIframe ? urlRegex.exec(document.referrer)?.[0] || location.href : location.href);
-    }
-});
-
-let params = currentURL.searchParams,
+let params = new URLSearchParams(location.search),
     hasParam = param => params.get(param) !== null,
     dataSpecified = options.dataSpecified || params.get('data'),
     username = params.get('username') || options.username,
@@ -72,13 +64,13 @@ const createElement = object => {
 }
 
 const jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
-    let data = btoa(escape((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
-    let url = currentURL;
+    let data = btoa(encodeURIComponent((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
+    let url = new URL(location.href);
 
     if (withURL) {
         url.searchParams.set('data', data);
         if (redirect)
-            return window.top.location.href = url;
+            return top.location.href = url;
 
         data = url.href
             // Replace %3D ('=' url encoded) with '='
@@ -89,7 +81,7 @@ const jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
 };
 
 const base64ToJson = data => {
-    const jsonData = unescape(atob(data || dataSpecified));
+    const jsonData = decodeURIComponent(atob(data || dataSpecified));
     return typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 };
 
@@ -111,7 +103,7 @@ const reverse = (reversed, callback) => {
 };
 
 const urlOptions = ({ remove, set }) => {
-    const url = currentURL;
+    const url = new URL(location.href);
     if (remove) url.searchParams.delete(remove);
     if (set) url.searchParams.set(set[0], set[1]);
     
