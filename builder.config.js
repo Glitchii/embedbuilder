@@ -12,7 +12,7 @@ options = {
     avatar: 'https://cdn.discordapp.com/embed/avatars/1.png',
     verified: false,
     noUser: false,
-    dataSpecified: false,
+    data: null,
     guiTabs: ['author', 'description'],
     useJsonEditor: false,
     reverseColumns: false,

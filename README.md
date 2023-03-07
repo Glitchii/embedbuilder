@@ -50,6 +50,7 @@ nomultiembedsoption     Remove multi-embeds option from the menu.
                         Together with the 'single' option, this allows
                         the developer to force the user to either use only a single or multi-embeds.
 sourceOption            Display link to source code in menu. (Off by deafult unless enabled or top domain host is glitchii.github.io)
+data=                   URL + Base64 encoded string of json data to be used on the embed instead of the default. 
 ```
 <small>Case matters, all parameters should be lowercase.</small>
 ### Example URL with all* the above parameters:

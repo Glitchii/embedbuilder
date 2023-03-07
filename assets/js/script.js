@@ -10,7 +10,7 @@ mainHost = "glitchii.github.io";
 
 let params = new URLSearchParams(location.search),
     hasParam = param => params.get(param) !== null,
-    dataSpecified = options.dataSpecified || params.get('data'),
+    dataSpecified = options.data || params.get('data'),
     username = params.get('username') || options.username,
     avatar = params.get('avatar') || options.avatar,
     guiTabs = params.get('guitabs') || options.guiTabs,
@@ -63,7 +63,7 @@ const createElement = object => {
     return element;
 }
 
-const jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
+const encodeJson = (jsonCode, withURL = false, redirect = false) => {
     let data = btoa(encodeURIComponent((JSON.stringify(typeof jsonCode === 'object' ? jsonCode : json))));
     let url = new URL(location.href);
 
@@ -80,10 +80,15 @@ const jsonToBase64 = (jsonCode, withURL = false, redirect = false) => {
     return data;
 };
 
-const base64ToJson = data => {
+const decodeJson = data => {
     const jsonData = decodeURIComponent(atob(data || dataSpecified));
     return typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 };
+
+// IMPORTANT: jsonToBase64 and base64ToJson are subject to removal in the future.
+// Use encodeJson and decodeJson instead (they are aliases)
+let jsonToBase64 = encodeJson, base64ToJson = decodeJson;
+
 
 const toRGB = (hex, reversed, integer) => {
     if (reversed) return '#' + hex.match(/\d+/g).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
@@ -174,7 +179,7 @@ const changeLastActiveGuiEmbed = index => {
 }
 
 // Called after building embed for extra work.
-const afterBuilding = () => autoUpdateURL && urlOptions({ set: ['data', jsonToBase64(json)] });
+const afterBuilding = () => autoUpdateURL && urlOptions({ set: ['data', encodeJson(json)] });
 // Parses emojis to images and adds code highlighting.
 const externalParsing = ({ noEmojis, element } = {}) => {
     !noEmojis && twemoji.parse(element || document.querySelector('.msgEmbed'), { base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/' });
@@ -252,7 +257,7 @@ let jsonObject = window.json || {
 }
 
 if (dataSpecified)
-    jsonObject = base64ToJson();
+    jsonObject = decodeJson();
 
 if (allowPlaceholders)
     allowPlaceholders = params.get('placeholders') === 'errors' ? 1 : 2;
@@ -1290,7 +1295,7 @@ addEventListener('DOMContentLoaded', () => {
 
     document.querySelector('.top-btn.menu')?.addEventListener('click', e => {
         if (e.target.closest('.item.dataLink')) {
-            const data = jsonToBase64(json, true).replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&');
+            const data = encodeJson(json, true).replace(/(?<!data=[^=]+|=)=(&|$)/g, x => x === '=' ? '' : '&');
             if (!window.chrome)
                 // With long text inside a 'prompt' on Chromium based browsers, some text will be trimmed off and replaced with '...'.
                 return prompt('Here\'s the current URL with base64 embed data:', data);
@@ -1321,7 +1326,7 @@ addEventListener('DOMContentLoaded', () => {
             autoUpdateURL = document.body.classList.toggle('autoUpdateURL');
             if (autoUpdateURL) localStorage.setItem('autoUpdateURL', true);
             else localStorage.removeItem('autoUpdateURL');
-            urlOptions({ set: ['data', jsonToBase64(json)] });
+            urlOptions({ set: ['data', encodeJson(json)] });
         } else if (e.target.closest('.item.reverse')) {
             reverse(reverseColumns);
             reverseColumns = !reverseColumns;
