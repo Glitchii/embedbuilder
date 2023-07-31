@@ -85,8 +85,8 @@ const decodeJson = data => {
     return typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 };
 
-// IMPORTANT: jsonToBase64 and base64ToJson are subject to removal in the future.
-// Use encodeJson and decodeJson instead (they are aliases)
+// IMPORTANT: jsonToBase64 and base64ToJson are subject to removal.
+// Use encodeJson and decodeJson instead, they are aliases.
 let jsonToBase64 = encodeJson, base64ToJson = decodeJson;
 
 
@@ -949,18 +949,18 @@ addEventListener('DOMContentLoaded', () => {
                     e.classList.add('active');
 
         else if (opts?.guiTabs) {
-            const tabs = opts.guiTabs.split?.(/, */) || opts.guiTabs;
+            const tabs = (opts.guiTabs.split?.(/, */) || opts.guiTabs).filter(item => item);
             const bottomKeys = ['footer', 'image'];
             const topKeys = ['author', 'content'];
-
 
             // Deactivate the default activated GUI fields
             for (const e of gui.querySelectorAll('.item:not(.guiEmbedName).active'))
                 e.classList.remove('active');
 
             // Activate wanted GUI fields
-            for (const e of document.querySelectorAll(`.${tabs.join(', .')}`))
-                e.classList.add('active');
+            if (tabs.length)
+                for (const e of document.querySelectorAll(`.${tabs.join(', .')}`))
+                    e.classList.add('active');
 
             // Autoscroll GUI to the bottom if necessary.
             if (!tabs.some(item => topKeys.includes(item)) && tabs.some(item => bottomKeys.includes(item))) {
