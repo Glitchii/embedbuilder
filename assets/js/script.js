@@ -451,6 +451,9 @@ addEventListener('DOMContentLoaded', () => {
                 else return `<span class="mention interactive">@${match.includes('&#38;') ? 'role' : 'user'}</span>`
             })
 
+            // parse text in brackets and then the URL in parentheses.
+            .replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`)
+    
         if (inlineBlock)
             // Treat both inline code and code blocks as inline code
             txt = txt.replace(/`([^`]+?)`|``([^`]+?)``|```((?:\n|.)+?)```/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m);
@@ -463,10 +466,6 @@ addEventListener('DOMContentLoaded', () => {
             // Inline code
             txt = txt.replace(/`([^`]+?)`|``([^`]+?)``/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m)
         }
-
-        // URL parse
-        txt = txt.replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`);
-
         return txt;
     }
 
