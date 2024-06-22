@@ -2936,3 +2936,9 @@ body.single .top>.gui .item.guiEmbedName {
     font-size: 16px;
     font-weight: bold;
 }
+
+.timestamp {
+    background-color: #4e50587a;
+    padding: 0px 2px 0px 2px;
+    border-radius: 4px;
+}
