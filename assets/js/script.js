@@ -424,11 +424,31 @@ addEventListener('DOMContentLoaded', () => {
 
         return true;
     }
+    const formatTimestamp = (time, format) => {
+        const date = new Date(time * 1000);
+        switch (format) {
+            case 't':
+                return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            case 'T':
+                return date.toLocaleTimeString('en-US');
+            case 'd':
+                return date.toLocaleDateString('en-US');
+            case 'D':
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            case 'f':
+                return date.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            case 'F':
+                return date.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            case 'R':
+                return `${date.getTime() > Date.now() ? 'in ' : ''}${ms(Date.now() - date.getTime(), { long: true })}${Date.now() > date.getTime() ? ' ago' : ''}`;
+            default:
+                return date.toLocaleString();
+        }
+    };
 
     const markup = (txt, { replaceEmojis, inlineBlock, inEmbed }) => {
         if (replaceEmojis)
             txt = txt.replace(/(?<!code(?: \w+=".+")?>[^>]+)(?<!\/[^\s"]+?):((?!\/)\w+):/g, (match, p) => p && emojis[p] ? emojis[p] : match);
-
         txt = txt
             /** Markdown */
             .replace(/&#60;:\w+:(\d{17,19})&#62;/g, '<img class="emoji" src="https://cdn.discordapp.com/emojis/$1.png"/>')
@@ -457,6 +477,8 @@ addEventListener('DOMContentLoaded', () => {
 
             // parse text in brackets and then the URL in parentheses.
             .replace(/\[([^\[\]]+)\]\((.+?)\)/g, `<a title="$1" target="_blank" class="anchor" href="$2">$1</a>`)
+            // Timestamps
+            .replace(/&#60;t:(\d+):([tTdDfFR])&#62;/g, (match, time, format) => `<span class="timestamp">${formatTimestamp(time, format)}</span>`);
     
         if (inlineBlock)
             // Treat both inline code and code blocks as inline code

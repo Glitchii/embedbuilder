@@ -28,6 +28,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/foldgutter.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/fold/foldcode.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/json-lint.min.js"></script>
+        <script>
+            /* https://cdn.jsdelivr.net/npm/ms@2.1.3/index.min.js */
+            var s=1e3,m=60*s,h=60*m,d=24*h,w=7*d,y=365.25*d;function parse(e){if(!((e=String(e)).length>100)){var r=/^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(e);if(r){var a=parseFloat(r[1]);switch((r[2]||"ms").toLowerCase()){case"years":case"year":case"yrs":case"yr":case"y":return a*y;case"weeks":case"week":case"w":return a*w;case"days":case"day":case"d":return a*d;case"hours":case"hour":case"hrs":case"hr":return a*h;case"minutes":case"minute":case"mins":case"min":return a*m;case"seconds":case"second":case"secs":case"sec":case"s":return a*s;case"milliseconds":case"millisecond":case"msecs":case"msec":case"ms":return a;default:return}}}}function fmtShort(e){var r=Math.abs(e);return r>=d?Math.round(e/d)+"d":r>=h?Math.round(e/h)+"h":r>=m?Math.round(e/m)+"m":r>=s?Math.round(e/s)+"s":e+"ms"}function fmtLong(e){var r=Math.abs(e);return r>=d?plural(e,r,d,"day"):r>=h?plural(e,r,h,"hour"):r>=m?plural(e,r,m,"minute"):r>=s?plural(e,r,s,"second"):e+" ms"}function plural(s,e,r,a){var n=e>=1.5*r;return Math.round(s/r)+" "+a+(n?"s":"")}window.ms=function(s,e){e=e||{};var r=typeof s;if("string"===r&&s.length>0)return parse(s);if("number"===r&&isFinite(s))return e.long?fmtLong(s):fmtShort(s);throw new Error("val is not a non-empty string or a valid number. val="+JSON.stringify(s))};
+          </script>
         <script src="https://unpkg.com/jsonlint@1.6.3/web/jsonlint.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/addon/lint/lint.min.js"></script>
