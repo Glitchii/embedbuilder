@@ -439,10 +439,6 @@ addEventListener('DOMContentLoaded', () => {
             .replace(/__(.+?)__/g, '<u>$1</u>')
             .replace(/\*(.+?)\*/g, '<em>$1</em>')
             .replace(/_(.+?)_/g, '<em>$1</em>')
-            //headings
-            .replace(/^# (.*)$/gm, '<h1 class="heading1">$1</h1>')
-            .replace(/^## (.*)$/gm, '<h2 class="heading2">$1</h2>')
-            .replace(/^### (.*)$/gm, '<h3 class="heading3">$1</h3>')
             // Replace >>> and > with block-quotes. &#62; is HTML code for >
             .replace(/^(?: *&#62;&#62;&#62; ([\s\S]*))|(?:^ *&#62;(?!&#62;&#62;) +.+\n)+(?:^ *&#62;(?!&#62;&#62;) .+\n?)+|^(?: *&#62;(?!&#62;&#62;) ([^\n]*))(\n?)/mg, (all, match1, match2, newLine) => {
                 return `<div class="blockquote"><div class="blockquoteDivider"></div><blockquote>${match1 || match2 || newLine ? match1 || match2 : all.replace(/^ *&#62; /gm, '')}</blockquote></div>`;
@@ -474,6 +470,10 @@ addEventListener('DOMContentLoaded', () => {
             // Inline code
             txt = txt.replace(/`([^`]+?)`|``([^`]+?)``/g, (m, x, y, z) => x ? `<code class="inline">${x}</code>` : y ? `<code class="inline">${y}</code>` : z ? `<code class="inline">${z}</code>` : m)
         }
+
+        txt = txt.replace(/^# (.*)$/gm, '<h1 class="heading1">$1</h1>')
+            .replace(/^## (.*)$/gm, '<h2 class="heading2">$1</h2>')
+            .replace(/^### (.*)$/gm, '<h3 class="heading3">$1</h3>')
         return txt;
     }
 
